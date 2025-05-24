@@ -1,0 +1,39 @@
+; Definition file for Kung Fu Man
+; Contains all the filenames needed for the character
+
+; Player information
+[Info]
+name = "Ryu"		   ;Name of character
+displayname = "Ryu"	   ;Name of character to display
+versiondate = 07,27,2013    ;Version date of character (MM-DD-YYYY or X.XX)
+mugenversion = 1.1          ;Version of M.U.G.E.N character works on (X.XX)
+author = "John"        ;Character author name
+pal.defaults = 1,2	;Default palettes in order of preference
+localcoord = 320,240        ;Local coordinate space width and height
+
+; Files for the player
+[Files]
+cmd     = common/commands.cmd           ;Command set
+cns     = common/constants.cns           ;Constants
+st      = common/constants.cns           ;States
+stcommon = common1.cns      ;Common states (from data/or motif)
+sprite  = common/sprites.sff           ;Sprite
+anim    = common/animations.air           ;Animation
+sound   = common/sounds.snd           ;Sound
+
+;--------------------
+;[Palettes] ;(can have up to 12)
+;--------------------
+;Palettes
+pal1	 = palettes/ryu1.act	;SFA Palette 1   
+pal2	 = palettes/ryu2.act	;SFA Palette 2 
+;--------------------
+[Palette Keymap] ;(Maps character selection buttons to palette numbers)
+;--------------------
+;Palette Keymap
+x = 1 ;Press button X to select palette 1, etc.
+y = 1
+z = 1
+a = 2
+b = 2
+c = 2
