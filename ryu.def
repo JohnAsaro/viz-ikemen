@@ -30,15 +30,18 @@ st2	 = state/custom.cns	;Custom states
 ;[Palettes] (can have up to 12)
 ;--------------------
 ; Palettes
-pal1	 = palettes/ryu1.act	;SFA Palette 1   
-pal2	 = palettes/ryu2.act	;SFA Palette 2 
+;pal1	 = palette/ryu1.act	
+;pal2	 = palette/ryu2.act	
+;pal3	 = palette/ryu3.act 	
+;pal4	 = palette/ryu4.act 	
+;pal5	 = palette/ryu5.act 	
+;pal6	 = palette/ryu6.act	
 ;--------------------
-[Palette Keymap] ;(Maps character selection buttons to palette numbers)
-;--------------------
-;Palette Keymap
-x = 1 ;Press button X to select palette 1, etc.
-y = 1
+[Palette Keymap]
+x = 1
+y = 2
 z = 1
 a = 2
-b = 2
+b = 1
 c = 2
+
