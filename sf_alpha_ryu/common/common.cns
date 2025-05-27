@@ -542,17 +542,14 @@ time = 30
 type = VelSet
 trigger1 = Time = 0
 x = 0
-z = -7
 
 [State 110, 4]
 type = VelMul
 trigger1 = 1
-z = 0.8
 
 [State 110, 5]
 type = VelSet
 trigger1 = AnimTime = -8
-z = 0
 
 [State 110, 7]
 type = CtrlSet
@@ -590,17 +587,14 @@ time = 30
 type = VelSet
 trigger1 = Time = 0
 x = 0
-z = 7
 
 [State 115, 4]
 type = VelMul
 trigger1 = 1
-z = 0.8
 
 [State 115, 5]
 type = VelSet
 trigger1 = AnimTime = -8
-z = 0
 
 [State 115, 7]
 type = CtrlSet
@@ -1023,7 +1017,7 @@ type = StateTypeSet
 trigger1 = Time = 0
 trigger1 = GetHitVar(yvel) != 0 && GetHitVar(fall)
 trigger2 = Pos Y != 0
-type = a
+statetype = A
 
 [State 5000, 6]
 type = ChangeState

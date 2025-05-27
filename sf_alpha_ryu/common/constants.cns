@@ -14,7 +14,6 @@ airjuggle = 20
 sparkno = 0
 guard.sparkno = 40
 KO.echo = 0
-volume = 0
 
 [Size]
 xscale = 1
@@ -23,9 +22,7 @@ ground.back = 15
 ground.front = 17
 air.back = 13
 air.front = 13
-z.width = 3
 height = 60
-attack.width = 4,4
 attack.dist = 160
 proj.attack.dist = 90
 proj.doscale = 0
@@ -43,8 +40,8 @@ jump.fwd = 3.4
 runjump.back = -2.55,-8.1
 runjump.fwd = 4,-8.1
 airjump.neu = 0,-8.1
-airjump.back = -2.55,-8.1
-airjump.fwd = 2.5,-8.1
+airjump.back = -2.55
+airjump.fwd = 2.5
 
 [Movement]
 airjump.num = 0
