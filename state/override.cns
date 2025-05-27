@@ -1,0 +1,230 @@
+;===========================================================================
+; Var Sets
+;---------------------------------------------------------------------------
+; Var(0) = Randomizer
+; Var(1) = Dizzy counter
+; Var(2) = Recover from Dizzy counter
+; Var(20)= Flash
+============================================================================
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+;-----Super Explode Finish-----
+[State -2, KOExplode]
+type = Explod
+triggerall = MoveHit
+triggerall = WinKO = 1
+triggerall = NumExplod(4400) = 0
+trigger1 = HitDefAttr = SA, HA
+trigger2 = StateNo = 3805
+pos = 0,0
+postype = left
+bindtime = -1
+anim = 4400
+id = 4400
+sprpriority = -5
+time = 50
+ignorehitpause = 1
+scale = .85, 1.10
+ownpal = 1
+
+[State -2, KOExplode]
+type = Explod
+triggerall = ProjHit = 1
+triggerall = WinKO = 1
+triggerall = NumExplod(4400) = 0
+trigger1 = HitDefAttr = SA, HP
+trigger2 = NumProjid(1440) > 0
+pos = 0,0
+postype = left
+bindtime = -1
+anim = 4400
+id = 4400
+sprpriority = -5
+time = 50
+ignorehitpause = 1
+scale = .85, 1.10
+ownpal = 1
+
+[State -2, KOSound]
+type = PlaySnd
+triggerall = WinKO = 1
+triggerall = NumExplod(4400) = 1
+trigger1 = Var(20) = 0
+value = 20,1
+ignorehitpause = 1
+channel = 1
+
+[State -2, 1]
+type = VarAdd
+triggerall = WinKO = 1
+triggerall = NumExplod(4400) = 1
+trigger1 = TimeMod = 1,0
+ignorehitpause = 1
+v = 20
+value = 10
+
+[State -2, 2]
+type = VarSet
+triggerall = WinKO = 1
+triggerall = NumExplod(4400) = 1
+trigger1 = Var(20) >= 200
+ignorehitpause = 1
+v = 20
+value = -1
+
+[State -2,3]
+type = Envcolor
+triggerall = WinKO = 1
+trigger1 = NumExplod(4400) = 1
+value = var(20),var(20),var(20)
+ignorehitpause = 1
+under = 1
+
+[State -2,4]
+type = AssertSpecial
+triggerall = WinKO = 1
+trigger1 = NumExplod(4400) = 1
+ignorehitpause = 1
+flag = NoMusic
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+[Statedef -3]
+
+;-----Display-----
+[State -3, Variables]
+type = DisplayToClipboard
+trigger1 = StateNo != 5300
+text = "Random:%d  Dizzy:%d/200"
+params = Var(0), Var(1)
+;-----------------
+
+;-----RemoveExplod-----
+[State -1, RemoveExplod]
+type = RemoveExplod
+trigger1 = Stateno != 3200
+trigger1 = Stateno != 3210
+trigger1 = Stateno != 3220
+id = 1330
+;-----------------------
+
+;-----Dizzy Counter-----
+[State -3, VarRandom]
+type = VarRandom
+trigger1 = stateno = 5000
+trigger2 = stateno = 5010
+trigger3 = stateno = 5020
+trigger4 = stateno = 5070
+trigger5 = stateno = 5080
+v = 0
+range = 0,100
+
+[State -3, VarAdd]
+type = VarAdd
+trigger1 = stateno = 5000
+trigger2 = stateno = 5010
+trigger3 = stateno = 5020
+trigger4 = stateno = 5070
+v = 1
+value = 1
+
+[State -3, VarAdd]
+type = VarAdd
+trigger1 = TimeMod = 10,0
+v = 1
+value = -1
+
+[State -3, VarSet]
+type = VarSet
+trigger1 = Var(1) <= 0
+v = 1
+value = 0
+
+[State -3, VarSet]
+type = VarSet
+trigger1 = Var(1) >= 200
+v = 1
+value = 200
+
+[State -3, VarSet]
+type = VarSet
+trigger1 = StateNo != 5300
+v = 2
+value = 0
+
+[State -3, ChangeState]
+type = ChangeState
+triggerall = Alive
+triggerall = HitShakeOver
+triggerall = Var(1) >= 200
+trigger1 = stateno = 5000
+trigger2 = stateno = 5010
+trigger3 = stateno = 5020
+trigger4 = stateno = 5070
+value = 5290
+;-----------------------
+
+;-----Hit Sounds-----
+[State -3, Hit1]
+type = PlaySnd
+triggerall = Alive
+triggerall = Time = 0
+triggerall = Var(0) = [0,50]
+trigger1 = Stateno = 5000
+trigger2 = Stateno = 5010
+value = 5000, 0
+
+[State -3, Hit2]
+type = PlaySnd
+triggerall = Alive
+triggerall = Time = 0
+triggerall = Var(0) = [50,100]
+trigger1 = stateno = 5020
+trigger2 = stateno = 5030
+trigger3 = stateno = 5050
+trigger4 = stateno = 5070
+trigger5 = stateno = 5080
+value = 5000, 1
+;-------------------
+
+;This controller plays a sound everytime the player lands.
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = StateNo = 52 ;Jump land
+trigger2 = StateNo = 102 ;Hop Forward land
+trigger3 = StateNo = 107 ;Hop Back land
+trigger4 = StateNo = 702 ;Hop Kick land
+trigger5 = StateNo = 1030 ;Shoryuken land
+trigger6 = StateNo = 3040 ;Shin Shoryuken land
+value = 0, 0
+
+;-----Ryu KOed-----
+[State -3, Ryu_KOed]
+Type = PlaySnd
+triggerall = PalNo < 7
+triggerall = Life = 0
+trigger1 = StateNo = 5050
+trigger1 = Time = 1
+value = 11, 1
+channel = 0
+
+[State -3, EvilRyu_KOed]
+Type = PlaySnd
+triggerall = PalNo > 6
+triggerall = Life = 0
+trigger1 = StateNo = 5050
+trigger1 = Time = 1
+value = 11, 2
+channel = 0
+;---------------
+
+
