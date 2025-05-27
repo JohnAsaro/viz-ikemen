@@ -1,4 +1,4 @@
-; Ryu's Command File.
+; CPU Command File.
 
 ;-| Super Motions |--------------------------------------------------------
 ; Shinkuu Hadoken
@@ -1773,3 +1773,47 @@ trigger1 = ctrl
 ;---------------------------------------------------------------------------
 ;===========================================================================
 
+
+;======================================================================
+;  CPU-ONLY DECISIONS  (State –1 blocks)
+;  -------------------------------------------------
+;  Place AFTER the last human-input State –1 block.
+;  These are evaluated only when var(59) > 0 (AI on).
+;======================================================================
+
+;--------------------------------------------------
+; 1)  Anti-air Shoryuken
+;--------------------------------------------------
+[State -1, CPU Shoryu AA]
+type       = ChangeState
+value      = 130                 ; your DP state number
+triggerall = var(59) > 0         ; CPU only
+triggerall = Ctrl                ; must have control
+triggerall = Power >= 1000       ; has meter (optional)
+trigger1   = P2MoveType = A      ; opponent attacking
+trigger1   = P2StateType = A     ; …and airborne
+trigger1   = P2BodyDist X < 45
+trigger1   = Random < (40 + 5*AILevel)   ; harder levels react more
+
+;--------------------------------------------------
+; 2)  Zoning Hadouken
+;--------------------------------------------------
+[State -1, CPU Hadouken]
+type       = ChangeState
+value      = 120                 ; fireball state
+triggerall = var(59) > 0
+triggerall = Ctrl
+triggerall = StateType = S       ; standing
+trigger1   = P2BodyDist X > 120
+trigger1   = Random < (10 + 8*AILevel)
+
+;--------------------------------------------------
+; 3)  Default walk-forward (fallback)
+;--------------------------------------------------
+[State -1, CPU WalkFwd]
+type       = ChangeState
+value      = 20                  ; walk-forward state
+triggerall = var(59) > 0
+trigger1   = 1                   ; always true (last in list)
+
+;===============  end of CPU blocks  =================

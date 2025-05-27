@@ -1,25 +1,30 @@
 ;==============================================================================
-;  RYU – AI core
-;  Anything here is completely engine-agnostic (works in Win, 1.0, 1.1, Ikemen)
+;  RYU – AI core  (extra -3 / -2 blocks)
 ;==============================================================================
 
-;-------------------------------------------------
-; 1) Detect when the CPU is in control (-3 state)
-;-------------------------------------------------
+;------------------------------------------------------------------
+;  -3  : executes every tick (not while in someone else’s custom)
+;------------------------------------------------------------------
+[Statedef -3]
+
 [State -3, AI flag]
 type      = VarSet
 trigger1  = 1
-var(59)   = AILevel    ; 0 = human, 1-8 = CPU     
+var(59)   = AILevel        ; 0 = human, 1-8 = CPU difficulty
 
-;-------------------------------------------------
-; 2) Reflexes that must run even while in hit-stun
-;    (example: auto-guard on easier levels)
-;-------------------------------------------------
-[State -2, Auto-guard]
+
+;------------------------------------------------------------------
+;  -2  : executes every tick *even in hit-stun / custom states*
+;------------------------------------------------------------------
+[Statedef -2]
+
+; Auto-guard on lower levels
+[State -2, AutoGuard]
 type       = ChangeState
-value      = 1200                ; Ryu’s guard state number
+value      = 120                 ; common guard-start state
 triggerall = var(59) > 0         ; CPU only
-triggerall = Ctrl                ; can cancel into guard
+triggerall = Ctrl                ; must have control
 trigger1   = P2MoveType = A      ; opponent is attacking
 trigger1   = P2BodyDist X < 25
-trigger1   = Random < 20 * (9 - AILevel)
+trigger1   = Random < 20 * (9 - AILevel)   ; scales with difficulty
+ignorehitpause = 1
