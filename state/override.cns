@@ -216,15 +216,6 @@ trigger1 = StateNo = 5050
 trigger1 = Time = 1
 value = 11, 1
 channel = 0
-
-[State -3, EvilRyu_KOed]
-Type = PlaySnd
-triggerall = PalNo > 6
-triggerall = Life = 0
-trigger1 = StateNo = 5050
-trigger1 = Time = 1
-value = 11, 2
-channel = 0
 ;---------------
 
 

@@ -50,45 +50,6 @@ command = x, x, F, a, z
 time = 30
 
 ;-| Special Motions |------------------------------------------------------
-; Asura Warp Forward
-[Command]
-name = "asuraf_2p"
-command = F, D, DF, x+y
-[Command]
-name = "asuraf_2p"
-command = F, D, DF, y+z
-[Command]
-name = "asuraf_2p"
-command = F, D, DF, x+z
-[Command]
-name = "asuraf_2k"
-command = F, D, DF, a+b
-[Command]
-name = "asuraf_2k"
-command = F, D, DF, b+c
-[Command]
-name = "asuraf_2k"
-command = F, D, DF, a+c
-
-; Asura Warp Backward
-[Command]
-name = "asurab_2p"
-command = B, D, DB, x+y
-[Command]
-name = "asurab_2p"
-command = B, D, DB, y+z
-[Command]
-name = "asurab_2p"
-command = B, D, DB, x+z
-[Command]
-name = "asurab_2k"
-command = B, D, DB, a+b
-[Command]
-name = "asurab_2k"
-command = B, D, DB, b+c
-[Command]
-name = "asurab_2k"
-command = B, D, DB, a+c
 
 ; Shoryuken
 [Command]
@@ -900,87 +861,10 @@ trigger15 = stateno = 430
 trigger16 = stateno = 440
 trigger17 = stateno = 450
 
-;---------------------------------------------------------------------------
-; Shun Goku Satsu
-[State -1, shungokusatsu]
-type = ChangeState
-value = 3800
-triggerall = palno > 6
-triggerall = power >= 3000
-triggerall = command = "shungokusatsu"
-triggerall = statetype != A
-trigger1 = ctrl
-trigger2 = StateNo = 200
-trigger3 = StateNo = 230
-
-[State -1, shungokusatsu]
-type = ChangeState
-value = 3800
-triggerall = palno > 6
-triggerall = power >= 3000
-triggerall = command = "shungokusatsu"
-triggerall = statetype != A
-triggerall = movecontact
-trigger1 = ctrl
-trigger2 = stateno = 200
-trigger3 = stateno = 210
-trigger4 = stateno = 215
-trigger5 = stateno = 216
-trigger6 = stateno = 220
-trigger7 = stateno = 222
-trigger8 = stateno = 225
-trigger9 = stateno = 230
-trigger10 = stateno = 240
-trigger11 = stateno = 250
-trigger12 = stateno = 400
-trigger13 = stateno = 410
-trigger14 = stateno = 420
-trigger15 = stateno = 430
-trigger16 = stateno = 440
-trigger17 = stateno = 450
 
 ;===========================================================================
 ;---------------------------------------------------------------------------
 ; Special Moves
-;---------------------------------------------------------------------------
-; Asura Warp Forward XYZ
-[State -1, asraf_2p]
-type = ChangeState
-value = 2000
-triggerall = palno > 6
-triggerall = command = "asuraf_2p"
-triggerall = statetype != A
-trigger1 = ctrl
-
-;---------------------------------------------------------------------------
-; Asura Warp Forward ABC
-[State -1, asraf_2k]
-type = ChangeState
-value = 2010
-triggerall = palno > 6
-triggerall = command = "asuraf_2k"
-triggerall = statetype != A
-trigger1 = ctrl
-
-;---------------------------------------------------------------------------
-; Asura Warp Backward XYZ
-[State -1, asrab_2p]
-type = ChangeState
-value = 2020
-triggerall = palno > 6
-triggerall = command = "asurab_2p"
-triggerall = statetype != A
-trigger1 = ctrl
-
-;---------------------------------------------------------------------------
-; Asura Warp Backward ABC
-[State -1, asrab_2k]
-type = ChangeState
-value = 2030
-triggerall = palno > 6
-triggerall = command = "asurab_2k"
-triggerall = statetype != A
-trigger1 = ctrl
 
 ;---------------------------------------------------------------------------
 ; Light Shoryuken

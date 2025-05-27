@@ -105,53 +105,6 @@ trigger1 = Pos Y >= 0
 value = 5100 ;Hit ground
 
 ;---------------------------------------------------------------------------
-; Grabbed by Shun Goku Satsu
-[Statedef 3810]
-type    = A
-movetype= H
-physics = N
-velset = 0,0
-
-[State 3910, 0]
-type = NotHitBy
-trigger1 = 1
-value = SCA
-time = 1
-
-[State 3810, 0]
-type = ChangeAnim2
-trigger1 = Time = 0
-value = 860
-
-[State 3810, No scroll]
-type = ScreenBound
-trigger1 = Time <= 30
-value = 1
-movecamera = 0,0
-
-[State 3810, LifeAdd]
-type = LifeAdd
-trigger1 = time = 95
-value = -500
-
-[State 3810, 6]
-type = SelfState
-trigger1 = Alive = 0
-value = 5150
-
-[State 3810, 6]
-type = ChangeAnim
-triggerall = Alive = 1
-trigger1 = Time = 95
-value = 5110
-
-[State 3810, 6]
-type = SelfState
-triggerall = Alive = 1
-trigger1 = Time = 200
-value = 5120
-
-;---------------------------------------------------------------------------
 ; Dizzy
 [Statedef 5300]
 type    = S
@@ -191,7 +144,7 @@ value = 5000, 2
 
 [State 5300, 2]
 type = ChangeAnim2
-triggerall = P1Name = "RyuSFA"
+triggerall = P1Name = "Ryu"
 triggerall = Anim = 5300
 trigger1 = Command = "FF"
 trigger2 = Command = "BB"
