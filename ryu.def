@@ -8,7 +8,7 @@ displayname = "Ryu"	   ;Name of character to display
 versiondate = 2001,08,04   ;Version date of character
 mugenversion = 2001,04,14  ;Version of M.U.G.E.N character works on
 author = "N64Mario"        ;Character author name
-pal.defaults = 1,2 ;Default palettes in order of preference
+pal.defaults = 1,2,3,4,5,6 ;Default palettes in order of preference
 ;--------------------
 ;[Common Files] 
 ;--------------------
@@ -26,22 +26,10 @@ st       = state/override.cns	;Override States
 st1	 = state/ryu.cns	;Ryu's States
 st2	 = state/custom.cns	;Custom states
 ;--------------------
-;--------------------
-;[Palettes] (can have up to 12)
+;[Palettes] ;(can have up to 12)
 ;--------------------
 ; Palettes
-;pal1	 = palette/ryu1.act	
-;pal2	 = palette/ryu2.act	
-;pal3	 = palette/ryu3.act 	
-;pal4	 = palette/ryu4.act 	
-;pal5	 = palette/ryu5.act 	
-;pal6	 = palette/ryu6.act	
-;--------------------
-[Palette Keymap]
-x = 1
-y = 2
-z = 1
-a = 2
-b = 1
-c = 2
+pal1	 = palette/ryu1.act	
+pal2	 = palette/ryu2.act	
+
 
