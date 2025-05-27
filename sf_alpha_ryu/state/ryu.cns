@@ -2322,19 +2322,20 @@ value = 150, 0
 channel = 0
 
 [State 800, 1]
-type = HitDef
-Trigger1 = Time = 0
-attr = S, NT
-hitflag = M-
+type  = HitDef
+trigger1 = Time = 0
+attr     = S, NT
+hitflag  = M-
 priority = 1, Miss
-sparkno = -1
-sprpriority = 1
+sparkno  = -1
+p1sprpriority = 0      ; Ryu stays at normal depth (optional line)
+p2sprpriority = 1      ; victim is drawn in front during the grab
 ground.velocity = 4,-4
-p1facing = ifelse (command = "holdfwd", -1, 1)
-p2facing = 1
+p1facing  = ifelse(command = "holdfwd", -1, 1)
+p2facing  = 1
 p1stateno = 801
 p2stateno = 802
-fall = 1
+fall      = 1
 
 [State 800, 2]
 type = ChangeState
@@ -2431,13 +2432,15 @@ attr = S, NT
 hitflag = M-
 priority = 1, Miss
 sparkno = -1
-sprpriority = 1
+p2sprpriority = 1        ; victim drawn slightly in front
 ground.velocity = 4,-6
 p1facing = ifelse (command = "holdfwd", -1, 1)
 p2facing = 1
 p1stateno = 811
 p2stateno = 812
 fall = 1
+
+
 
 [State 810, 2]
 type = ChangeState

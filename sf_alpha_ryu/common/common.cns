@@ -287,10 +287,16 @@ physics = N
 ctrl = 1
 anim = 60
 
-[State 90, 0]
-type = AssertSpecial
+[State 90, AfterImage shorten]
+type = AfterImageTime
+trigger1 = Time = 0
+time = 1              ; 1 tick after-image blur
+
+[State 90, NoWalk]
+type  = AssertSpecial
 trigger1 = 1
-flag = NoWalk
+flag  = nowalk        ; player can’t drop into walk while this is asserted
+ignorehitpause = 1    ; (good practice for AssertSpecial)
 
 [State 90, 1]
 type = VelSet

@@ -9,6 +9,8 @@ versiondate = 5,27,2025   ;Version date of character
 mugenversion = 1.1  ;Version of M.U.G.E.N character works on
 author = "N64Mario"        ;Character author name
 pal.defaults = 1,2 ;Default palettes in order of preference
+localcoord = 320,240        ;Local coordinate space width and height
+
 ;--------------------
 ;[Common Files] 
 ;--------------------
