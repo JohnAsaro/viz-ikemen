@@ -1,7 +1,6 @@
 ;==============================================================================
-;  RYU – AI core  (extra -3 / -2 blocks)
+;  RYU – AI code
 ;==============================================================================
-
 ;------------------------------------------------------------------
 ;  -3  : executes every tick (not while in someone else’s custom)
 ;------------------------------------------------------------------
@@ -12,6 +11,12 @@ type      = VarSet
 trigger1  = 1
 var(59)   = AILevel        ; 0 = human, 1-8 = CPU difficulty
 
+[State -3, show flag]
+type  = DisplayToClipboard
+trigger1 = 1
+text = "var(59) = %d"
+params = var(59)             
+ignorehitpause = 1
 
 ;------------------------------------------------------------------
 ;  -2  : executes every tick *even in hit-stun / custom states*
