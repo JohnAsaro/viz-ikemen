@@ -1799,6 +1799,5 @@ triggerall = Ctrl
 triggerall = StateType = S
 trigger1   = P2BodyDist X > 120
 trigger1   = Random < (10 + 8*AILevel)
-
 ;====================================================================
 
