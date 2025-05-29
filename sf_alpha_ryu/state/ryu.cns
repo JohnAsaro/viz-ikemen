@@ -4357,7 +4357,7 @@ type = HitDef
 trigger1 = Anim = 225
 trigger1 = AnimElem = 5
 attr = S, HA
-damage = 100, 10
+damage = 165, 10
 animtype = Light
 guardflag = MA
 hitflag = MAF
@@ -4373,7 +4373,7 @@ ground.slidetime = 5
 ground.hittime  = 12
 ground.velocity = 1
 air.type = Low
-air.velocity = -5, -4
+air.velocity = 1
 air.hittime = 12
 envshake.time = 20
 envshake.freq = 100
@@ -4387,7 +4387,7 @@ triggerall = MoveContact = 0
 trigger1 = Anim = 225
 trigger1 = AnimElem = 5,4
 attr = S, HA
-damage = 175, 10
+damage = 165, 10
 animtype = Light
 hitflag = MAF
 priority = 3, Hit
@@ -4402,7 +4402,7 @@ ground.slidetime = 5
 ground.hittime  = 12
 ground.velocity = 1
 air.type = Low
-air.velocity = -5, -4
+air.velocity = 1
 air.hittime = 12
 envshake.time = 20
 envshake.freq = 100
@@ -4442,6 +4442,308 @@ triggerall = Anim = 225
 trigger1 = AnimTime = 0
 value = 0
 ctrl = 1
+
+;------------------------------
+; Metsu Shoryuken Success
+[State 3020, 5]
+type = ChangeAnim
+triggerall = MoveContact
+trigger1 = Anim = 225
+trigger1 = AnimElem = 5,4
+value = 1015
+
+[State 3010, 5]
+type = PosAdd
+trigger1 = Anim = 1015
+trigger1 = AnimElem = 1
+x = 20
+
+[State 3030, 0]
+type = PlaySnd
+triggerall = PalNo < 7
+trigger1 = Anim = 1015
+trigger1 = AnimElem = 4
+value = 320, 1
+channel = 0
+
+[State 3030, 0]
+type = PlaySnd
+triggerall = PalNo > 6
+trigger1 = Anim = 1015
+trigger1 = AnimElem = 4
+value = 320, 3
+channel = 0
+
+[State 3030, 4]
+type = HitDef
+trigger1 = Anim = 1015
+trigger1 = AnimElem = 4
+attr = S, HA
+damage = 165, 10
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 20, 20
+sparkno = 3
+sparkxy = 0, -60
+hitsound = S2,3
+guardsound = S2,0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -1,-10
+air.type = Low
+air.velocity = -1,-10
+air.hittime = 12
+envshake.time = 20
+envshake.freq = 100
+envshake.ampl = -3
+envshake.phase = 10
+kill = 0
+
+[State 3020, 5]
+type = ChangeState
+trigger1 = Anim = 1015
+trigger1 = AnimElem = 5
+value = 3025
+
+;------------------------------
+; Shin Shoryuken Success
+[State 3020, 5]
+type = ChangeAnim
+triggerall = MoveContact
+trigger1 = Anim = 225
+trigger1 = AnimElem = 5,8
+value = 1030
+
+[State 3010, 5]
+type = PosAdd
+trigger1 = Anim = 1030
+trigger1 = AnimElem = 1
+x = 20
+
+[State 3010, 6]
+type = PlaySnd
+triggerall = PalNo < 7
+triggerall = Anim = 1030
+trigger1 = AnimElem = 5
+value = 340, 0
+channel = 0
+
+[State 3010, 6]
+type = PlaySnd
+triggerall = PalNo > 6
+triggerall = Anim = 1030
+trigger1 = AnimElem = 5
+value = 340, 1
+channel = 0
+
+[State 3030, 7]
+type = HitDef
+trigger1 = Anim = 1030
+trigger1 = AnimElem = 2
+attr = S, HA
+damage = 165, 10
+animtype = Light
+hitflag = MAF
+priority = 3, Hit
+pausetime = 40, 44
+guard.pausetime = 20, 20
+sparkno = S4500 ;3
+sparkxy = 0, -70
+hitsound = S2,8
+guardsound = S2,0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = 2,-5
+air.type = Low
+air.velocity = 2,-5
+air.hittime = 12
+envshake.time = 20
+envshake.freq = 100
+envshake.ampl = -5
+envshake.phase = 10
+kill = 0
+
+[State 3030, 7]
+type = HitDef
+trigger1 = Anim = 1030
+trigger1 = AnimElem = 6
+attr = S, HA
+damage = 165, 10
+animtype = Medium
+hitflag = MAF
+priority = 3, Hit
+pausetime = 40, 40
+guard.pausetime = 20, 20
+sparkno = S4500 ;3
+sparkxy = 0, -90
+hitsound = S2,8
+guardsound = S2,0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = 1,-10
+air.type = Low
+air.velocity = 1,-10
+air.hittime = 12
+envshake.time = 20
+envshake.freq = 100
+envshake.ampl = -5
+envshake.phase = 10
+kill = 0
+
+[State 3030, 8]
+type = ChangeState
+trigger1 = Anim = 1030
+trigger1 = AnimElem = 8
+value = 3030
+
+;---------------------------------------------------------------------------
+; Metsu Shoryuken - Rising
+[Statedef 3025]
+type    = A
+movetype= A
+physics = A
+velset = 5,-10
+
+[State 3025, 0]
+type = NotHitBy
+trigger1 = Time = 1
+value = SCA, NP, SP
+time = 10
+
+[State 3025, 1]
+type = VelMul
+trigger1 = 1
+x = .9
+
+[State 3025, 2]
+type = VelSet
+trigger1 = Vel Y > 0
+x = 0
+
+[State 3025, 3]
+type = HitDef
+triggerall = Palno < 7
+trigger1 = AnimElem = 5
+attr = A, HA
+damage = 165, 10
+animtype = Heavy
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 10, 10
+sparkno = 3
+sparkxy = 0, -90
+hitsound = S2,3
+guardsound = S2,0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -4,-8
+air.type = High
+air.velocity = -4,-8
+air.hittime = 12
+fall = 1
+air.fall = 1
+
+[State 3025, 3]
+type = HitDef
+triggerall = Palno > 6
+trigger1 = AnimElem = 5
+attr = A, HA
+damage = 165, 10
+animtype = Up
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 10, 10
+sparkno = 3
+sparkxy = 0, -90
+hitsound = S2,3
+guardsound = S2,0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -1,-8.5
+air.type = High
+air.velocity = -1,-8.5
+air.hittime = 12
+fall = 1
+air.fall = 1
+
+[State 3025, 3]
+type = HitDef
+trigger1 = Anim = 615
+trigger1 = AnimElem = 3
+attr = A, HA
+damage = 50, 10
+animtype = Heavy
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 10, 10
+sparkno = 3
+sparkxy = 0, -60
+hitsound = S2,3
+guardsound = S2,0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -10,10
+air.type = High
+air.velocity = -10,10
+air.hittime = 12
+fall = 1
+air.fall = 1
+fall.envshake.time = 20
+fall.envshake.freq = 100
+fall.envshake.ampl = -3
+fall.envshake.phase = 10
+fall.recover = 0
+
+[State 3025, 4]
+type = ChangeAnim
+triggerall = Anim = 1015
+trigger1 = Time = 10
+value = 1001
+
+[State 3025, 4]
+type = ChangeAnim
+triggerall = Palno > 6
+triggerall = MoveHit
+trigger1 = Anim = 1001
+trigger1 = Time >= 20
+value = 615
+
+[State 3025, 5]
+type = PlaySnd
+trigger1 = Anim = 615
+trigger1 = AnimElem = 2
+value = 1, 3
+
+[State 3025, 5]
+type = null ;PlaySnd
+trigger1 = Anim = 615
+trigger1 = AnimElem = 3
+value = 200, 0
+channel = 0
+
+[State 3025, 6]
+type = ChangeState
+triggerall = Anim = 615
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= -5
+value = 52
+
+[State 3025, 5]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= -5
+value = 1030
 
 ;---------------------------------------------------------------------------
 ; Shin Shoryuken - Rising
@@ -4487,7 +4789,7 @@ x = 0
 type = HitDef
 trigger1 = AnimElem = 8,0
 attr = A, HA
-damage = 100, 10
+damage = 165, 10
 animtype = Up
 hitflag = MAF
 priority = 3, Hit
@@ -4516,7 +4818,7 @@ kill = 0
 type = HitDef
 trigger1 = AnimElem = 8,5
 attr = A, HA
-damage = 175, 10
+damage = 165, 10
 animtype = Up
 hitflag = MAF
 priority = 3, Hit
@@ -4576,7 +4878,6 @@ type = ChangeState
 trigger1 = AnimTime = 0
 value = 0
 ctrl = 1
-
 ;---------------------------------------------------------------------------
 ; Shinkuu Tatsumaki Senpuu Kyaku Lvl 1
 [Statedef 3100]

@@ -21,7 +21,7 @@
 	- Changed level 1 (light) Tatsumaki Senpuu Kyaku damage up from 30*6 to 40*6
 	- Changed level 2 (light) Tatsumaki Senpuu Kyaku damage up from 30*10 to 35*10
 	- Changed level 3 (heavy) Tatsumaki Senpuu Kyaku damage up from 30*14 to 32*14
-	- Changed Shin Shoryuken damage from 100*3 to 175*3  
+	- Changed Shin Shoryuken damage from 100*3 to 165*3, now automatically stuns the opponent on full connect
 
 
 
