@@ -3258,7 +3258,7 @@ value = 1101
 type    = A
 movetype= A
 physics = N
-juggle  = 0
+juggle  = 2
 velset = 3,0
 ctrl = 0
 anim = 1110
@@ -3272,7 +3272,7 @@ value = 1, 3
 type = HitDef
 trigger1 = Time = 0
 attr = A, SA
-damage = 50, 10
+damage = 80, 10
 animtype = Hard
 guardflag = MA
 hitflag = MAF
@@ -3339,7 +3339,7 @@ value = 1111
 type    = A
 movetype= A
 physics = N
-juggle  = 0
+juggle  = 2
 velset = 3,0
 ctrl = 0
 anim = 1110
@@ -3421,7 +3421,7 @@ value = 1121
 type    = A
 movetype= A
 physics = N
-juggle  = 0
+juggle  = 2
 velset = 3,0
 ctrl = 0
 anim = 1110
@@ -3437,7 +3437,7 @@ trigger1 = Time = 0
 trigger2 = Time = 10
 trigger3 = Time = 20
 attr = A, SA
-damage = 50, 10
+damage = 40, 10
 animtype = Hard
 guardflag = MA
 hitflag = MAF
@@ -3483,7 +3483,7 @@ value = 1, 3
 type    = A
 movetype= A
 physics = A
-juggle  = 0
+juggle  = 2
 ctrl = 0
 anim = 1110
 poweradd = 100
@@ -3527,7 +3527,7 @@ y = -1
 type = HitDef
 trigger1 = Time = 0
 attr = A, SA
-damage = 50, 10
+damage = 80, 10
 animtype = Hard
 guardflag = HA
 hitflag = MAF
@@ -3559,7 +3559,7 @@ value = 1120
 type    = A
 movetype= A
 physics = A
-juggle  = 0
+juggle  = 2
 ctrl = 0
 anim = 1110
 poweradd = 100
@@ -3636,7 +3636,7 @@ value = 1120
 type    = A
 movetype= A
 physics = A
-juggle  = 0
+juggle  = 2
 ctrl = 0
 anim = 1110
 poweradd = 100
@@ -3682,7 +3682,7 @@ trigger1 = Time = 0
 trigger2 = Time = 10
 trigger3 = Time = 20
 attr = A, SA
-damage = 50, 10
+damage = 40, 10
 animtype = Hard
 guardflag = HA
 hitflag = MAF
@@ -3717,7 +3717,7 @@ physics = S
 poweradd= 100
 ctrl = 0
 velset = 0,0
-anim = 1300
+anim = 1301
 
 [State 1300, 0]
 type = Width
@@ -3763,7 +3763,7 @@ projhits = 1
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 50,10
+damage    = 45,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -3838,13 +3838,13 @@ projanim = 1400
 projhitanim = 1410
 projshadow = -1
 offset = 100, -55
-velocity = 4, 0
+velocity = 3, 0
 accel = 0, 0
 projhits = 1
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 50,10
+damage    = 60,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -3925,7 +3925,7 @@ projhits = 1
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 50,10
+damage    = 60,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -4026,11 +4026,11 @@ projshadow = -1
 offset = 100, -55
 velocity = 3, 0
 accel = 0, 0
-projhits = 1
+projhits = 3
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 30,10
+damage    = 10,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -4050,6 +4050,7 @@ air.velocity = -5,-1
 air.juggle = 1
 air.fall = 1
 fall = 1
+fall.recover = 0
 palfx.time = 30
 palfx.add = 30,0,0
 palfx.mul = 300,150,150
@@ -4071,7 +4072,7 @@ physics = S
 poweradd= 100
 ctrl = 0
 velset = 0,0
-anim = 1300
+anim = 1302
 
 [State 1340, Anim]
 type = ChangeAnim
@@ -4091,7 +4092,7 @@ channel = 0
 type = ChangeAnim
 triggerall = Anim = 198
 trigger1 = Time = 15
-value = 1300
+value = 1302
 
 [State 1340, 0]
 type = Width
@@ -4108,7 +4109,7 @@ value = 20,0
 [State 1340, 0]
 type = PlaySnd
 triggerall = PalNo < 7
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimElem = 2
 value = 300, 0
 channel = 0
@@ -4116,32 +4117,32 @@ channel = 0
 [State 1340, 0]
 type = null ;PlaySnd
 triggerall = PalNo > 6
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimElem = 2
 value = 300, 2
 channel = 0
 
 [State 1340, 1]
 type = PlaySnd
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimElem = 4
 value = 10, 0
 
 [State 1340, 2]
 type = Projectile
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimElem = 4
 projanim = 1420
 projhitanim = 1430
 projshadow = -1
 offset = 100, -55
-velocity = 4, 0
+velocity = 3, 0
 accel = 0, 0
-projhits = 1
+projhits = 6
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 30,10
+damage    = 6,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -4161,6 +4162,7 @@ air.velocity = -5,-1
 air.juggle = 1
 air.fall = 1
 fall = 1
+fall.recover = 0
 palfx.time = 30
 palfx.add = 30,0,0
 palfx.mul = 300,150,150
@@ -4168,7 +4170,7 @@ palfx.sinadd = 50, 10, 10, 10
 
 [State 1340, 3]
 type = ChangeState
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimTime = 0
 value = 0
 ctrl = 1
@@ -4182,7 +4184,7 @@ physics = S
 poweradd= 100
 ctrl = 0
 velset = 0,0
-anim = 1300
+anim = 1302
 
 [State 1350, Anim]
 type = ChangeAnim
@@ -4202,7 +4204,7 @@ channel = 0
 type = ChangeAnim
 triggerall = Anim = 198
 trigger1 = Time = 20
-value = 1300
+value = 1302
 
 [State 1350, 0]
 type = Width
@@ -4219,7 +4221,7 @@ value = 20,0
 [State 1350, 0]
 type = PlaySnd
 triggerall = PalNo < 7
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimElem = 2
 value = 300, 0
 channel = 0
@@ -4227,20 +4229,20 @@ channel = 0
 [State 1350, 0]
 type = null ;PlaySnd
 triggerall = PalNo > 6
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimElem = 2
 value = 300, 2
 channel = 0
 
 [State 1350, 1]
 type = PlaySnd
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimElem = 4
 value = 10, 0
 
 [State 1350, 2]
 type = Projectile
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimElem = 4
 projanim = 1420
 projhitanim = 1430
@@ -4248,11 +4250,11 @@ projshadow = -1
 offset = 100, -55
 velocity = 5, 0
 accel = 0, 0
-projhits = 1
+projhits = 6
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 30,10
+damage    = 6,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -4279,7 +4281,7 @@ palfx.sinadd = 50, 10, 10, 10
 
 [State 1350, 3]
 type = ChangeState
-trigger1 = Anim = 1300
+trigger1 = Anim = 1302
 trigger1 = AnimTime = 0
 value = 0
 ctrl = 1
