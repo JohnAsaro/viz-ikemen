@@ -9,12 +9,22 @@
 	- Heavy Shakunetsu Hadoken damage changed from 50x3 to 10x3 and animation changed from 14 to 19 frames
 	- Medium Shakunetsu Hadoken damage changed from 50x2 to 6x6 and animation changed from 14 to 19 frames, projectile velocity changed to be same speed as light shakunetsu hadoken (used to be in between light and heavy speed)
 	- Light Shakunetsu Hadoken damage changed from 50x1 to 6x6
-	- Heavy Hadoken damage changed from 50x1 to 60x1
-	- Medium Hadoken damage changed from 50x1 to 60x1, projectile velocity changed to be same speed as light hadoken (used to be in between light and heavy speed)
 	- Light Hadoken damage changed from 50x1 to 45x1, animation changed from 14 to 10 frames
-	- Heavy tastsu damage changed from 50x3 to 40x3, juggle point consumption increased from 0x3 to 2x3
-	- Medium tatsu damage kept at 50x2, juggle point consumption increased from 0x2 to 2x2
+	- Medium Hadoken damage changed from 50x1 to 60x1, projectile velocity changed to be same speed as light hadoken (used to be in between light and heavy speed)
+	- Heavy Hadoken damage changed from 50x1 to 60x1
 	- Light tatsu changed from 50x1 to 80x1, juggle point consumption increased from 0x1 to 2x1
+	- Medium tatsu damage kept at 50x2, juggle point consumption increased from 0x2 to 2x2
+	- Heavy tastsu damage changed from 50x3 to 40x3, juggle point consumption increased from 0x3 to 2x3	
+	- Changed level 1 (light) Shinkuu Hadoken damage down from 100x3 to 100x2
+	- Changed level 2 (medium) Shinkuu Hadoken damage down from 100x4 to 100x3
+	- Changed level 3 (heavy) Shinkuu Hadoken damage down from 100x3 to 100x4
+	- Changed level 1 (light) Tatsumaki Senpuu Kyaku damage up from 30*6 to 40*6
+	- Changed level 2 (light) Tatsumaki Senpuu Kyaku damage up from 30*10 to 35*10
+	- Changed level 3 (heavy) Tatsumaki Senpuu Kyaku damage up from 30*14 to 32*14
+	- Changed Shin Shoryuken damage from 100*3 to 175*3  
+
+
+
 
 - Todo:
 	- Balance super damage
@@ -25,5 +35,6 @@
 	2 - This isn't necessarily supposed to represent any SFA Ryu perfectly, its just a pretty good approximation as a mugen character used to test this nn. 
 	3 - Theres an issue where under certain conditions you can do an air dp, I don't know how to fix and it and I don't care because its fun. 
 	4 - All dps do 50x2 damage, the different strengths are how far the dp goes up.
-	5 - Dps intentionally kept at 0 juggle point consumption, you can get 400 plus damage/full stun combo in the corner with a 5dp > 5mp loop. Timings a little weird, but 
-	I wonder if a neural network would ever find this.
+	5 - Dps intentionally kept at 0 juggle point consumption, you can get 400 plus damage/full stun combo in the corner with a hdp > 5mp loop. Timings a little weird, but 
+	I wonder if a neural network would ever find this. You can also get a 800+ damage combo with roundstart close hk double hit > htatsu > 5mp > hp loop into stun > lvl 1 Tatsumaki Senpuu Kyaku 
+	6 - You can get dizzied out of your super, its not particularly common but for example if the opponent is at 99 dizzy and you hit them with Shin Shoryuken, they will fall out. You still get the punish the opponent and they do not recover before the super finishes.
