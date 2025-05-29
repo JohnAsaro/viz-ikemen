@@ -15,7 +15,7 @@ localcoord = 320,240        ;Local coordinate space width and height
 ;[Common Files] 
 ;--------------------
 [Files]
-cmd	 = common/commands.cmd, common/ai_commands.cmd ;Commands/CPU code at bottom
+cmd	 = common/commands.cmd ;Commands/CPU code at bottom
 cns	 = common/constants.cns	 ;Constants
 stcommon = common/common.cns	 ;Common states
 sprite	 = common/sprites.sff	 ;Sprites
@@ -24,10 +24,9 @@ sound	 = common/sounds.snd	 ;Sound
 ;--------------------
 ;[States] 
 ;--------------------
-st       = state/override.cns	;Override States
+st       = state/override.cns	;Override States and CPU activation code
 st1	 = state/ryu.cns	;Ryu's States
 st2	 = state/custom.cns	;Custom state
-st3 	 = ai.cns		;CPU state machine
 ;--------------------
 ;[Palettes] ;(can have up to 12)
 ;--------------------

@@ -1771,4 +1771,34 @@ trigger1 = statetype = S
 trigger1 = ctrl
 
 ;---------------------------------------------------------------------------
-;===========================================================================
+;====================================================================
+;  AI Code - Doesn't completely override the random action triggers of the mugen CPU, but that is fine, makes it more player like
+;====================================================================
+
+;--------------------------------------------------
+;  Anti-air Shoryuken
+;--------------------------------------------------
+[State -1, CPU Shoryu AA]
+type       = ChangeState
+value      = 1000                 ; light dp 
+triggerall = var(59) > 0         ; CPU only
+triggerall = Ctrl                ; must have control
+trigger1   = P2MoveType = A      ; opponent is attacking
+trigger1   = P2StateType = A     ; …and airborne
+trigger1   = P2BodyDist X < 45
+trigger1   = Random < (40 + 5*AILevel)
+
+;--------------------------------------------------
+;  Zoning Hadouken
+;--------------------------------------------------
+[State -1, CPU Hadouken]
+type       = ChangeState
+value      = 1300                 ; light fireball
+triggerall = var(59) > 0
+triggerall = Ctrl
+triggerall = StateType = S
+trigger1   = P2BodyDist X > 120
+trigger1   = Random < (10 + 8*AILevel)
+
+;====================================================================
+

@@ -4,7 +4,7 @@
 ;  constname = value
 ;----------------------------------------
 [Data]
-life = 1000
+life = 10000
 attack = 100
 defence = 100
 power = 3000

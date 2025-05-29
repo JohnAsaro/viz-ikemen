@@ -99,12 +99,18 @@ flag = NoMusic
 ;---------------------------------------------------------------------------
 [Statedef -3]
 
+;-----CPU Activation-----
+[State -3, AI flag]
+type      = VarSet
+trigger1  = 1
+var(59)   = AILevel        ; 0 = human, 1-8 = CPU difficulty
+
 ;-----Display-----
 [State -3, Variables]
 type = DisplayToClipboard
 trigger1 = StateNo != 5300
-text = "Random:%d  Dizzy:%d/200"
-params = Var(0), Var(1)
+text = "Random:%d,  Dizzy:%d/200, var(59) = %d"
+params = Var(0), Var(1), Var(59)
 ;-----------------
 
 ;-----RemoveExplod-----
