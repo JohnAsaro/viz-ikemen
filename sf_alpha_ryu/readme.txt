@@ -5,9 +5,13 @@
 	- Removed Evil Ryu
 	- Removed all palettes except for 1 and 2
 	- Changed dizzy counter from 200 to 100
+	- Shakunetsu Hadoken (all ver) now knocks down 
+	- Heavy Shakunetsu Hadoken damage changed from 50x3 to 30x1
+	- Medium Shakunetsu Hadoken damage changed from 50x2 to 30x1
+	- Light Shakunetsu Hadoken damage changed from 50x1 to 30x1
+
 - Todo:
-	- Switch to sfa2 style red fireball
-	
+	- Different hadokens have different recoveries
 - Notes: 
 	1 - Dizzy counter in this mugen character is not accurate to dizzy counter in the SFA games, here it ticks up with each attack and ticks down overtime. In the SFA games, it would tick up after each hit, and go away all at once if not hit for some period of time.
 	2 - This isn't necessarily supposed to represent any SFA Ryu perfectly, its just a pretty good approximation as a mugen character used to test this nn. 

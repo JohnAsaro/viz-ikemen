@@ -4030,7 +4030,7 @@ projhits = 1
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 50,10
+damage    = 30,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -4137,11 +4137,11 @@ projshadow = -1
 offset = 100, -55
 velocity = 4, 0
 accel = 0, 0
-projhits = 2
+projhits = 1
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 50,10
+damage    = 30,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -4248,11 +4248,11 @@ projshadow = -1
 offset = 100, -55
 velocity = 5, 0
 accel = 0, 0
-projhits = 3
+projhits = 1
 projmisstime = 0
 ; HitDef
 attr = S, SP
-damage    = 50,10
+damage    = 30,10
 animtype  = Hard
 getpower  = 10
 givepower = 20
@@ -5960,7 +5960,7 @@ time = 1
 
 [State 5290, 3]
 type = ChangeAnim
-triggerall = var(1) = 200
+triggerall = var(1) = 100
 trigger1 = Time = 0
 value = 5290
 
