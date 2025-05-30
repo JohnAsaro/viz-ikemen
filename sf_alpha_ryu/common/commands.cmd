@@ -1788,39 +1788,39 @@ trigger1 = ctrl
 ;--------------------------------------------------
 [State -1, CPU Shoryu light]
 type       = ChangeState
-value      = 1000                 ; light DP state
+value      = 1000                 ; Light DP state
 triggerall = var(59) > 0          ; CPU only
 triggerall = Ctrl                 ; can act
 triggerall = Pos Y = 0            ; grounded
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X < 45
-trigger1   = Random < (40 + 12*AILevel)
+trigger1   = Random < (40 + 15*AILevel) ;4-16% chance depending on difficulty 
 
 ;--------------------------------------------------
 ;  2)  Medium DP  (mid range)
 ;--------------------------------------------------
 [State -1, CPU Shoryuken medium]
 type       = ChangeState
-value      = 1010                 ; medium DP state
+value      = 1010                 ; Medium DP state
 triggerall = var(59) > 0
 triggerall = Ctrl
 triggerall = Pos Y = 0
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X >= 45 && P2BodyDist X < 60
-trigger1   = Random < (40 + 12*AILevel)
+trigger1   = Random < (40 + 12*AILevel) ;4-16% chance depending on difficulty 
 
 ;--------------------------------------------------
 ;  3)  Heavy DP  (farther but still AA range)
 ;--------------------------------------------------
 [State -1, CPU Shoryuken heavy]
 type       = ChangeState
-value      = 1020                 ; heavy DP state
+value      = 1020                 ; Heavy DP state
 triggerall = var(59) > 0
 triggerall = Ctrl
 triggerall = Pos Y = 0
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X >= 60 && P2BodyDist X < 85
-trigger1   = Random < (40 + 12*AILevel)
+trigger1   = Random < (40 + 12*AILevel) ; 4-16% chance depending on difficulty 
 
 ;--------------------------------------------------
 ;  Zoning Hadouken (Far)
@@ -1834,8 +1834,7 @@ triggerall = var(59) > 0
 triggerall = Ctrl
 triggerall = StateType = S
 trigger1   = P2BodyDist X > 170 
-
-trigger1   = Random < (100 + 100*AILevel)
+trigger1   = Random < (300 + 50*AILevel) ; 30-70% chance depending on difficulty
 ;--------------------------------------------------
 ;  Zoning Hadouken (Close)
 ;  • 40 % chance = Light Shakunetsu Hadoken (1330)
@@ -1849,25 +1848,25 @@ triggerall = Ctrl
 triggerall = StateType = S
 trigger1   = P2BodyDist X <= 170
 trigger1   = P2BodyDist X >= 100
-trigger1   = Random < (100 + 100*AILevel)
+trigger1   = Random < (300 + 50*AILevel) ; 30-70% chance depending on difficulty
 
 ;--------------------------------------------------
 ;  Throw when in close range
 ;--------------------------------------------------
 [State -1, CPU Close Throw]
 type       = ChangeState
-value      = 800                 ; throw attempt
+value      = 800                 ; Throw attempt
 triggerall = var(59) > 0         ; CPU only
 triggerall = Ctrl                ; Ryu has control
 triggerall = StateType = S       ; Ryu is standing
 triggerall = Pos Y = 0           ; (redundant but explicit)
 
 ; ---- opponent must be throwable ------------------------------
-triggerall = EnemyNear, StateType = S   ; opponent standing
+triggerall = EnemyNear, StateType = S   ; Opponent standing
 triggerall = EnemyNear, MoveType != H   ; not in hit-stun / lying
 
 ; ---- distance window -----------------------------------------
-trigger1   = P2BodyDist X < 25          ; in throw range
+trigger1   = P2BodyDist X < 25          ; In throw range
 
 ; ---- small randomness so it doesn't throw every single time --
 trigger1   = Random < (40 + 30*AILevel)  ; 4–28% depending on difficulty
@@ -1899,6 +1898,7 @@ triggerall = var(59) > 0
 triggerall = Power >= 1000
 triggerall = StateNo = [150,152]
 persistent = 0
-trigger1   = Random >= 50 && Random < 100   ; next 5 %  (50–99)
+trigger1   = P2BodyDist X < 50          
+trigger1   = Random >= 50 && Random < 100   ; Next 5 %  (50–99)
 ;==============================================================
 
