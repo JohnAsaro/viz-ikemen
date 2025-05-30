@@ -1870,7 +1870,7 @@ triggerall = EnemyNear, MoveType != H   ; not in hit-stun / lying
 trigger1   = P2BodyDist X < 25          ; in throw range
 
 ; ---- small randomness so it doesn't throw every single time --
-trigger1   = Random < (15 + 5*AILevel)  ; 15–55 % depending on difficulty
+trigger1   = Random < (40 + 30*AILevel)  ; 4–28% depending on difficulty
 ;--------------------------------------------------
 
 ;--------------------------------------------------
