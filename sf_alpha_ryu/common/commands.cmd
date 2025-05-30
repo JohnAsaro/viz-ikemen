@@ -1791,7 +1791,7 @@ type       = ChangeState
 value      = 1000                 ; Light DP state
 triggerall = var(59) > 0          ; CPU only
 triggerall = Ctrl                 ; can act
-triggerall = Pos Y = 0            ; grounded
+triggerall = statetype != A       ; grounded
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X < 45
 trigger1   = Random < (40 + 15*AILevel) ;4-16% chance depending on difficulty 
@@ -1804,7 +1804,7 @@ type       = ChangeState
 value      = 1010                 ; Medium DP state
 triggerall = var(59) > 0
 triggerall = Ctrl
-triggerall = Pos Y = 0
+triggerall = statetype != A 
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X >= 45 && P2BodyDist X < 60
 trigger1   = Random < (40 + 12*AILevel) ;4-16% chance depending on difficulty 
@@ -1817,7 +1817,7 @@ type       = ChangeState
 value      = 1020                 ; Heavy DP state
 triggerall = var(59) > 0
 triggerall = Ctrl
-triggerall = Pos Y = 0
+triggerall = statetype != A 
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X >= 60 && P2BodyDist X < 85
 trigger1   = Random < (40 + 12*AILevel) ; 4-16% chance depending on difficulty 
@@ -1832,7 +1832,7 @@ type       = ChangeState
 value      = ifelse(Random < 400, 1350, 1320)   ; 40/60 split
 triggerall = var(59) > 0
 triggerall = Ctrl
-triggerall = StateType = S
+triggerall = statetype != A 
 trigger1   = P2BodyDist X > 170 
 trigger1   = Random < (300 + 50*AILevel) ; 30-70% chance depending on difficulty
 ;--------------------------------------------------
@@ -1845,7 +1845,7 @@ type       = ChangeState
 value      = ifelse(Random < 400, 1330, 1300)   ; 40/60 split
 triggerall = var(59) > 0
 triggerall = Ctrl
-triggerall = StateType = S
+triggerall = statetype != A 
 trigger1   = P2BodyDist X <= 170
 trigger1   = P2BodyDist X >= 100
 trigger1   = Random < (300 + 50*AILevel) ; 30-70% chance depending on difficulty
