@@ -1776,28 +1776,125 @@ trigger1 = ctrl
 ;====================================================================
 
 ;--------------------------------------------------
-;  Anti-air Shoryuken
+;  Shoryuken Anti-Air
+;  •  < 45 px      ? Light Shoryuken   (1000)
+;  •  45–59 px     ? Medium Shoryuken  (1010)
+;  •  60–85 px     ? Heavy Shoryuken   (1020)
 ;--------------------------------------------------
-[State -1, CPU Shoryu AA]
+;--------------------------------------------------
+;  1)  Light DP  (close)
+;--------------------------------------------------
+[State -1, CPU Shoryu light]
 type       = ChangeState
-value      = 1000                 ; light dp 
-triggerall = var(59) > 0         ; CPU only
-triggerall = Ctrl                ; must have control
-trigger1   = P2MoveType = A      ; opponent is attacking
-trigger1   = P2StateType = A     ; …and airborne
+value      = 1000                 ; light DP state
+triggerall = var(59) > 0          ; CPU only
+triggerall = Ctrl                 ; can act
+triggerall = Pos Y = 0            ; grounded
+trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X < 45
 trigger1   = Random < (40 + 5*AILevel)
 
 ;--------------------------------------------------
-;  Zoning Hadouken
+;  2)  Medium DP  (mid range)
 ;--------------------------------------------------
-[State -1, CPU Hadouken]
+[State -1, CPU Shoryuken medium]
 type       = ChangeState
-value      = 1300                 ; light fireball
+value      = 1010                 ; medium DP state
+triggerall = var(59) > 0
+triggerall = Ctrl
+triggerall = Pos Y = 0
+trigger1   = P2MoveType = A && P2StateType = A
+trigger1   = P2BodyDist X >= 45 && P2BodyDist X < 60
+trigger1   = Random < (40 + 5*AILevel)
+
+;--------------------------------------------------
+;  3)  Heavy DP  (farther but still AA range)
+;--------------------------------------------------
+[State -1, CPU Shoryuken heavy]
+type       = ChangeState
+value      = 1020                 ; heavy DP state
+triggerall = var(59) > 0
+triggerall = Ctrl
+triggerall = Pos Y = 0
+trigger1   = P2MoveType = A && P2StateType = A
+trigger1   = P2BodyDist X >= 60 && P2BodyDist X < 85
+trigger1   = Random < (40 + 5*AILevel)
+
+;--------------------------------------------------
+;  Zoning Hadouken (Far)
+;  • 40 % chance = Heavy Shakunetsu Hadoken (1350)
+;  • 60 % chance = Heavy Hadoken (1320)
+;--------------------------------------------------
+[State -1, CPU Hadouken Far]
+type       = ChangeState
+value      = ifelse(Random < 400, 1350, 1320)   ; 40/60 split
 triggerall = var(59) > 0
 triggerall = Ctrl
 triggerall = StateType = S
-trigger1   = P2BodyDist X > 120
+trigger1   = P2BodyDist X > 170 
+
 trigger1   = Random < (10 + 8*AILevel)
-;====================================================================
+;--------------------------------------------------
+;  Zoning Hadouken (Close)
+;  • 40 % chance = Light Shakunetsu Hadoken (1330)
+;  • 60 % chance = Light Hadoken (1300)
+;--------------------------------------------------
+[State -1, CPU Hadouken Close]
+type       = ChangeState
+value      = ifelse(Random < 400, 1330, 1300)   ; 40/60 split
+triggerall = var(59) > 0
+triggerall = Ctrl
+triggerall = StateType = S
+trigger1   = P2BodyDist X <= 170
+trigger1   = P2BodyDist X >= 100
+
+;--------------------------------------------------
+;  Throw when in close range
+;--------------------------------------------------
+[State -1, CPU Close Throw]
+type       = ChangeState
+value      = 800                 ; throw attempt
+triggerall = var(59) > 0         ; CPU only
+triggerall = Ctrl                ; Ryu has control
+triggerall = StateType = S       ; Ryu is standing
+triggerall = Pos Y = 0           ; (redundant but explicit)
+
+; ---- opponent must be throwable ------------------------------
+triggerall = EnemyNear, StateType = S   ; opponent standing
+triggerall = EnemyNear, MoveType != H   ; not in hit-stun / lying
+
+; ---- distance window -----------------------------------------
+trigger1   = P2BodyDist X < 25          ; in throw range
+
+; ---- small randomness so it doesn't throw every single time --
+trigger1   = Random < (15 + 5*AILevel)  ; 15–55 % depending on difficulty
+;--------------------------------------------------
+
+;--------------------------------------------------
+;  CPU Alpha Counter  – 5 % each
+;--------------------------------------------------
+;--------------------------------------------------
+;  Shoryu AC  (state 950)
+;--------------------------------------------------
+[State -1, CPU AC Shoryu]
+type       = ChangeState
+value      = 950
+triggerall = var(59) > 0         ; CPU only
+triggerall = Power >= 1000       ; need 1 bar
+triggerall = StateNo = [150,152] ; exactly the guard-shake states
+persistent = 0                   ; one roll per block-string
+trigger1   = P2BodyDist X < 50          ; in counter range
+trigger1   = Random < 50         ; 5 %  (0–49)
+;--------------------------------------------------
+;  Sweep AC  (state 960)
+;--------------------------------------------------
+[State -1, CPU AC Sweep]
+type       = ChangeState
+value      = 960
+triggerall = var(59) > 0
+triggerall = Power >= 1000
+triggerall = StateNo = [150,152]
+persistent = 0
+trigger1   = Random >= 50 && Random < 100   ; next 5 %  (50–99)
+;==============================================================
 
