@@ -1789,6 +1789,8 @@ trigger1 = ctrl
 [State -1, CPU Shoryu light]
 type       = ChangeState
 value      = 1000                 ; Light DP state
+triggerall = RoundState = 2        
+triggerall = Time >= 5		  ; game still going
 triggerall = var(59) > 0          ; CPU only
 triggerall = Ctrl                 ; can act
 triggerall = statetype != A       ; grounded
@@ -1802,6 +1804,8 @@ trigger1   = Random < (40 + 15*AILevel) ;4-16% chance depending on difficulty
 [State -1, CPU Shoryuken medium]
 type       = ChangeState
 value      = 1010                 ; Medium DP state
+triggerall = RoundState = 2        
+triggerall = Time >= 5		
 triggerall = var(59) > 0
 triggerall = Ctrl
 triggerall = statetype != A 
@@ -1815,6 +1819,8 @@ trigger1   = Random < (40 + 12*AILevel) ;4-16% chance depending on difficulty
 [State -1, CPU Shoryuken heavy]
 type       = ChangeState
 value      = 1020                 ; Heavy DP state
+triggerall = RoundState = 2        
+triggerall = Time >= 5		
 triggerall = var(59) > 0
 triggerall = Ctrl
 triggerall = statetype != A 
@@ -1830,6 +1836,8 @@ trigger1   = Random < (40 + 12*AILevel) ; 4-16% chance depending on difficulty
 [State -1, CPU Hadouken Far]
 type       = ChangeState
 value      = ifelse(Random < 400, 1350, 1320)   ; 40/60 split
+triggerall = RoundState = 2        
+triggerall = Time >= 5		
 triggerall = var(59) > 0
 triggerall = Ctrl
 triggerall = statetype != A 
@@ -1843,6 +1851,8 @@ trigger1   = Random < (300 + 50*AILevel) ; 30-70% chance depending on difficulty
 [State -1, CPU Hadouken Close]
 type       = ChangeState
 value      = ifelse(Random < 400, 1330, 1300)   ; 40/60 split
+triggerall = RoundState = 2        
+triggerall = Time >= 5		
 triggerall = var(59) > 0
 triggerall = Ctrl
 triggerall = statetype != A 
@@ -1856,6 +1866,8 @@ trigger1   = Random < (300 + 50*AILevel) ; 30-70% chance depending on difficulty
 [State -1, CPU Close Throw]
 type       = ChangeState
 value      = 800                 ; Throw attempt
+triggerall = RoundState = 2      ; during round
+triggerall = Time >= 5		 ; time not over
 triggerall = var(59) > 0         ; CPU only
 triggerall = Ctrl                ; Ryu has control
 triggerall = StateType = S       ; Ryu is standing
@@ -1882,9 +1894,11 @@ trigger1   = Random < (40 + 30*AILevel)  ; 4–28% depending on difficulty
 [State -1, CPU AC Shoryu]
 type       = ChangeState
 value      = 950
+triggerall = RoundState = 2      ; during round
 triggerall = var(59) > 0         ; CPU only
 triggerall = Power >= 1000       ; need 1 bar
-triggerall = StateNo = [150,152] ; exactly the guard-shake states
+triggerall = Time >= 5		 ; time not over
+triggerall = StateNo = [150,152] ; the guard-shake states
 persistent = 0                   ; one roll per block-string
 trigger1   = P2BodyDist X < 50          ; in counter range
 trigger1   = Random < 50         ; 5 %  (0–49)
@@ -1894,8 +1908,10 @@ trigger1   = Random < 50         ; 5 %  (0–49)
 [State -1, CPU AC Sweep]
 type       = ChangeState
 value      = 960
+triggerall = RoundState = 2      
 triggerall = var(59) > 0
 triggerall = Power >= 1000
+triggerall = Time >= 5		
 triggerall = StateNo = [150,152]
 persistent = 0
 trigger1   = P2BodyDist X < 50          
