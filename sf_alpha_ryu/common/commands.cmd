@@ -1774,6 +1774,8 @@ trigger1 = ctrl
 ;====================================================================
 ;  AI Code - Doesn't completely override the random action triggers of the mugen CPU, but that is fine, makes it more player like
 ;====================================================================
+; Note random refers to a random num 0-999
+;====================================================================
 
 ;--------------------------------------------------
 ;  Shoryuken Anti-Air
@@ -1792,7 +1794,7 @@ triggerall = Ctrl                 ; can act
 triggerall = Pos Y = 0            ; grounded
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X < 45
-trigger1   = Random < (40 + 5*AILevel)
+trigger1   = Random < (40 + 12*AILevel)
 
 ;--------------------------------------------------
 ;  2)  Medium DP  (mid range)
@@ -1805,7 +1807,7 @@ triggerall = Ctrl
 triggerall = Pos Y = 0
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X >= 45 && P2BodyDist X < 60
-trigger1   = Random < (40 + 5*AILevel)
+trigger1   = Random < (40 + 12*AILevel)
 
 ;--------------------------------------------------
 ;  3)  Heavy DP  (farther but still AA range)
@@ -1818,7 +1820,7 @@ triggerall = Ctrl
 triggerall = Pos Y = 0
 trigger1   = P2MoveType = A && P2StateType = A
 trigger1   = P2BodyDist X >= 60 && P2BodyDist X < 85
-trigger1   = Random < (40 + 5*AILevel)
+trigger1   = Random < (40 + 12*AILevel)
 
 ;--------------------------------------------------
 ;  Zoning Hadouken (Far)
@@ -1833,7 +1835,7 @@ triggerall = Ctrl
 triggerall = StateType = S
 trigger1   = P2BodyDist X > 170 
 
-trigger1   = Random < (10 + 8*AILevel)
+trigger1   = Random < (100 + 100*AILevel)
 ;--------------------------------------------------
 ;  Zoning Hadouken (Close)
 ;  • 40 % chance = Light Shakunetsu Hadoken (1330)
@@ -1847,6 +1849,7 @@ triggerall = Ctrl
 triggerall = StateType = S
 trigger1   = P2BodyDist X <= 170
 trigger1   = P2BodyDist X >= 100
+trigger1   = Random < (100 + 100*AILevel)
 
 ;--------------------------------------------------
 ;  Throw when in close range
@@ -1873,6 +1876,7 @@ trigger1   = Random < (15 + 5*AILevel)  ; 15–55 % depending on difficulty
 ;--------------------------------------------------
 ;  CPU Alpha Counter  – 5 % each
 ;--------------------------------------------------
+
 ;--------------------------------------------------
 ;  Shoryu AC  (state 950)
 ;--------------------------------------------------
