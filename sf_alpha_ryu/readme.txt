@@ -22,19 +22,14 @@
 	- Changed level 2 (light) Tatsumaki Senpuu Kyaku damage up from 30*10 to 35*10
 	- Changed level 3 (heavy) Tatsumaki Senpuu Kyaku damage up from 30*14 to 32*14
 	- Changed Shin Shoryuken damage from 100*3 to 165*3, now automatically stuns the opponent on full connect
-
-
-
-
-- Todo:
-	- Balance super damage
--Considering:
-	- Change throw damage from 200 to 150
+	- Fixed some compatibility issues with Mugen 1.1 and Ikemen GO
+	
 - Notes: 
 	1 - Dizzy counter in this mugen character is not accurate to dizzy counter in the SFA games, here it ticks up with each attack and ticks down overtime. In the SFA games, it would tick up after each hit, and go away all at once if not hit for some period of time.
 	2 - This isn't necessarily supposed to represent any SFA Ryu perfectly, its just a pretty good approximation as a mugen character used to test this nn. 
 	3 - All dps do 50x2 damage, the different strengths are how far the dp goes up.
 	4 - Dps intentionally kept at 0 juggle point consumption, you can get 400 plus damage/full stun combo in the corner with a hdp > 5mp loop. Timings a little weird, but 
 	I wonder if a neural network would ever find this. You can also get a 800+ damage combo with roundstart close hk double hit > htatsu > 5mp > hp loop into stun > lvl 1 Tatsumaki Senpuu Kyaku 
-	5 - You can get dizzied out of your super, its not particularly common but for example if the opponent is at 99 dizzy and you hit them with Shin Shoryuken, they will fall out. You still get the punish the opponent and they do not recover before the super finishes.
+	5 - You can get dizzied out of your super, its not particularly common but for example if the opponent is at 99 dizzy and you hit them with Shin Shoryuken, they will fall out. You still get the punish the opponent and they do not recover before the super finishes. The way to fix this would be to make supers not do stun damage, but I think Shin Shoryuken instant stun is cool so it stays for now.
 	6 - Currently the idea is that the sparring partner will be at ai level 4.
+	7 - It is impossible to kill with Shin Shoryuken, the opponent will be dizzied instead. 
