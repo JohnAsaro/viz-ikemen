@@ -33,3 +33,6 @@
 	5 - You can get dizzied out of your super, its not particularly common but for example if the opponent is at 99 dizzy and you hit them with Shin Shoryuken, they will fall out. You still get the punish the opponent and they do not recover before the super finishes. The way to fix this would be to make supers not do stun damage, but I think Shin Shoryuken instant stun is cool so it stays for now.
 	6 - Currently the idea is that the sparring partner will be at ai level 4.
 	7 - It is impossible to kill with Shin Shoryuken, the opponent will be dizzied instead. 
+
+- Issues:
+	1 - In Ikemen GO the KO background flashes for 1 frame whenever you super. This does not happen in any version of the original mugen.

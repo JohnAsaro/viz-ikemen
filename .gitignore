@@ -1,0 +1,4 @@
+__pycache__
+.env
+Ikemen_GO/*
+!Ikemen_GO/install_ikemen_go_here.txt
