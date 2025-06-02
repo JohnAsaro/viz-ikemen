@@ -1,11 +1,35 @@
 # ikemen_env.py
-import gymnasium as gym, numpy as np, cv2, mss, pydirectinput, time, subprocess, os
+import gymnasium as gym
+import numpy as np
+import cv2
+import mss
+import pydirectinput
+import time
+import subprocess 
+import os 
 
 ACTIONS = ["left", "right", "up", "down", "x", "y", "z", "a", "s", "d"]  # 10-button discrete
 
 # Ikemen GO executable path
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
 IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO.exe")
+IKEMEN_DIR = os.path.join(BASE_DIR, "Ikemen_GO")          # folder that contains Ikemen_GO.exe
+CHAR_DEF = os.path.relpath(
+    os.path.join(BASE_DIR, "sf_alpha_ryu", "ryu.def"),   # → ../sf_alpha_ryu/ryu.def
+    IKEMEN_DIR
+)
+
+cmd = [
+    IKEMEN_EXE,
+    # P1  (human)  – everything in ONE quoted string, options by commas
+    "-p1", f"{CHAR_DEF},ai=0,pal=1,control=human",
+    # P2  (CPU lv-4)
+    "-p2", f"{CHAR_DEF},ai=4,pal=2,control=ai",
+    # stage, rounds, window size, etc.
+    "-stage", "stages/training.def",
+    "-rounds", "2", # first to 2 rounds wins
+    "--nosound", "--windowed", "--width", "320", "--height", "240",
+]
 
 class IkemenEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 60}
@@ -15,8 +39,12 @@ class IkemenEnv(gym.Env):
         self.observation_space = gym.spaces.Box(0,255, shape=(4,84,84), dtype=np.uint8)
 
         # launch Ikemen once, keep handle
-        self.proc = subprocess.Popen(["Ikemen_GO.exe","--nosound","--windowed",
-                                      "--width","320","--height","240"])
+        self.proc = subprocess.Popen(
+            cmd,
+            cwd=IKEMEN_DIR,                     # run inside Ikemen_GO folder
+            stdout=subprocess.DEVNULL,          # keep console clean (optional)
+            stderr=subprocess.STDOUT
+        )
         time.sleep(2)                             # give window time
         self.sct  = mss.mss()
         self.win  = {"top":60,"left":160,"width":320,"height":240}
@@ -65,3 +93,15 @@ class IkemenEnv(gym.Env):
         # white “KO” flashes = high average brightness top centre
         patch = np.asarray(self.sct.grab({"left":150,"top":20,"width":40,"height":10}))[:,:,:3]
         return patch.mean() > 200
+
+if __name__ == "__main__":
+    env = IkemenEnv()
+    obs, _ = env.reset()
+    for _ in range(60000):           # 1000 seconds at 60 FPS
+        #a  = env.action_space.sample()
+        #obs, r, done, trunc, _ = env.step(a)
+        #if done:
+        #    obs, _ = env.reset()
+        time.sleep(0.016)  # 60 FPS
+        print(_)
+    env.proc.terminate()           # close Ikemen when done
