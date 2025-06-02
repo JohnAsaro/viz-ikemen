@@ -21,13 +21,13 @@ CHAR_DEF = os.path.relpath(
 
 cmd = [
     IKEMEN_EXE,
-    # P1  (human)  – everything in ONE quoted string, options by commas
-    "-p1", f"{CHAR_DEF},ai=0,pal=1,control=human",
-    # P2  (CPU lv-4)
-    "-p2", f"{CHAR_DEF},ai=4,pal=2,control=ai",
-    # stage, rounds, window size, etc.
-    "-stage", "stages/training.def",
-    "-rounds", "2", # first to 2 rounds wins
+    "-p1", CHAR_DEF,                 # P1 human
+    "-p1.color", "1",
+    "-p2", CHAR_DEF,                 # P2 CPU (lvl 4)
+    "-p2.ai", "4",
+    "-p2.color", "2",
+    "-s", "stages/training.def",
+    "-rounds", "1",
     "--nosound", "--windowed", "--width", "320", "--height", "240",
 ]
 
@@ -98,10 +98,10 @@ if __name__ == "__main__":
     env = IkemenEnv()
     obs, _ = env.reset()
     for _ in range(60000):           # 1000 seconds at 60 FPS
-        #a  = env.action_space.sample()
-        #obs, r, done, trunc, _ = env.step(a)
-        #if done:
-        #    obs, _ = env.reset()
+    #    a  = env.action_space.sample()
+    #    obs, r, done, trunc, _ = env.step(a)
+    #    if done:
+    #        obs, _ = env.reset()
         time.sleep(0.016)  # 60 FPS
         print(_)
     env.proc.terminate()           # close Ikemen when done

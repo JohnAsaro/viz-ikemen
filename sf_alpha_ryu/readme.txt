@@ -36,3 +36,4 @@
 
 - Issues:
 	1 - In Ikemen GO the KO background flashes for 1 frame whenever you super. This does not happen in any version of the original mugen.
+	2 - Shakunetsu Hadoken flashes blue sometimes.
