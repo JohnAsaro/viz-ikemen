@@ -8,6 +8,7 @@ import time
 import subprocess 
 import os 
 from config import ACTIONS, DEFAULT_ACTION_MAPPING
+import pygetwindow as gw
 
 ACTIONS = list(DEFAULT_ACTION_MAPPING.keys())  # ["left", "right", …]
 
@@ -19,6 +20,15 @@ CHAR_DEF = os.path.relpath(
     os.path.join(BASE_DIR, "sf_alpha_ryu", "ryu.def"),   # → ../sf_alpha_ryu/ryu.def
     IKEMEN_DIR
 )
+
+def find_ikemen_rect():
+    # Look for any window title containing “Ikemen”
+    wins = [w for w in gw.getAllTitles() if "Ikemen" in w]
+    if not wins:
+        raise RuntimeError("Could not find an IKEMEN GO window on your desktop.")
+    # Grab the actual Window object
+    win = gw.getWindowsWithTitle(wins[0])[0]
+    return win.left, win.top, win.width, win.height
 
 class IkemenEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 60}
@@ -48,10 +58,12 @@ class IkemenEnv(gym.Env):
             stderr=subprocess.STDOUT
         )
         time.sleep(2)                             # give window time
+        x, y, w, h = find_ikemen_rect()
+        # The capture is exactly at (x, y), with a size of (w, h)
         self.sct  = mss.mss()
-        self.win  = {"top":60,"left":160,"width":320,"height":240}
-
+        self.win = {"left": x, "top": y, "width": w, "height": h}
     # -----------------------------------------------------------------
+    
     def _grab(self):
         frm = np.array(self.sct.grab(self.win))[:,:,:3]
         frm = cv2.cvtColor(frm, cv2.COLOR_BGR2GRAY)
@@ -80,31 +92,49 @@ class IkemenEnv(gym.Env):
         p2 = self._lifebar_p2()
         r  = (self.prev_p2 - p2)/100.0
         self.prev_p2 = p2
-
-        done = self._round_over()
+        done = False
+        if env.proc.poll() is not None:  # process has exited
+            done = True
         trunc= False
         return np.stack(self.stack,0), r, done, trunc, {}
 
     # --- helpers -----------------------------------------------------
     def _lifebar_p2(self):
-        # quick & dirty: sample 1px strip of red HP bar
-        bar = self.sct.grab({"left":210,"top":40,"width":100,"height":1})
+        x0 = self.win["left"] + 210
+        y0 = self.win["top"]  + 40
+        bar = self.sct.grab({"left":x0, "top":y0, "width":450, "height":30})
         return np.count_nonzero(np.asarray(bar)[:,:,2] > 200)
 
-    def _round_over(self):
-        # white “KO” flashes = high average brightness top centre
-        patch = np.asarray(self.sct.grab({"left":150,"top":20,"width":40,"height":10}))[:,:,:3]
-        return patch.mean() > 200
+
+    def debug_show_grabs(self):
+        frame = self._grab()
+        cv2.imshow("Full 84×84 Crop", frame)
+
+        x0 = self.win["left"] + 750
+        y0 = self.win["top"]  +  110
+        lifebar = np.asarray(
+            self.sct.grab({"left":x0, "top":y0, "width":450, "height":30})
+        )[:, :, 2]
+        cv2.imshow("Lifebar Strip (red channel)", lifebar)
+        cv2.waitKey(1) # Update OpenCV window every 1 ms
 
 if __name__ == "__main__":
     env = IkemenEnv()
     obs, _ = env.reset()
-    for _ in range(600):           # 100 seconds at 60 FPS
-        a  = env.action_space.sample()
-        obs, r, done, trunc, _ = env.step(a)
-        if done:
-            obs, _ = env.reset()
-        time.sleep(0.016)  # 60 FPS
-        print(f"Action: {DEFAULT_ACTION_MAPPING[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
-
+    total_reward = 0.0
+    for i in range(6000):           # 1000 seconds at 60 FPS
+        if env.proc.poll() is None: # proess is still running
+            a  = env.action_space.sample()
+            obs, r, done, trunc, _ = env.step(a)
+            if done:
+                obs, _ = env.reset()
+            time.sleep(0.016)  # 60 FPS
+            print(f"Action: {DEFAULT_ACTION_MAPPING[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
+            env.debug_show_grabs()
+            total_reward += r
+        else:
+            break
     env.proc.terminate()           # close Ikemen when done
+    cv2.destroyAllWindows()        # close all OpenCV windows
+    print(f"Total reward: {total_reward:.2f}")
+    print("Environment closed.")

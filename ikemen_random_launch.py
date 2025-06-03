@@ -1,3 +1,5 @@
+# Launch ikemen with a random action agent.
+
 import time
 from ikemen_wrapper import IkemenEnv      
 from config import ACTIONS, DEFAULT_ACTION_MAPPING
