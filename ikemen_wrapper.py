@@ -7,8 +7,9 @@ import pydirectinput
 import time
 import subprocess 
 import os 
+from config import ACTIONS, DEFAULT_ACTION_MAPPING
 
-ACTIONS = ["left", "right", "up", "down", "x", "y", "z", "a", "s", "d"]  # 10-button discrete
+ACTIONS = list(DEFAULT_ACTION_MAPPING.keys())  # ["left", "right", …]
 
 # Ikemen GO executable path
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -19,24 +20,25 @@ CHAR_DEF = os.path.relpath(
     IKEMEN_DIR
 )
 
-cmd = [
-    IKEMEN_EXE,
-    "-p1", CHAR_DEF,                 # P1 human
-    "-p1.color", "1",
-    "-p2", CHAR_DEF,                 # P2 CPU (lvl 4)
-    "-p2.ai", "4",
-    "-p2.color", "2",
-    "-s", "stages/training.def",
-    "-rounds", "1",
-    "--nosound", "--windowed", "--width", "320", "--height", "240",
-]
-
 class IkemenEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 60}
 
-    def __init__(self):
+    def __init__(self, ai_level=4):
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
         self.observation_space = gym.spaces.Box(0,255, shape=(4,84,84), dtype=np.uint8)
+
+        cmd = [
+            IKEMEN_EXE,
+            "-p1", CHAR_DEF,                 # P1 human
+            "-p1.color", "1",
+            "-p2", CHAR_DEF,                 # P2 CPU
+            "-p2.ai", str(ai_level),  
+            "-p2.color", "2",
+            "-s", "stages/training.def",
+            "-rounds", "2",
+            "--nosound", "--windowed", "--width", "320", "--height", "240",
+            "--setport", "7501",  # set input port
+        ]
 
         # launch Ikemen once, keep handle
         self.proc = subprocess.Popen(
@@ -97,11 +99,12 @@ class IkemenEnv(gym.Env):
 if __name__ == "__main__":
     env = IkemenEnv()
     obs, _ = env.reset()
-    for _ in range(60000):           # 1000 seconds at 60 FPS
-    #    a  = env.action_space.sample()
-    #    obs, r, done, trunc, _ = env.step(a)
-    #    if done:
-    #        obs, _ = env.reset()
+    for _ in range(600):           # 100 seconds at 60 FPS
+        a  = env.action_space.sample()
+        obs, r, done, trunc, _ = env.step(a)
+        if done:
+            obs, _ = env.reset()
         time.sleep(0.016)  # 60 FPS
-        print(_)
+        print(f"Action: {DEFAULT_ACTION_MAPPING[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
+
     env.proc.terminate()           # close Ikemen when done
