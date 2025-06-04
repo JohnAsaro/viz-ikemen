@@ -3,7 +3,11 @@ __pycache__
 Ikemen_GO/*
 !Ikemen_GO/install_ikemen_go_here.txt
 !Ikemen_GO/save
-!Ikemen_GO/scripts
 Ikemen_GO/save/stats.json
 Ikemen_GO/save/replays
 !Ikemen_GO/launch_ikemen.bat
+!Ikemen_GO/external
+Ikemen_GO/external/icons
+Ikemen_GO/external/script
+Ikemen_GO/external/shaders
+!Ikemen_GO/external/mods/
