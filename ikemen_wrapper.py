@@ -10,8 +10,6 @@ import os
 from config import ACTIONS, DEFAULT_ACTION_MAPPING
 import pygetwindow as gw
 
-ACTIONS = list(DEFAULT_ACTION_MAPPING.keys())  # ["left", "right", …]
-
 # Ikemen GO executable path
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
 IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO.exe")
@@ -93,7 +91,7 @@ class IkemenEnv(gym.Env):
         r  = (self.prev_p2 - p2)/100.0
         self.prev_p2 = p2
         done = False
-        if env.proc.poll() is not None:  # process has exited
+        if self.proc.poll() is not None:  # process has exited
             done = True
         trunc= False
         return np.stack(self.stack,0), r, done, trunc, {}
@@ -119,7 +117,7 @@ class IkemenEnv(gym.Env):
         cv2.waitKey(1) # Update OpenCV window every 1 ms
 
 if __name__ == "__main__":
-    env = IkemenEnv()
+    env = IkemenEnv(ai_level=4)
     obs, _ = env.reset()
     total_reward = 0.0
     for i in range(6000):           # 1000 seconds at 60 FPS
