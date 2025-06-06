@@ -1,5 +1,16 @@
 debug_timer = 0
 
+function playerstateInfo(p)
+	local si_oldid = id()
+	if not player(p) then return false end
+	local si_ret = string.format(
+		'State No: %d (P%d); CTRL: %s; Type: %s; MoveType: %s; Physics: %s; Time: %d',
+		stateno(), stateownerplayerno(), boolToInt(ctrl()), statetype(), movetype(), physics(), time()-1
+	)
+	playerid(si_oldid)
+	return si_ret
+end
+
 --;===========================================================
 --; MATCH LOOP
 --;===========================================================
@@ -11,7 +22,9 @@ function loop()
     debug_timer = debug_timer + 1
     if debug_timer % 300 == 0 then -- Print every 5 seconds (300 frames at 60 FPS)  
         print(statusInfo(1))
+		print(playerstateInfo(1))
         print(statusInfo(2))
+		print(playerstateInfo(2))
         debug_timer = 1
     end
 	if start == nil then --match started via command line without -loadmotif flag
