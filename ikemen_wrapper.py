@@ -45,7 +45,7 @@ class IkemenEnv(gym.Env):
             "-s", "stages/training.def",
             "-rounds", "2",
             "--nosound", "--windowed", "--width", "320", "--height", "240",
-            "--setport", "7500",  # set input port
+            "--setport", "7500",  # set host port, not really neccessary to specify, just here so I remember this isn't the input port, because I had to learn that the hard way
         ]
 
         # launch Ikemen once, keep handle

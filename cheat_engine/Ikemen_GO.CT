@@ -2,16 +2,16 @@
 <CheatTable CheatEngineTableVersion="45">
   <CheatEntries>
     <CheatEntry>
-      <ID>0</ID>
+      <ID>2</ID>
       <Description>"P2-Health"</Description>
       <VariableType>4 Bytes</VariableType>
-      <Address>C0012CE2C8</Address>
+      <Address>C001CDE2C8</Address>
     </CheatEntry>
     <CheatEntry>
-      <ID>1</ID>
+      <ID>4</ID>
       <Description>"CPU-Difficulty"</Description>
       <VariableType>4 Bytes</VariableType>
-      <Address>C0012CE8F8</Address>
+      <Address>C001CDE8F8</Address>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols/>
