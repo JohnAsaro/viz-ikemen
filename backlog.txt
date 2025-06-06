@@ -1,0 +1,2 @@
+1 - Try and make a lua script that prints out the current hp of p2 at all times to avoid having to use cheat engine,
+hopefully avoid socket aswell because oh my god luarocks sucks so bad and so does socket programming

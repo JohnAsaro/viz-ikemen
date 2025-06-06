@@ -13,6 +13,7 @@ Ikemen_GO.exe ^
 -p2.color 2 ^
 -s stages/training.def ^
 -rounds 1 ^
+-setport 7500 ^
 --nosound ^
 --windowed ^
 --width 320 ^
