@@ -11,6 +11,17 @@ function playerstateInfo(p)
 	return si_ret
 end
 
+function forceDP(p)
+	local si_oldid = id()
+	if not player(p) then return false end
+
+	-- Only do this if the player is Ryu and use net-safe Random method
+	if name() == "Ryu" then
+		changeState(1000)
+	end
+end
+
+
 --;===========================================================
 --; MATCH LOOP
 --;===========================================================
@@ -26,6 +37,7 @@ function loop()
         print(statusInfo(2))
 		print(playerstateInfo(2))
         debug_timer = 1
+		forceDP(1)
     end
 	if start == nil then --match started via command line without -loadmotif flag
 		if esc() then
