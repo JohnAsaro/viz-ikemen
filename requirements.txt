@@ -1,0 +1,5 @@
+gymnasium==1.0.0
+numpy==1.23.5
+lupa==2.4
+mss==10.0.0
+opencv-python==4.10.0.84
