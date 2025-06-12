@@ -1,0 +1,20 @@
+- lua to python communication with sqlite
+
+- change num rounds to 1
+
+- only give reward if your guy wins, so reward 1 if win else no
+
+- ai starts at lvl 1, which is random input, work up to lvl 4
+
+- so I guess just learning of visual info? you CAN give it health reward shaping later but idk if that will help
+
+- should have ryu full move list as input space 
+
+- 	// Execute a match of gameplay
+	luaRegister(l, "game", func(l *lua.LState) int {
+		// Anonymous function to load characters and stages, and/or wait for them to finish loading
+^ might be a way to load straight into a game through lua scripting
+
+^ counterpoint, main.lua is actually still loaded when you load the game through the command line, so it might work to just place all modded commands in there
+
+-, -stresstest can be used as frameskip from the command line

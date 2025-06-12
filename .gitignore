@@ -9,4 +9,9 @@ Ikemen_GO/external/icons
 Ikemen_GO/external/script
 Ikemen_GO/external/shaders
 !Ikemen_GO/external/mods/
+!Ikemen_GO/save/
+Ikemen_GO/save/stats.json
 !Ikemen_GO/save/config.ini
+!Ikemen_GO/data/
+Ikemen_GO/data/*
+!Ikemen_GO/data/select.def
