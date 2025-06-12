@@ -1,4 +1,7 @@
 # mugen-nn
-- Currently using 60 fps capped ikemen GO, will update this note in the future when that changes.
-- Install Ikemen GO in Ikemen_GO folder, 6/9/25 nightly build of Ikemen GO required, otherwise compatibility with scripts not guaranteed, keep config.ini, select.def, and external_interface.lua from this repository over the Ikemen Nightly versions of those files.
-- You might need luarocks, if you are on windows use this guide if you don't have it https://gist.github.com/Frityet/06ec8d5572b5ea08353c7de92cffc001
+
+- To setup:
+1: Clone https://github.com/JohnAsaro/Ikemen-GO fork of Ikemen GO into folder A
+2: Build the game in folder A
+3: Clone this repository into folder B
+4: Paste the contents of folder A into folder B, merge everything without overwriting anything, you need this version of config.ini, select.def, and external_interface.lua

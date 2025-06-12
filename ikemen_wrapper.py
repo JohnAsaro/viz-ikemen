@@ -9,11 +9,13 @@ import subprocess
 import os 
 from config import ACTIONS, DEFAULT_ACTION_MAPPING
 import pygetwindow as gw
+import sqlite3
 
 # Ikemen GO executable path
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
 IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO.exe")
 IKEMEN_DIR = os.path.join(BASE_DIR, "Ikemen_GO")          # folder that contains Ikemen_GO.exe
+DB_PATH = os.path.join(IKEMEN_DIR, "external", "mods", "bridge.db")  # path to the database file
 CHAR_DEF = os.path.relpath(
     os.path.join(BASE_DIR, "sf_alpha_ryu", "ryu.def"),   # → ../sf_alpha_ryu/ryu.def
     IKEMEN_DIR
@@ -43,9 +45,8 @@ class IkemenEnv(gym.Env):
             "-p2.ai", str(ai_level),  
             "-p2.color", "2",
             "-s", "stages/training.def",
-            "-rounds", "2",
+            "-rounds", "1",
             "--nosound", "--windowed", "--width", "320", "--height", "240",
-            "--setport", "7500",  # set host port, not really neccessary to specify, just here so I remember this isn't the input port, because I had to learn that the hard way
         ]
 
         # launch Ikemen once, keep handle
@@ -116,20 +117,45 @@ class IkemenEnv(gym.Env):
         cv2.imshow("Lifebar Strip (red channel)", lifebar)
         cv2.waitKey(1) # Update OpenCV window every 1 ms
 
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+      CREATE TABLE IF NOT EXISTS commands (
+        id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        cmd  TEXT    NOT NULL,
+        arg  INTEGER,
+        done INTEGER NOT NULL DEFAULT 0
+      )
+    """)
+    conn.commit()
+    conn.close()
+
+def enqueue_command(cmd, arg=None):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("INSERT INTO commands (cmd, arg) VALUES (?, ?)", (cmd, arg))
+    conn.commit()
+    conn.close()
+
+
 if __name__ == "__main__":
     env = IkemenEnv(ai_level=4)
+    init_db()
     obs, _ = env.reset()
     total_reward = 0.0
-    for i in range(6000):           # 1000 seconds at 60 FPS
+    for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # proess is still running
             a  = env.action_space.sample()
-            obs, r, done, trunc, _ = env.step(a)
-            if done:
-                obs, _ = env.reset()
+            #obs, r, done, trunc, _ = env.step(a)
+            enqueue_command("forceAction", 1000)
+            print(f"Enqueued command: forceAction at step {i}")
+            #if done:
+            #    obs, _ = env.reset()
             time.sleep(0.016)  # 60 FPS
-            print(f"Action: {DEFAULT_ACTION_MAPPING[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
+            #print(f"Action: {DEFAULT_ACTION_MAPPING[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
             env.debug_show_grabs()
-            total_reward += r
+            #total_reward += r
         else:
             break
     env.proc.terminate()           # close Ikemen when done
