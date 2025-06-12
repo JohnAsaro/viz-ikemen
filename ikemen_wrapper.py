@@ -117,7 +117,20 @@ class IkemenEnv(gym.Env):
         cv2.imshow("Lifebar Strip (red channel)", lifebar)
         cv2.waitKey(1) # Update OpenCV window every 1 ms
 
-def init_db():
+def init_db(overwrite=True):
+    """Initialize the database, optionally overwriting if it exists."""
+    # Remove existing database if overwrite is True
+    if overwrite and os.path.exists(DB_PATH):
+        try:
+            os.remove(DB_PATH)
+            print(f"Removed existing database at {DB_PATH}")
+        except Exception as e:
+            print(f"Failed to remove existing database: {e}")
+    
+    # Create the directory structure if it doesn't exist
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    
+    # Connect and create tables
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
@@ -130,6 +143,8 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+    
+    print(f"Database initialized at {DB_PATH}")
 
 def enqueue_command(cmd, arg=None):
     conn = sqlite3.connect(DB_PATH)
