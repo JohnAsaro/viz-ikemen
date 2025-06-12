@@ -30,6 +30,14 @@ function forceAction(p, data)
 	end
 end
 
+function forceDP(p)
+	if not player(p) then return false end
+
+	if name() == "Ryu" then
+		changeState(1000)
+	end
+end
+
 -- End [Functions]
 
 -- Per-frame polling loop
@@ -44,12 +52,13 @@ hook.add("loop", "external_interface", function()
 
   for _, row in ipairs(rows) do
     if row.cmd == "forceAction" then
-      forceAction(1, row.arg)
+      forceAction(1, tonumber(row.arg))
     else
       print("[Lua] Unknown cmd:", row.cmd)
     end
-    db:execute(string.format(
-      "UPDATE commands SET done = 1 WHERE id = %d", row.id
-    ))
+    --db:execute(string.format(  --doesnt work, I need to find another way to do this
+    --  "UPDATE commands SET done = 1 WHERE id = %d", row.id
+    --)
+  --)
   end
 end)
