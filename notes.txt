@@ -1,6 +1,3 @@
-- lua to python communication with sqlite
-
-- change num rounds to 1
 
 - only give reward if your guy wins, so reward 1 if win else no
 
@@ -10,11 +7,23 @@
 
 - should have ryu full move list as input space 
 
-- 	// Execute a match of gameplay
-	luaRegister(l, "game", func(l *lua.LState) int {
-		// Anonymous function to load characters and stages, and/or wait for them to finish loading
-^ might be a way to load straight into a game through lua scripting
+- -stresstest can be used as frameskip from the command line
 
-^ counterpoint, main.lua is actually still loaded when you load the game through the command line, so it might work to just place all modded commands in there
+- my options for sending input is either communicating through bitwise mapping with zss lua squlite and python (booooooooooooooooooo) or 
+just formatting forceCommand like I would if building and ai in .cmd, luckily it seems like important calls like "ctrl" are in tact so I think
+I can make it such that moves dont interact that make, which means after fixing up the sql to lua communication i get to work on the ryu ai again yayyy
 
--, -stresstest can be used as frameskip from the command line
+
+luaRegister(l, "command", func(*lua.LState) int {
+		l.Push(lua.LBool(sys.debugWC.commandByName(strArg(l, 1))))
+		return 1
+	})
+
+
+luaRegister(l, "ctrl", func(*lua.LState) int {
+	l.Push(lua.LBool(sys.debugWC.ctrl()))
+	return 1
+})
+
+Reminder when porting over statedefs, triggerall must be met, trigger1-n just one of them have to be met,
+so like trigger1 = 210 mean you can cancel from standing medium punch but dont have to

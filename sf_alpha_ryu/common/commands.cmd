@@ -535,117 +535,6 @@ trigger16 = stateno = 440
 trigger17 = stateno = 450
 
 ;---------------------------------------------------------------------------
-; Messatsu Gou Shoryuu Lvl 1
-[State -1, shoryu_a]
-type = ChangeState
-value = 3060
-triggerall = palno > 6
-triggerall = power >= 1000
-triggerall = command = "shoryu_a"
-triggerall = statetype != A
-trigger1 = ctrl
-
-[State -1, shoryu_a]
-type = ChangeState
-value = 3060
-triggerall = palno > 6
-triggerall = power >= 1000
-triggerall = command = "shoryu_a"
-triggerall = statetype != A
-triggerall = movecontact
-trigger1 = ctrl
-trigger2 = stateno = 200
-trigger3 = stateno = 210
-trigger4 = stateno = 215
-trigger5 = stateno = 216
-trigger6 = stateno = 220
-trigger7 = stateno = 222
-trigger8 = stateno = 225
-trigger9 = stateno = 230
-trigger10 = stateno = 240
-trigger11 = stateno = 250
-trigger12 = stateno = 400
-trigger13 = stateno = 410
-trigger14 = stateno = 420
-trigger15 = stateno = 430
-trigger16 = stateno = 440
-trigger17 = stateno = 450
-
-;---------------------------------------------------------------------------
-; Messatsu Gou Shoryuu Lvl 2
-[State -1, shoryu_b]
-type = ChangeState
-value = 3070
-triggerall = palno > 6
-triggerall = power >= 2000
-triggerall = command = "shoryu_b"
-triggerall = statetype != A
-trigger1 = ctrl
-
-[State -1, shoryu_b]
-type = ChangeState
-value = 3070
-triggerall = palno > 6
-triggerall = power >= 2000
-triggerall = command = "shoryu_b"
-triggerall = statetype != A
-triggerall = movecontact
-trigger1 = ctrl
-trigger2 = stateno = 200
-trigger3 = stateno = 210
-trigger4 = stateno = 215
-trigger5 = stateno = 216
-trigger6 = stateno = 220
-trigger7 = stateno = 222
-trigger8 = stateno = 225
-trigger9 = stateno = 230
-trigger10 = stateno = 240
-trigger11 = stateno = 250
-trigger12 = stateno = 400
-trigger13 = stateno = 410
-trigger14 = stateno = 420
-trigger15 = stateno = 430
-trigger16 = stateno = 440
-trigger17 = stateno = 450
-
-;---------------------------------------------------------------------------
-; Messatsu Gou Shoryuu Lvl 3
-[State -1, shoryu_c]
-type = ChangeState
-value = 3080
-triggerall = palno > 6
-triggerall = power >= 3000
-triggerall = command = "shoryu_c"
-triggerall = statetype != A
-trigger1 = ctrl
-
-[State -1, shoryu_c]
-type = ChangeState
-value = 3080
-triggerall = palno > 6
-triggerall = power >= 3000
-triggerall = command = "shoryu_c"
-triggerall = statetype != A
-triggerall = movecontact
-trigger1 = ctrl
-trigger2 = stateno = 200
-trigger3 = stateno = 210
-trigger4 = stateno = 215
-trigger5 = stateno = 216
-trigger6 = stateno = 220
-trigger7 = stateno = 222
-trigger8 = stateno = 225
-trigger9 = stateno = 230
-trigger10 = stateno = 240
-trigger11 = stateno = 250
-trigger12 = stateno = 400
-trigger13 = stateno = 410
-trigger14 = stateno = 420
-trigger15 = stateno = 430
-trigger16 = stateno = 440
-trigger17 = stateno = 450
-
-;---------------------------------------------------------------------------
 ; Shinkuu Tatsumaki Senpuu Kyaku Lvl 1
 [State -1, hurricane_a]
 type = ChangeState
@@ -1779,9 +1668,9 @@ trigger1 = ctrl
 
 ;--------------------------------------------------
 ;  Shoryuken Anti-Air
-;  •  < 45 px      ? Light Shoryuken   (1000)
-;  •  45–59 px     ? Medium Shoryuken  (1010)
-;  •  60–85 px     ? Heavy Shoryuken   (1020)
+;  •  < 45 px       Light Shoryuken   (1000)
+;  •  45–59 px      Medium Shoryuken  (1010)
+;  •  60–85 px      Heavy Shoryuken   (1020)
 ;--------------------------------------------------
 ;--------------------------------------------------
 ;  1)  Light DP  (close)

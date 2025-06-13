@@ -106,6 +106,8 @@ function forceAction(p, data)
 	end
 end
 
+function forceCommand()
+  
 -- End [Functions]
 
 -- Per-frame polling loop
@@ -121,6 +123,8 @@ hook.add("loop", "external_interface", function()
   for _, row in ipairs(rows) do
     if row.cmd == "forceAction" then
       forceAction(1, tonumber(row.arg))
+    elseif row.cmd == "forceCommand" then
+      forceCommand()
     else
       print("[Lua] Unknown cmd:", row.cmd)
     end
