@@ -106,24 +106,6 @@ function forceAction(p, data)
 	end
 end
 
-function forceDP(p)
-	if not player(p) then return false end
-
-	if name() == "Ryu" then
-		changeState(1000)
-	end
-end
-
-function forceCommand(p, cmdIndex)
-	if not player(p) then return false end
-	if name() ~= "Ryu" then return false end
-  
-	-- Force input 
-	commandInput(main.t_cmd[cmdIndex], main.t_pIn[p])
-	return true
-end
-
-
 -- End [Functions]
 
 -- Per-frame polling loop
@@ -139,10 +121,6 @@ hook.add("loop", "external_interface", function()
   for _, row in ipairs(rows) do
     if row.cmd == "forceAction" then
       forceAction(1, tonumber(row.arg))
-    elseif row.cmd == "forceDP" then
-      forceDP(1)
-    elseif row.cmd == "forceCommand" then
-      forceCommand(1, row.cmd)
     else
       print("[Lua] Unknown cmd:", row.cmd)
     end

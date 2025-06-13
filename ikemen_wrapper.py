@@ -163,7 +163,7 @@ if __name__ == "__main__":
         if env.proc.poll() is None: # proess is still running
             a  = env.action_space.sample()
             #obs, r, done, trunc, _ = env.step(a)
-            enqueue_command("forceCommand", "hadoken_x")
+            enqueue_command("forceAction", "1000")
             print(f"Enqueued command: forceAction at step {i}")
             #if done:
             #    obs, _ = env.reset()
