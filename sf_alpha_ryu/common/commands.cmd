@@ -1272,24 +1272,6 @@ trigger3 = stateno = 152
 ;---------------------------------------------------------------------------
 ; Basic Moves
 ;---------------------------------------------------------------------------
-; Glide Fwd
-[State -1, Run Fwd]
-type = ChangeState
-value = 90
-triggerall = PalNo > 6
-trigger1 = command = "FF"
-trigger1 = statetype = S
-trigger1 = ctrl
-
-;---------------------------------------------------------------------------
-; Glide Back
-[State -1, Run Back]
-type = ChangeState
-value = 95
-triggerall = PalNo > 6
-trigger1 = command = "BB"
-trigger1 = statetype = S
-trigger1 = ctrl
 
 ;---------------------------------------------------------------------------
 ; Hop Fwd
@@ -1412,17 +1394,6 @@ trigger1 = ctrl
 type = ChangeState
 value = 215
 triggerall = PalNo < 7
-triggerall = command = "fwd_y"
-triggerall = command != "holddown"
-trigger1 = statetype = S
-trigger1 = ctrl
-
-;---------------------------------------------------------------------------
-; Top Down Chop
-[State -1, Chop]
-type = ChangeState
-value = 216
-triggerall = PalNo > 6
 triggerall = command = "fwd_y"
 triggerall = command != "holddown"
 trigger1 = statetype = S
