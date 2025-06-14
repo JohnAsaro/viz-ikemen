@@ -3,11 +3,10 @@ import gymnasium as gym
 import numpy as np
 import cv2
 import mss
-import pydirectinput
 import time
 import subprocess 
 import os 
-from config import ACTIONS, DEFAULT_ACTION_MAPPING
+from commands import ACTIONS, RYU_STATES
 import pygetwindow as gw
 import sqlite3
 
@@ -61,29 +60,96 @@ class IkemenEnv(gym.Env):
         # The capture is exactly at (x, y), with a size of (w, h)
         self.sct  = mss.mss()
         self.win = {"left": x, "top": y, "width": w, "height": h}
+        self.init_db() 
     # -----------------------------------------------------------------
-    
+    def init_db(self, overwrite=True):
+        """Initialize the database, overwriting if it exists."""
+        # Remove existing database if overwrite is True
+        if overwrite and os.path.exists(DB_PATH):
+            try:
+                os.remove(DB_PATH)
+                print(f"Removed existing database at {DB_PATH}")
+            except Exception as e:
+                print(f"Failed to remove existing database: {e}")
+        
+        # Create the directory structure if it doesn't exist
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        
+        # Connect and create tables
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS episodes (
+            id   INTEGER PRIMARY KEY AUTOINCREMENT,
+            cmd  TEXT    NOT NULL,
+            arg  INTEGER,
+            done INTEGER NOT NULL DEFAULT 0
+        )
+        """)
+        conn.commit()
+        conn.close()
+        
+        print(f"Database initialized at {DB_PATH}")
+
+    def enqueue_command(self, cmd, arg):
+        """
+        - Update the existing episodes command column
+        - If no episode active, insert a new episode 
+        """
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # Check if there's any active episode (done=0)
+        c.execute("SELECT id FROM episodes WHERE done = 0 LIMIT 1")
+        active_cmd = c.fetchone()
+        
+        if active_cmd:
+            # Update the existing active command
+            c.execute(
+                "UPDATE episodes SET cmd = ?, arg = ? WHERE id = ?",
+                (cmd, arg, active_cmd[0])
+            )
+            print(f"Updated existing episode ID {active_cmd[0]}")
+        else:
+            # No active episode, insert a new one
+            c.execute(
+                "INSERT INTO episodes (cmd, arg, done) VALUES (?, ?, 0)",
+                (cmd, arg)
+            )
+        
+        conn.commit()
+        conn.close()
+
+    def finish_episode(self):
+        """Mark row with that told Ryu what to do in the last episode as done."""
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # Find and mark the most recent command
+        c.execute("UPDATE episodes SET done = 1 WHERE id = (SELECT MAX(id) FROM episodes WHERE done = 0)")
+        
+        # Check if any row was affected
+        if c.rowcount > 0:
+            print("Marked episode as complete.")
+        
+        conn.commit()
+        conn.close()
+    # ----------------------------------------------------------------
     def _grab(self):
         frm = np.array(self.sct.grab(self.win))[:,:,:3]
         frm = cv2.cvtColor(frm, cv2.COLOR_BGR2GRAY)
         frm = cv2.resize(frm, (84,84), interpolation=cv2.INTER_AREA)
         return frm
 
-    def _press(self, a):
-        key = ACTIONS[a]
-        pydirectinput.keyDown(key); pydirectinput.keyUp(key)
-
-    # -----------------------------------------------------------------
     def reset(self, seed=None, options=None):
-        # F4 is Ikemen’s hard reset
-        pydirectinput.keyDown("f4"); pydirectinput.keyUp("f4"); time.sleep(0.1)
+        # pydirectinput.keyDown("f4"); pydirectinput.keyUp("f4"); time.sleep(0.1) # Must find a new way to reset
         frame = self._grab()
         self.stack = [frame]*4
         self.prev_p2 = self._lifebar_p2()
         return np.stack(self.stack,0), {}
-
+    # -----------------------------------------------------------------
     def step(self, action):
-        self._press(action)
+        self.enqueue_command(cmd = "forceAction", arg = RYU_STATES[ACTIONS[action]])
         frame = self._grab()
         self.stack.pop(0); self.stack.append(frame)
 
@@ -117,62 +183,22 @@ class IkemenEnv(gym.Env):
         cv2.imshow("Lifebar Strip (red channel)", lifebar)
         cv2.waitKey(1) # Update OpenCV window every 1 ms
 
-def init_db(overwrite=True):
-    """Initialize the database, optionally overwriting if it exists."""
-    # Remove existing database if overwrite is True
-    if overwrite and os.path.exists(DB_PATH):
-        try:
-            os.remove(DB_PATH)
-            print(f"Removed existing database at {DB_PATH}")
-        except Exception as e:
-            print(f"Failed to remove existing database: {e}")
-    
-    # Create the directory structure if it doesn't exist
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    
-    # Connect and create tables
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("""
-      CREATE TABLE IF NOT EXISTS commands (
-        id   INTEGER PRIMARY KEY AUTOINCREMENT,
-        cmd  TEXT    NOT NULL,
-        arg  INTEGER,
-        done INTEGER NOT NULL DEFAULT 0
-      )
-    """)
-    conn.commit()
-    conn.close()
-    
-    print(f"Database initialized at {DB_PATH}")
-
-def enqueue_command(cmd, arg=None):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("INSERT INTO commands (cmd, arg) VALUES (?, ?)", (cmd, arg))
-    conn.commit()
-    conn.close()
-
-
 if __name__ == "__main__":
     env = IkemenEnv(ai_level=4)
-    init_db()
-    obs, _ = env.reset()
     total_reward = 0.0
+    obs, _ = env.reset()
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # proess is still running
             a  = env.action_space.sample()
-            #obs, r, done, trunc, _ = env.step(a)
-            enqueue_command("forceAction", "1000")
-            print(f"Enqueued command: forceAction at step {i}")
-            #if done:
-            #    obs, _ = env.reset()
+            obs, r, done, trunc, _ = env.step(a)
             time.sleep(0.016)  # 60 FPS
-            #print(f"Action: {DEFAULT_ACTION_MAPPING[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
+            print(f"Enqueued command: forceAction at step {i}")
+            print(f"Action: {[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
             env.debug_show_grabs()
-            #total_reward += r
+            total_reward += r
         else:
             break
+    env.finish_episode()               # Mark row as done in the database 
     env.proc.terminate()           # close Ikemen when done
     cv2.destroyAllWindows()        # close all OpenCV windows
     print(f"Total reward: {total_reward:.2f}")

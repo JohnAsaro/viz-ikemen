@@ -106,14 +106,13 @@ function forceAction(p, data)
 	end
 end
 
-function forceCommand()
   
 -- End [Functions]
 
 -- Per-frame polling loop
 hook.add("loop", "external_interface", function()
   local rows, qerr = db:query([[
-    SELECT id, cmd, arg FROM commands WHERE done = 0;
+    SELECT id, cmd, arg FROM episodes WHERE done = 0;
   ]])
   if not rows then
     if qerr ~= "no rows" then print("[Lua][DB error]", qerr) end
@@ -123,13 +122,11 @@ hook.add("loop", "external_interface", function()
   for _, row in ipairs(rows) do
     if row.cmd == "forceAction" then
       forceAction(1, tonumber(row.arg))
-    elseif row.cmd == "forceCommand" then
-      forceCommand()
     else
       print("[Lua] Unknown cmd:", row.cmd)
     end
     --db:execute(string.format(  --doesnt work, I need to find another way to do this
-    --  "UPDATE commands SET done = 1 WHERE id = %d", row.id
+    --  "UPDATE episodes SET done = 1 WHERE id = %d", row.id
     --)
   --)
   end

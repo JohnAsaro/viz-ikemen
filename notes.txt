@@ -14,16 +14,41 @@ just formatting forceCommand like I would if building and ai in .cmd, luckily it
 I can make it such that moves dont interact that make, which means after fixing up the sql to lua communication i get to work on the ryu ai again yayyy
 
 
-luaRegister(l, "command", func(*lua.LState) int {
-		l.Push(lua.LBool(sys.debugWC.commandByName(strArg(l, 1))))
-		return 1
-	})
+			luaRegister(l, "command", func(*lua.LState) int {
+					l.Push(lua.LBool(sys.debugWC.commandByName(strArg(l, 1))))
+					return 1
+				})
 
 
-luaRegister(l, "ctrl", func(*lua.LState) int {
-	l.Push(lua.LBool(sys.debugWC.ctrl()))
-	return 1
-})
+			luaRegister(l, "ctrl", func(*lua.LState) int {
+				l.Push(lua.LBool(sys.debugWC.ctrl()))
+				return 1
+			})
 
-Reminder when porting over statedefs, triggerall must be met, trigger1-n just one of them have to be met,
-so like trigger1 = 210 mean you can cancel from standing medium punch but dont have to
+			Reminder when porting over statedefs, triggerall must be met, trigger1-n just one of them have to be met,
+			so like trigger1 = 210 mean you can cancel from standing medium punch but dont have to
+
+- actually no I probably need to do weird lua mapping stuff ughhhhhhhhhhhhhhh, probably the best way to do this would be assert input for normals and directions and then change state conditionally for everything else?
+tommorow I have to take a closer look at how walking and buttons are handeled, althought I guess I can do everything in lua it would just be a lot of changestate change anim, would have to basically rewrite the entire char,
+but maybe thats fine idk
+
+- okay i think what I want to do can be achieved through assertCommand and bitwise mapping
+
+Actually it doesnt seem that bad, so the zss script probably looks something like
+
+zss:
+[Statedef -4]
+
+map(relevant_command: 0)
+map(relevant_command2: 0)
+etc...
+if relevant_command = 1, assertCommand(relevant_command)
+
+On the lua side, 
+local str curr, prev
+
+function luaAssertCommand(str: cmd):
+	mapSet(prev, 0)
+	mapSet(curr, 1)
+
+and a few obvious changes on the python wrapper side

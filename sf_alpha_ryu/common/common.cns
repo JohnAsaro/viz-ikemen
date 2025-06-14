@@ -27,13 +27,6 @@ trigger1 = Anim != 0 && Anim != 5
 trigger2 = Anim = 5 && AnimTime = 0 ;Turn anim over
 value = 0
 
-[State 0, 1]
-type = ChangeAnim
-triggerall = PalNo > 6
-trigger1 = Anim != 1 && Anim != 5
-trigger2 = Anim = 5 && AnimTime = 0 ;Turn anim over
-value = 1
-
 [State 0, 2]
 type = VelSet
 trigger1 = Time = 0

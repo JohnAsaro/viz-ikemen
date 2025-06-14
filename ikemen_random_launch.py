@@ -2,7 +2,7 @@
 
 import time
 from ikemen_wrapper import IkemenEnv      
-from config import ACTIONS, DEFAULT_ACTION_MAPPING
+from commands import ACTIONS, RYU_STATES
 
 N_EPISODES = 1                         # how many two-round matches to run
 STEP_DELAY = 0.016                      # ≈60 FPS
@@ -16,7 +16,7 @@ def run_episode(ai_level=4):
     while env.proc.poll() is None:      # loop until the IKEMEN window quits
         a = env.action_space.sample()
         obs, r, done, trunc, _ = env.step(a)
-        print(f"Action: {DEFAULT_ACTION_MAPPING[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
+        print(f"Action: {RYU_STATES[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
         time.sleep(STEP_DELAY)
         total_reward_episode += r
 
