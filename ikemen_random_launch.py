@@ -4,11 +4,11 @@ import time
 from ikemen_wrapper import IkemenEnv      
 from commands import ACTIONS, RYU_STATES
 
-N_EPISODES = 1                         # how many two-round matches to run
+N_EPISODES = 1                         # how many matches to run
 STEP_DELAY = 0.016                      # ≈60 FPS
 
 def run_episode(ai_level=4):
-    """Play N 2-round matchs and return when Ikemen closes."""
+    """Play N 1-round matchs and return when Ikemen closes."""
     env = IkemenEnv(ai_level=ai_level)
     obs, _ = env.reset()
     total_reward_episode = 0.0

@@ -52,3 +52,10 @@ function luaAssertCommand(str: cmd):
 	mapSet(curr, 1)
 
 and a few obvious changes on the python wrapper side
+
+- I have to have some handeler that decides what happens if there is a tie, 
+like so I think that means the sqlite episode should only be marked done if our ryu 
+explicitly wins or loses because I believe the round is played again if there is a tie (gotta check if this is right tho)
+
+
+- actually no more Ryu if I want to distrubute this he has got to go, that really bums me out but honestly I should have thought of that earlier

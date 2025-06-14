@@ -43,12 +43,6 @@ name = "shoryu_c"
 command = ~D, DF, F, D, DF, F, c
 time = 25
 
-; Shun Goku Satsu
-[Command]
-name = "shungokusatsu"
-command = x, x, F, a, z
-time = 30
-
 ;-| Special Motions |------------------------------------------------------
 
 ; Shoryuken
@@ -1639,9 +1633,9 @@ trigger1 = ctrl
 
 ;--------------------------------------------------
 ;  Shoryuken Anti-Air
-;  •  < 45 px       Light Shoryuken   (1000)
-;  •  45–59 px      Medium Shoryuken  (1010)
-;  •  60–85 px      Heavy Shoryuken   (1020)
+;  ï¿½  < 45 px       Light Shoryuken   (1000)
+;  ï¿½  45ï¿½59 px      Medium Shoryuken  (1010)
+;  ï¿½  60ï¿½85 px      Heavy Shoryuken   (1020)
 ;--------------------------------------------------
 ;--------------------------------------------------
 ;  1)  Light DP  (close)
@@ -1690,8 +1684,8 @@ trigger1   = Random < (40 + 12*AILevel) ; 4-16% chance depending on difficulty
 
 ;--------------------------------------------------
 ;  Zoning Hadouken (Far)
-;  • 40 % chance = Heavy Shakunetsu Hadoken (1350)
-;  • 60 % chance = Heavy Hadoken (1320)
+;  ï¿½ 40 % chance = Heavy Shakunetsu Hadoken (1350)
+;  ï¿½ 60 % chance = Heavy Hadoken (1320)
 ;--------------------------------------------------
 [State -1, CPU Hadouken Far]
 type       = ChangeState
@@ -1705,8 +1699,8 @@ trigger1   = P2BodyDist X > 170
 trigger1   = Random < (300 + 50*AILevel) ; 30-70% chance depending on difficulty
 ;--------------------------------------------------
 ;  Zoning Hadouken (Close)
-;  • 40 % chance = Light Shakunetsu Hadoken (1330)
-;  • 60 % chance = Light Hadoken (1300)
+;  ï¿½ 40 % chance = Light Shakunetsu Hadoken (1330)
+;  ï¿½ 60 % chance = Light Hadoken (1300)
 ;--------------------------------------------------
 [State -1, CPU Hadouken Close]
 type       = ChangeState
@@ -1741,11 +1735,11 @@ triggerall = EnemyNear, MoveType != H   ; not in hit-stun / lying
 trigger1   = P2BodyDist X < 25          ; In throw range
 
 ; ---- small randomness so it doesn't throw every single time --
-trigger1   = Random < (40 + 30*AILevel)  ; 4–28% depending on difficulty
+trigger1   = Random < (40 + 30*AILevel)  ; 4ï¿½28% depending on difficulty
 ;--------------------------------------------------
 
 ;--------------------------------------------------
-;  CPU Alpha Counter  – 5 % each
+;  CPU Alpha Counter  ï¿½ 5 % each
 ;--------------------------------------------------
 
 ;--------------------------------------------------
@@ -1761,7 +1755,7 @@ triggerall = Time >= 5		 ; time not over
 triggerall = StateNo = [150,152] ; the guard-shake states
 persistent = 0                   ; one roll per block-string
 trigger1   = P2BodyDist X < 50          ; in counter range
-trigger1   = Random < 50         ; 5 %  (0–49)
+trigger1   = Random < 50         ; 5 %  (0ï¿½49)
 ;--------------------------------------------------
 ;  Sweep AC  (state 960)
 ;--------------------------------------------------
@@ -1775,6 +1769,6 @@ triggerall = Time >= 5
 triggerall = StateNo = [150,152]
 persistent = 0
 trigger1   = P2BodyDist X < 50          
-trigger1   = Random >= 50 && Random < 100   ; Next 5 %  (50–99)
+trigger1   = Random >= 50 && Random < 100   ; Next 5 %  (50ï¿½99)
 ;==============================================================
 
