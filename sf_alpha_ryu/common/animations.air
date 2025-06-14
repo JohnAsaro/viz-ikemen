@@ -2556,6 +2556,10 @@ Clsn2Default: 2
 4400,0, 0,0, 1, , A
 
 
+; Super Explode 2
+[Begin Action 4401]
+4401,0, 0,0, 1, , A
+
 ; Impact
 [Begin Action 4500]
 4500,7, 0,0, 1

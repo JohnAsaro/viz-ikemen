@@ -27,6 +27,7 @@ sound	 = common/sounds.snd	 ;Sound
 st       = state/override.cns	;Override States and CPU activation code
 st1	 = state/ryu.cns	;Ryu's States
 st2	 = state/custom.cns	;Custom state
+;st3 	 = state/external.zss   ;External 
 ;--------------------
 ;[Palettes] ;(can have up to 12)
 ;--------------------

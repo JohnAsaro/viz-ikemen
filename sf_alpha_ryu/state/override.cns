@@ -20,14 +20,14 @@
 type = Explod
 triggerall = MoveHit
 triggerall = WinKO = 1
-triggerall = NumExplod(4400) = 0
+triggerall = NumExplod(4401) = 0
 trigger1 = HitDefAttr = SA, HA
 trigger2 = StateNo = 3805
 pos = 0,0
 postype = left
 bindtime = -1
-anim = 4400
-id = 4400
+anim = 4401
+id = 4401
 sprpriority = -5
 removetime = 50
 ignorehitpause = 1
@@ -38,14 +38,14 @@ ownpal = 1
 type = Explod
 triggerall = ProjHit = 1
 triggerall = WinKO = 1
-triggerall = NumExplod(4400) = 0
+triggerall = NumExplod(4401) = 0
 trigger1 = HitDefAttr = SA, HP
 trigger2 = NumProjid(1440) > 0
 pos = 0,0
 postype = left
 bindtime = -1
-anim = 4400
-id = 4400
+anim = 4401
+id = 4401
 sprpriority = -5
 removetime = 50
 ignorehitpause = 1
@@ -55,7 +55,7 @@ ownpal = 1
 [State -2, KOSound]
 type = PlaySnd
 triggerall = WinKO = 1
-triggerall = NumExplod(4400) = 1
+triggerall = NumExplod(4401) = 1
 trigger1 = Var(20) = 0
 value = 20,1
 ignorehitpause = 1
@@ -64,7 +64,7 @@ channel = 1
 [State -2, 1]
 type = VarAdd
 triggerall = WinKO = 1
-triggerall = NumExplod(4400) = 1
+triggerall = NumExplod(4401) = 1
 trigger1 = TimeMod = 1,0
 ignorehitpause = 1
 v = 20
@@ -73,7 +73,7 @@ value = 10
 [State -2, 2]
 type = VarSet
 triggerall = WinKO = 1
-triggerall = NumExplod(4400) = 1
+triggerall = NumExplod(4401) = 1
 trigger1 = Var(20) >= 200
 ignorehitpause = 1
 v = 20
@@ -82,7 +82,7 @@ value = -1
 [State -2,3]
 type = Envcolor
 triggerall = WinKO = 1
-trigger1 = NumExplod(4400) = 1
+trigger1 = NumExplod(4401) = 1
 value = var(20),var(20),var(20)
 ignorehitpause = 1
 under = 1
@@ -90,7 +90,7 @@ under = 1
 [State -2,4]
 type = AssertSpecial
 triggerall = WinKO = 1
-trigger1 = NumExplod(4400) = 1
+trigger1 = NumExplod(4401) = 1
 ignorehitpause = 1
 flag = NoMusic
 

@@ -35,5 +35,4 @@
 	7 - It is impossible to kill with Shin Shoryuken, the opponent will be dizzied instead. 
 
 - Issues:
-	1 - In Ikemen GO the KO background flashes for 1 frame whenever you super. This does not happen in any version of the original mugen.
-	2 - Shakunetsu Hadoken flashes blue sometimes.
+	1 - Shakunetsu Hadoken flashes blue sometimes.
