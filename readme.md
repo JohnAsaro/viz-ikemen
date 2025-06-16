@@ -7,6 +7,6 @@
 3. Clone this repository into folder B
 4. Paste the contents of folder A into folder B, merging everything without overwriting anything. The following files from this repository must be preserved:
    - `config.ini`
-   - `data/select.def`
+   - `data/select.def` <- remove sf_alpha_ryu from file if you dont have him
    - `external/script/external_interface.lua`
    - `external/script/main.lua`

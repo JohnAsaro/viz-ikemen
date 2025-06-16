@@ -194,8 +194,6 @@
  ;Insert your characters below.
 
 kfm_zss, stages/kfm.def
-kfm720, stages/kfm.def, order=0
-kfm_zaxis, stages/kfm.def, order=0
 sf_alpha_ryu/ryu.def
 randomselect
 
