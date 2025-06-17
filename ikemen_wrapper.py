@@ -185,7 +185,7 @@ class IkemenEnv(gym.Env):
         cv2.waitKey(1) # Update OpenCV window every 1 ms
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=4)
+    env = IkemenEnv(ai_level=1)
     total_reward = 0.0
     obs, _ = env.reset()
     for i in range(1, 6001):           # 1000 seconds at 60 FPS

@@ -2541,7 +2541,7 @@ call EndState(0);
 # States that are executed when in self's state file (use StateDef -3)
 #===============================================================================
 [StateDef -3]
-#displayToClipboard{text: "p1cp: %f p2cp: %f"; params: p2BodyDist X,map(jug)}
+displayToClipboard{text: "p1cp: %f p2cp: %f input_map: %f"; params: p2BodyDist X,map(jug), map(ext_command)}
 
 #Landing Sound
 #This controller plays a sound every time KFM lands from a jump, or back-dash.
