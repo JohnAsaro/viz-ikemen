@@ -194,6 +194,7 @@
  ;Insert your characters below.
 
 kfm_zss, stages/kfm.def
+kfm_env/kfm_env.def
 sf_alpha_ryu/ryu.def
 randomselect
 

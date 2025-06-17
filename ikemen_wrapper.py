@@ -16,7 +16,7 @@ IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO.exe")
 IKEMEN_DIR = os.path.join(BASE_DIR, "Ikemen_GO")          # folder that contains Ikemen_GO.exe
 DB_PATH = os.path.join(IKEMEN_DIR, "external", "mods", "bridge.db")  # path to the database file
 CHAR_DEF = os.path.relpath(
-    os.path.join(BASE_DIR, "sf_alpha_ryu", "ryu.def"),   # → ../sf_alpha_ryu/ryu.def
+    os.path.join(BASE_DIR, "kfm_env", "kfm_env.def"),
     IKEMEN_DIR
 )
 

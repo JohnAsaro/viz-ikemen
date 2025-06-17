@@ -14,18 +14,20 @@ localcoord = 320,240        ;Local coordinate space width and height
 
 ; Files for the player
 [Files]
-cmd     = kfm.cmd           ;Command set
-cns     = kfm.const         ;Constants
-st      = kfm.zss           ;States
-st2 = hits.zss
-st3 = command.zss
-st4 = AI.zss
+cmd     = common/kfm.cmd           ;Command set
+cns     = common/kfm.const         ;Constants
+st      = states/kfm.zss           ;States
+st2 = states/hits.zss
+st3 = states/command.zss
+st4 = states/AI.zss
+st5 = states/external.zss           ;External interface that allows us to interact with KFM directly through lua mapSet
+;st6 = states/debug_mapping.zss      ;Testing ground for interacting with KFM directly via zss, should be commented out when not testing
 stcommon = common1.cns.zss  ;Common states (from data/ or motif)
-sprite  = kfm.sff           ;Sprite
-anim    = kfm.air           ;Animation
-sound   = kfm.snd           ;Sound
-ai      = kfm.ai            ;AI hints data (not used)
-movelist = movelist.dat     ;Ikemen feature: Movelist
+sprite  = common/kfm.sff           ;Sprite
+anim    = common/kfm.air           ;Animation
+sound   = common/kfm.snd           ;Sound
+ai      = kfm.ai            ;AI hints data (not used, however, this line has been a included in every kfm.def since the beginning of time, and thus is probably important)
+movelist = common/movelist.dat     ;Ikemen feature: Movelist
 
 ; Maps character selection buttons to palette numbers.
 [Palette Keymap]
@@ -44,5 +46,5 @@ c2 = 12
 
 ; Arcade mode
 [Arcade]
-intro.storyboard = intro.def
-ending.storyboard = ending.def
+intro.storyboard = arcade/intro.def
+ending.storyboard = arcade/ending.def

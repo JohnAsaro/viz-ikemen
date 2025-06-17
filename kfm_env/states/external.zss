@@ -1,0 +1,188 @@
+[StateDef -4] # Global states (not halted by pause/superPause, no helper limitations)
+
+if roundState != 2{ # While the match is not going on
+    mapSet{map: "ext_command"; value: 0} # Assert no commands
+}
+
+#Assert commands based on mapping
+if ctrl {
+    #-| Super Moves |--------------------------------------------------------
+
+    if map(ext_command) = 1{
+        assertCommand{name: "TripleKFPalm"; buffer.time: 1}
+    }
+    if map(ext_command) = 2{
+        assertCommand{name: "SmashKFUpper"; buffer.time: 1}
+    }
+    #-| Kung Fu Blocking (Parry) |------------------------------------------------------
+
+    if map(ext_command) = 3{
+        assertCommand{name: "blocking"; buffer.time: 1}
+    }
+    if map(ext_command) = 4{
+        assertCommand{name: "blocking"; buffer.time: 1}
+        assertCommand{name: "holddown"; buffer.time: 1}
+    }
+
+    #-| Special Moves |------------------------------------------------------
+
+    # Kung Fu Upper
+
+    if map(ext_command) = 5{
+        assertCommand{name: "upper_x"; buffer.time: 1}
+    }
+    if map(ext_command) = 6{
+        assertCommand{name: "upper_y"; buffer.time: 1}
+    }
+    if map(ext_command) = 7{
+        assertCommand{name: "upper_xy"; buffer.time: 1}
+    }
+
+    # Kung Fu Palm
+
+    if map(ext_command) = 8{
+        assertCommand{name: "QCF_x"; buffer.time: 1}
+    }
+    if map(ext_command) = 9{
+        assertCommand{name: "QCF_y"; buffer.time: 1}
+    }
+    if map(ext_command) = 10{
+        assertCommand{name: "QCF_xy"; buffer.time: 1}
+    }
+
+    # Kung Fu Blow
+
+    if map(ext_command) = 11{
+        assertCommand{name: "QCB_x"; buffer.time: 1}
+    }
+    if map(ext_command) = 12{
+        assertCommand{name: "QCB_y"; buffer.time: 1}
+    }
+    if map(ext_command) = 13{
+        assertCommand{name: "QCB_xy"; buffer.time: 1}
+    }
+
+    # Kung Fu Zankou
+
+    if map(ext_command) = 14{
+        assertCommand{name: "QCF_x"; buffer.time: 1}
+    }
+    if map(ext_command) = 15{
+        assertCommand{name: "QCF_y"; buffer.time: 1}
+    }
+    if map(ext_command) = 16{
+        assertCommand{name: "QCF_xy"; buffer.time: 1}
+    }
+
+    # Kung Fu Knee
+
+    if map(ext_command) = 17{
+        assertCommand{name: "FF_a"; buffer.time: 1}
+    }
+    if map(ext_command) = 18{
+        assertCommand{name: "FF_b"; buffer.time: 1}
+    }
+    if map(ext_command) = 19{
+        assertCommand{name: "FF_ab"; buffer.time: 1}
+    }
+
+    #-| Run |------------------------------------------------------
+
+    if map(ext_command) = 20{
+        assertCommand{name: "FF"; buffer.time: 1}
+    }
+    if map(ext_command) = 21{
+        assertCommand{name: "BB"; buffer.time: 1}
+    }
+
+    #-| Recovery |-----------------------------------------------
+
+    if map(ext_command) = 22{
+        assertCommand{name: "recovery"; buffer.time: 1}
+    }
+
+    #-| Standing/Jumping Buttons/KF Knee Followup |---------------------------------------------------------
+
+    if map(ext_command) = 23{
+        assertCommand{name: "a"; buffer.time: 1}
+    }
+    if map(ext_command) = 24{
+        assertCommand{name: "b"; buffer.time: 1}
+    }
+
+    if map(ext_command) = 25{
+        assertCommand{name: "x"; buffer.time: 1}
+    }
+    if map(ext_command) = 26{
+        assertCommand{name: "y"; buffer.time: 1}
+    }
+
+    #-| Crouching Buttons |---------------------------------------------------------
+
+    if map(ext_command) = 27{
+        assertCommand{name: "a"; buffer.time: 1}
+        assertCommand{name: "holddown"; buffer.time: 1}
+    }
+    if map(ext_command) = 28{
+        assertCommand{name: "b"; buffer.time: 1}
+        assertCommand{name: "holddown"; buffer.time: 1}
+    }
+
+    if map(ext_command) = 29{
+        assertCommand{name: "x"; buffer.time: 1}
+        assertCommand{name: "holddown"; buffer.time: 1}
+    }
+    if map(ext_command) = 30{
+        assertCommand{name: "y"; buffer.time: 1}
+        assertCommand{name: "holddown"; buffer.time: 1}
+    }
+
+    #-| Taunt |---------------------------------------------------------
+
+    if map(ext_command) = 31{
+        assertCommand{name: "start"; buffer.time: 1}
+    }
+
+    #-| Throws |---------------------------------------------------------
+
+    if map(ext_command) = 32{
+        assertCommand{name: "holdfwd"; buffer.time: 1}
+        assertCommand{name: "y"; buffer.time: 1}
+    }
+    if map(ext_command) = 33{
+        assertCommand{name: "holdback"; buffer.time: 1}
+        assertCommand{name: "y"; buffer.time: 1}
+    }
+
+    #-| 8 Cardinal Directions |---------------------------------------------------------
+
+    if map(ext_command) = 34{
+        assertCommand{name: "holdfwd"; buffer.time: 1}
+    }
+    if map(ext_command) = 35{
+        assertCommand{name: "holdback"; buffer.time: 1}
+    }
+    if map(ext_command) = 36{
+        assertCommand{name: "holdup"; buffer.time: 1}
+    }
+    if map(ext_command) = 37{
+        assertCommand{name: "holddown"; buffer.time: 1}
+    }
+
+    if map(ext_command) = 38{
+        assertCommand{name: "holdfwd"; buffer.time: 1}
+        assertCommand{name: "holdup"; buffer.time: 1}
+    }
+    if map(ext_command) = 39{
+        assertCommand{name: "holdback"; buffer.time: 1}
+        assertCommand{name: "holdup"; buffer.time: 1}
+    }
+    if map(ext_command) = 40{
+        assertCommand{name: "holdfwd"; buffer.time: 1}
+        assertCommand{name: "holddown"; buffer.time: 1}
+    }
+    if map(ext_command) = 41{
+        assertCommand{name: "holdback"; buffer.time: 1}
+        assertCommand{name: "holddown"; buffer.time: 1}
+    }
+}
