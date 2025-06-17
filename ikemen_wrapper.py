@@ -42,10 +42,11 @@ class IkemenEnv(gym.Env):
             "-p1.color", "1",
             "-p2", CHAR_DEF,                 # P2 CPU
             "-p2.ai", str(ai_level),  
-            "-p2.color", "2",
+            "-p2.color", "3",
             "-s", "stages/training.def",
             "-rounds", "1",
-            "--nosound", "--windowed", "--width", "320", "--height", "240",
+            "--nosound",
+            "--windowed", "--width", "320", "--height", "240",
         ]
 
         # launch Ikemen once, keep handle
@@ -58,7 +59,7 @@ class IkemenEnv(gym.Env):
         time.sleep(2)                             # give window time
         x, y, w, h = find_ikemen_rect()
         # The capture is exactly at (x, y), with a size of (w, h)
-        self.sct  = mss.mss()
+        self.sct  = mss.mss() # Screenshot
         self.win = {"left": x, "top": y, "width": w, "height": h}
         self.init_db() 
     # -----------------------------------------------------------------
@@ -188,7 +189,7 @@ if __name__ == "__main__":
     total_reward = 0.0
     obs, _ = env.reset()
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
-        if env.proc.poll() is None: # proess is still running
+        if env.proc.poll() is None: # Process is still running
             a  = env.action_space.sample()
             obs, r, done, trunc, _ = env.step(a)
             time.sleep(0.016)  # 60 FPS
