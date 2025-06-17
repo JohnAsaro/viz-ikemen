@@ -95,8 +95,8 @@ mapSet{map: "ext_dback"; value: 0} # Down Back, assertCommand holdback + assertC
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 
-#Assert Based On Mapping
-if ctrl {
+# Assert Based On Mapping
+if ctrl { # If we have control of the character, prevents us from doing actions while performing a different action or getting hit
     #-| Super Moves |--------------------------------------------------------
 
     if map(ext_TripleKFPalm) = 1{
