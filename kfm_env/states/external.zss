@@ -1,7 +1,7 @@
 [StateDef -4] # Global states (not halted by pause/superPause, no helper limitations)
 
 if roundState != 2{ # While the match is not going on
-    mapSet{map: "ext_command"; value: 0} # Assert no commands
+    mapSet{map: "ext_command"; value: 27} # Assert no commands
 }
 
 #Assert commands based on mapping
@@ -20,8 +20,8 @@ if ctrl {
         assertCommand{name: "blocking"; buffer.time: 1}
     }
     if map(ext_command) = 4{ # Kung Fu Blocking (Low)
+        assertInput{flag: D}
         assertCommand{name: "blocking"; buffer.time: 1}
-        assertCommand{name: "holddown"; buffer.time: 1}
     }
 
     #-| Special Moves |------------------------------------------------------
@@ -103,38 +103,34 @@ if ctrl {
 
     #-| Standing/Jumping Buttons/KF Knee Followup |---------------------------------------------------------
 
-    if map(ext_command) = 23{ # Standing Light Punch (becomes jumping light punch in air)
+    if map(ext_command) = 23{ # Standing Light Kick (becomes jumping light kick in air/kick followup when done after KF knee)
         assertCommand{name: "a"; buffer.time: 1}
     }
-    if map(ext_command) = 24{ # Standing Strong Punch (becomes jumping strong punch in air)
+    if map(ext_command) = 24{ # Standing Strong Kick (becomes jumping strong kick in air/kick followup when done after KF kne)
         assertCommand{name: "b"; buffer.time: 1}
     }
 
-    if map(ext_command) = 25{ # Standing Light Kick (becomes jumping light kick in air/kick followup when done after KF knee)
+    if map(ext_command) = 25{ # Standing Light Punch (becomes jumping light punch in air)
         assertCommand{name: "x"; buffer.time: 1}
     }
-    if map(ext_command) = 26{ # Standing Strong Kick (becomes jumping strong kick in air/kick followup when done after KF knee)
+    if map(ext_command) = 26{ # Standing Strong Punch (becomes jumping strong punch in aire)
         assertCommand{name: "y"; buffer.time: 1}
     }
 
     #-| Crouching Buttons |---------------------------------------------------------
 
-    if map(ext_command) = 27{ # Crouching Light Punch
-        assertCommand{name: "a"; buffer.time: 1}
-        assertCommand{name: "holddown"; buffer.time: 1}
+    if map(ext_command) = 27{ # Crouching Light Kick
+        assertInput{flag: D; flag2: a}
     }
-    if map(ext_command) = 28{ # Crouching Strong Punch
-        assertCommand{name: "b"; buffer.time: 1}
-        assertCommand{name: "holddown"; buffer.time: 1}
+    if map(ext_command) = 28{ # Crouching Strong Kick
+        assertInput{flag: D; flag2: b}
     }
 
-    if map(ext_command) = 29{ # Crouching Light Kick
-        assertCommand{name: "x"; buffer.time: 1}
-        assertCommand{name: "holddown"; buffer.time: 1}
+    if map(ext_command) = 29{ # Crouching Light Punch
+        assertInput{flag: D; flag2: x}
     }
-    if map(ext_command) = 30{ # Crouching Strong Kick
-        assertCommand{name: "y"; buffer.time: 1}
-        assertCommand{name: "holddown"; buffer.time: 1}
+    if map(ext_command) = 30{ # Crouching Strong Punch
+        assertInput{flag: D; flag2: y}
     }
 
     #-| Taunt |---------------------------------------------------------
@@ -146,43 +142,39 @@ if ctrl {
     #-| Throws |---------------------------------------------------------
 
     if map(ext_command) = 32{ # Forward Throw
-        assertCommand{name: "holdfwd"; buffer.time: 1}
+        assertInput{flag: R}
         assertCommand{name: "y"; buffer.time: 1}
     }
     if map(ext_command) = 33{ # Back Throw
-        assertCommand{name: "holdback"; buffer.time: 1}
+        assertInput{flag: L}
         assertCommand{name: "y"; buffer.time: 1}
     }
 
     #-| 8 Cardinal Directions |---------------------------------------------------------
 
     if map(ext_command) = 34{ # Walk Forward
-        assertCommand{name: "holdfwd"; buffer.time: 1}
+        assertInput{flag: R}
     }
     if map(ext_command) = 35{ # Walk Back
-        assertCommand{name: "holdback"; buffer.time: 1}
+        assertInput{flag: L}
     }
     if map(ext_command) = 36{ # Jump
-        assertCommand{name: "holdup"; buffer.time: 1}
+        assertInput{flag: U}
     }
     if map(ext_command) = 37{ # Crouch
-        assertCommand{name: "holddown"; buffer.time: 1}
+        assertInput{flag: D}
     }
 
     if map(ext_command) = 38{ # Jump Forward
-        assertCommand{name: "holdfwd"; buffer.time: 1}
-        assertCommand{name: "holdup"; buffer.time: 1}
+        assertInput{flag: R; flag2: U}
     }
     if map(ext_command) = 39{ # Jump Back
-        assertCommand{name: "holdback"; buffer.time: 1}
-        assertCommand{name: "holdup"; buffer.time: 1}
+        assertInput{flag: L; flag2: U}
     }
     if map(ext_command) = 40{ # Down Forward
-        assertCommand{name: "holdfwd"; buffer.time: 1}
-        assertCommand{name: "holddown"; buffer.time: 1}
+        assertInput{flag: R; flag2: D}
     }
     if map(ext_command) = 41{ # Down Back
-        assertCommand{name: "holdback"; buffer.time: 1}
-        assertCommand{name: "holddown"; buffer.time: 1}
+        assertInput{flag: L; flag2: D}
     }
 }

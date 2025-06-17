@@ -1,6 +1,7 @@
 [StateDef -4] # Global states (not halted by pause/superPause, no helper limitations)
 
 # Map Variable Declaration, set value = 1 for the command you wish to test
+# Hold directions don't seem to work properly when called through assertCommand, so assertInput is used in external.zss
 
 #-| Super Moves |--------------------------------------------------------
 
@@ -56,19 +57,19 @@ mapSet{map: "ext_recovery"; value: 0} # Recovery Command, assertCommand recovery
 
 #-| Standing/Jumping Buttons/KF Knee Followup |---------------------------------------------------------
 
-mapSet{map: "ext_a"; value: 0} # Standing Light Punch (becomes jumping light punch in air), assertCommand a
-mapSet{map: "ext_b"; value: 0} # Standing Strong Punch (becomes jumping strong punch in air), assertCommand b
+mapSet{map: "ext_a"; value: 0} # Standing Light Kick (becomes jumping light kick in air/kick followup when done after KF knee), assertCommand a
+mapSet{map: "ext_b"; value: 0} # Standing Strong Kick (becomes jumping strong kick in air/kick followup when done after KF knee), assertCommand b
 
-mapSet{map: "ext_x"; value: 0} # Standing Light Kick (becomes jumping light kick in air/kick followup when done after KF knee), assertCommand x
-mapSet{map: "ext_y"; value: 0} # Standing Strong Kick (becomes jumping strong kick in air/kick followup when done after KF knee), assertCommand y
+mapSet{map: "ext_x"; value: 0} # Standing Light Punch (becomes jumping light punch in air), assertCommand x
+mapSet{map: "ext_y"; value: 0} # Standing Strong Punch (becomes jumping strong punch in air), assertCommand y
 
 #-| Crouching Buttons |---------------------------------------------------------
 
-mapSet{map: "ext_crouch_a"; value: 0} # Crouching Light Punch, assertCommand a + assertCommand holddown
-mapSet{map: "ext_crouch_b"; value: 0} # Crouching Strong Punch, assertCommand b + assertCommand holddown
+mapSet{map: "ext_crouch_a"; value: 0} # Crouching Light Kick, assertCommand a + assertCommand holddown
+mapSet{map: "ext_crouch_b"; value: 0} # Crouching Strong Kick, assertCommand b + assertCommand holddown
 
-mapSet{map: "ext_crouch_x"; value: 0} # Crouching Light Kick, assertCommand x + assertCommand holddown
-mapSet{map: "ext_crouch_y"; value: 0} # Crouching Strong Kick, assertCommand y + assertCommand holddown
+mapSet{map: "ext_crouch_x"; value: 0} # Crouching Light Punch, assertCommand x + assertCommand holddown
+mapSet{map: "ext_crouch_y"; value: 0} # Crouching Strong Punch, assertCommand y + assertCommand holddown
 
 #-| Taunt |---------------------------------------------------------
 
