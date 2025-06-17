@@ -35,9 +35,9 @@ mapSet{map: "ext_QCB_xy"; value: 0} # Fast KF Blow, assertCommand QCB_xy (req 1/
 
 # Kung Fu Zankou
 
-mapSet{map: "ext_QCF_a"; value: 0} # Light KF Blow, assertCommand QCF_x
-mapSet{map: "ext_QCF_b"; value: 0} # Strong KF Blow, assertCommand QCF_y
-mapSet{map: "ext_QCF_ab"; value: 0} # Fast KF Blow, assertCommand QCF_xy (req 1/3 super bar)
+mapSet{map: "ext_QCF_a"; value: 0} # Light KF Zankou, assertCommand QCF_x
+mapSet{map: "ext_QCF_b"; value: 0} # Strong KF Zankou, assertCommand QCF_y
+mapSet{map: "ext_QCF_ab"; value: 0} # Fast KF Zankou, assertCommand QCF_xy (req 1/3 super bar)
 
 # Kung Fu Knee
 
@@ -45,30 +45,30 @@ mapSet{map: "ext_FF_a"; value: 0} # Light KF Knee, assertCommand FF_a
 mapSet{map: "ext_FF_b"; value: 0} # Strong KF Knee, assertCommand FF_b
 mapSet{map: "ext_FF_ab"; value: 0} # Fast KF Knee, assertCommand FF_ab (req 1/3 super bar)
 
-#-| Run |------------------------------------------------------
+#-| Run/Backdash |------------------------------------------------------
 
-mapSet{map: "ext_run_fwd"; value: 0} # Dash, assertCommand FF
+mapSet{map: "ext_run_fwd"; value: 0} # Forward Run, assertCommand FF
 mapSet{map: "ext_run_back"; value: 0} # Backdash, assertCommand BB
 
 #-| Recovery |-----------------------------------------------
 
-mapSet{map: "ext_recovery"; value: 0} # Recovery command, assertCommand recovery
+mapSet{map: "ext_recovery"; value: 0} # Recovery Command, assertCommand recovery
 
 #-| Standing/Jumping Buttons/KF Knee Followup |---------------------------------------------------------
 
-mapSet{map: "ext_a"; value: 0} # Standing light punch (becomes jumping light punch in air), assertCommand a
-mapSet{map: "ext_b"; value: 0} # Standing strong punch (becomes jumping strong punch in air), assertCommand b
+mapSet{map: "ext_a"; value: 0} # Standing Light Punch (becomes jumping light punch in air), assertCommand a
+mapSet{map: "ext_b"; value: 0} # Standing Strong Punch (becomes jumping strong punch in air), assertCommand b
 
-mapSet{map: "ext_x"; value: 0} # Standing light kick (becomes jumping light kick in air/kick followup when done after KF knee), assertCommand x
-mapSet{map: "ext_y"; value: 0} # Standing strong kick (becomes jumping strong kick in air/kick followup when done after KF knee), assertCommand y
+mapSet{map: "ext_x"; value: 0} # Standing Light Kick (becomes jumping light kick in air/kick followup when done after KF knee), assertCommand x
+mapSet{map: "ext_y"; value: 0} # Standing Strong Kick (becomes jumping strong kick in air/kick followup when done after KF knee), assertCommand y
 
 #-| Crouching Buttons |---------------------------------------------------------
 
-mapSet{map: "ext_crouch_a"; value: 0} # Crouching light punch, assertCommand a + assertCommand holddown
-mapSet{map: "ext_crouch_b"; value: 0} # Crouching strong punch, assertCommand b + assertCommand holddown
+mapSet{map: "ext_crouch_a"; value: 0} # Crouching Light Punch, assertCommand a + assertCommand holddown
+mapSet{map: "ext_crouch_b"; value: 0} # Crouching Strong Punch, assertCommand b + assertCommand holddown
 
-mapSet{map: "ext_crouch_x"; value: 0} # Crouching light kick, assertCommand x + assertCommand holddown
-mapSet{map: "ext_crouch_y"; value: 0} # Crouching strong kick, assertCommand y + assertCommand holddown
+mapSet{map: "ext_crouch_x"; value: 0} # Crouching Light Kick, assertCommand x + assertCommand holddown
+mapSet{map: "ext_crouch_y"; value: 0} # Crouching Strong Kick, assertCommand y + assertCommand holddown
 
 #-| Taunt |---------------------------------------------------------
 
@@ -76,20 +76,20 @@ mapSet{map: "ext_taunt"; value: 0} # Taunt, assertCommand start
 
 #-| Throws |---------------------------------------------------------
 
-mapSet{map: "ext_forward_throw"; value: 0} # Forward throw, assertCommand holdfwd + assertCommand y
-mapSet{map: "ext_back_throw"; value: 0} # Back throw, assertCommand holdback + assertCommand y
+mapSet{map: "ext_forward_throw"; value: 0} # Forward Throw, assertCommand holdfwd + assertCommand y
+mapSet{map: "ext_back_throw"; value: 0} # Back Throw, assertCommand holdback + assertCommand y
 
 #-| 8 Cardinal Directions |---------------------------------------------------------
 
-mapSet{map: "ext_fwd"; value: 0} # Walk forward, assertCommand holdfwd
-mapSet{map: "ext_back"; value: 0} # Walk back, assertCommand holdback
-mapSet{map: "ext_jump"; value: 0} # Walk forward, assertCommand holdup
-mapSet{map: "ext_crouch"; value: 0} # Walk forward, assertCommand holddown
+mapSet{map: "ext_fwd"; value: 0} # Walk Forward, assertCommand holdfwd
+mapSet{map: "ext_back"; value: 0} # Walk Back, assertCommand holdback
+mapSet{map: "ext_jump"; value: 0} # Jump, assertCommand holdup
+mapSet{map: "ext_crouch"; value: 0} # Crouch, assertCommand holddown
 
-mapSet{map: "ext_ufwd"; value: 0} # Jump forward, assertCommand holdfwd + assertCommand holdup
-mapSet{map: "ext_uback"; value: 0} # Jump back, assertCommand holdback + assertCommand holddown
-mapSet{map: "ext_dfwd"; value: 0} # Down forward, assertCommand holdfwd + assertCommand holdup
-mapSet{map: "ext_dback"; value: 0} # Down back, assertCommand holdback + assertCommand holddown
+mapSet{map: "ext_ufwd"; value: 0} # Jump Forward, assertCommand holdfwd + assertCommand holdup
+mapSet{map: "ext_uback"; value: 0} # Jump Back, assertCommand holdback + assertCommand holddown
+mapSet{map: "ext_dfwd"; value: 0} # Down Forward, assertCommand holdfwd + assertCommand holdup
+mapSet{map: "ext_dback"; value: 0} # Down Back, assertCommand holdback + assertCommand holddown
 
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------

@@ -6,7 +6,7 @@ import mss
 import time
 import subprocess 
 import os 
-from commands import ACTIONS, RYU_STATES
+from commands import ACTIONS
 import pygetwindow as gw
 import sqlite3
 
@@ -38,7 +38,7 @@ class IkemenEnv(gym.Env):
 
         cmd = [
             IKEMEN_EXE,
-            "-p1", CHAR_DEF,                 # P1 human
+            "-p1", CHAR_DEF,                 # P1 Learner
             "-p1.color", "1",
             "-p2", CHAR_DEF,                 # P2 CPU
             "-p2.ai", str(ai_level),  
@@ -149,7 +149,7 @@ class IkemenEnv(gym.Env):
         return np.stack(self.stack,0), {}
     # -----------------------------------------------------------------
     def step(self, action):
-        self.enqueue_command(cmd = "forceAction", arg = RYU_STATES[ACTIONS[action]])
+        self.enqueue_command(cmd = "assertCommand", arg = action)
         frame = self._grab()
         self.stack.pop(0); self.stack.append(frame)
 
@@ -192,7 +192,7 @@ if __name__ == "__main__":
             a  = env.action_space.sample()
             obs, r, done, trunc, _ = env.step(a)
             time.sleep(0.016)  # 60 FPS
-            print(f"Enqueued command: forceAction at step {i}")
+            print(f"Enqueued command: assertCommand at step {i}")
             print(f"Action: {[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
             env.debug_show_grabs()
             total_reward += r
