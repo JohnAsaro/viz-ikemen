@@ -30,7 +30,6 @@ def find_ikemen_rect():
     return win.left, win.top, win.width, win.height
 
 class IkemenEnv(gym.Env):
-    metadata = {"render_modes": ["human"], "render_fps": 60}
 
     def __init__(self, ai_level=4):
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
@@ -62,6 +61,7 @@ class IkemenEnv(gym.Env):
         self.sct  = mss.mss() # Screenshot
         self.win = {"left": x, "top": y, "width": w, "height": h}
         self.init_db() 
+        self.enqueue_command(cmd = "setup", arg = 0)
     # -----------------------------------------------------------------
     def init_db(self, overwrite=True):
         """Initialize the database, overwriting if it exists."""
@@ -82,8 +82,8 @@ class IkemenEnv(gym.Env):
         c.execute("""
         CREATE TABLE IF NOT EXISTS episodes (
             id   INTEGER PRIMARY KEY AUTOINCREMENT,
-            cmd  TEXT    NOT NULL,
-            arg  INTEGER,
+            cmd  TEXT    NOT NULL DEFAULT '',
+            arg  INTEGER NOT NULL DEFAULT 0,
             done INTEGER NOT NULL DEFAULT 0
         )
         """)
@@ -108,7 +108,7 @@ class IkemenEnv(gym.Env):
             # Update the existing active command
             c.execute(
                 "UPDATE episodes SET cmd = ?, arg = ? WHERE id = ?",
-                (cmd, arg, active_cmd[0])
+                (cmd, int(arg), active_cmd[0])
             )
             print(f"Updated existing episode ID {active_cmd[0]}")
         else:
@@ -146,7 +146,6 @@ class IkemenEnv(gym.Env):
         # pydirectinput.keyDown("f4"); pydirectinput.keyUp("f4"); time.sleep(0.1) # Must find a new way to reset
         frame = self._grab()
         self.stack = [frame]*4
-        self.prev_p2 = self._lifebar_p2()
         return np.stack(self.stack,0), {}
     # -----------------------------------------------------------------
     def step(self, action):
@@ -154,34 +153,16 @@ class IkemenEnv(gym.Env):
         frame = self._grab()
         self.stack.pop(0); self.stack.append(frame)
 
-        # reward = delta damage dealt - taken
-        p2 = self._lifebar_p2()
-        r  = (self.prev_p2 - p2)/100.0
-        self.prev_p2 = p2
         done = False
         if self.proc.poll() is not None:  # process has exited
             done = True
         trunc= False
-        return np.stack(self.stack,0), r, done, trunc, {}
-
-    # --- helpers -----------------------------------------------------
-    def _lifebar_p2(self):
-        x0 = self.win["left"] + 210
-        y0 = self.win["top"]  + 40
-        bar = self.sct.grab({"left":x0, "top":y0, "width":450, "height":30})
-        return np.count_nonzero(np.asarray(bar)[:,:,2] > 200)
-
+        return np.stack(self.stack,0), done, trunc, {}
 
     def debug_show_grabs(self):
         frame = self._grab()
         cv2.imshow("Full 84×84 Crop", frame)
 
-        x0 = self.win["left"] + 750
-        y0 = self.win["top"]  +  110
-        lifebar = np.asarray(
-            self.sct.grab({"left":x0, "top":y0, "width":450, "height":30})
-        )[:, :, 2]
-        cv2.imshow("Lifebar Strip (red channel)", lifebar)
         cv2.waitKey(1) # Update OpenCV window every 1 ms
 
 if __name__ == "__main__":
@@ -190,13 +171,12 @@ if __name__ == "__main__":
     obs, _ = env.reset()
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running
-            a  = env.action_space.sample()
-            obs, r, done, trunc, _ = env.step(a)
+            a = env.action_space.sample()
+            obs, done, trunc, _ = env.step(a)
             time.sleep(0.016)  # 60 FPS
             print(f"Enqueued command: assertCommand at step {i}")
-            print(f"Action: {[ACTIONS[a]]}, Reward: {r:.2f}, Done: {done}")
+            print(f"Action: {[ACTIONS[a]]}, Done: {done}")
             env.debug_show_grabs()
-            total_reward += r
         else:
             break
     env.finish_episode()               # Mark row as done in the database 

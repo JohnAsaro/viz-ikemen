@@ -2,15 +2,15 @@
 REM Ikemen GO launch script
 
 REM Character def paths
-SET CHAR_DEF=..\sf_alpha_ryu\ryu.def
+SET CHAR_DEF=..\kfm_env\kfm_env.def
 
 REM Launch Ikemen GO
 Ikemen_GO.exe ^
 -p1 %CHAR_DEF% ^
 -p1.color 1 ^
 -p2 %CHAR_DEF% ^
--p2.ai 4 ^
--p2.color 2 ^
+-p2.ai 1 ^
+-p2.color 3 ^
 -s stages/training.def ^
 -rounds 1 ^
 --nosound ^

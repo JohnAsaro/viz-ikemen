@@ -1,7 +1,7 @@
 [StateDef -4] # Global states (not halted by pause/superPause, no helper limitations)
 
 if roundState != 2{ # While the match is not going on
-    mapSet{map: "ext_command"; value: 22} # Assert no commands
+    mapSet{map: "ext_command"; value: 0} # Assert no commands
 }
 
 # Assert commands based on mapping

@@ -1,7 +1,7 @@
 -- external_interface.lua
 local sqlite3 = require("sqlite3")
 local DB_PATH = "external/mods/bridge.db"
- 
+
 -- Open the DB (will create if it doesn't exist)
 local db, err = sqlite3.new()
 assert(db, err)
@@ -101,8 +101,16 @@ end
 function forceAction(p, data)
 	if not player(p) then return false end
 
-	if name() == "Ryu" then
+	if name() == "Kung Fu Man" then
 		changeState(data)
+	end
+end
+
+function assertExtCommand(p, arg)
+	if not player(p) then return false end
+
+	if name() == "Kung Fu Man" then
+			mapSet('ext_command', arg)
 	end
 end
 
@@ -111,6 +119,7 @@ end
 
 -- Per-frame polling loop
 hook.add("loop", "external_interface", function()
+
   local rows, qerr = db:query([[
     SELECT id, cmd, arg FROM episodes WHERE done = 0;
   ]])
@@ -120,8 +129,8 @@ hook.add("loop", "external_interface", function()
   end
 
   for _, row in ipairs(rows) do
-    if row.cmd == "forceAction" then
-      forceAction(1, tonumber(row.arg))
+    if row.cmd == "assertCommand" then
+      assertExtCommand(1, tonumber(row.arg))
     else
       print("[Lua] Unknown cmd:", row.cmd)
     end
