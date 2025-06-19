@@ -114,29 +114,41 @@ function assertExtCommand(p, arg)
 	end
 end
 
+function logWinner(db)
+  local rows, qerr = db:query([[
+    SELECT id, winner FROM episodes WHERE done = 0;
+  ]])
+  db:execute(string.format(  
+  "UPDATE episodes SET winner = %d WHERE id = %d", winnerteam(), row.id
+  ))
+end
   
 -- End [Functions]
 
 -- Per-frame polling loop
 hook.add("loop", "external_interface", function()
-
+  --if roundover() then logWinner(db) end -- Log the winner if round is over
+  
   local rows, qerr = db:query([[
-    SELECT id, cmd, arg FROM episodes WHERE done = 0;
+    SELECT id, cmd, arg, winner FROM episodes WHERE done = 0;
   ]])
+
   if not rows then
     if qerr ~= "no rows" then print("[Lua][DB error]", qerr) end
     return
   end
 
   for _, row in ipairs(rows) do
+    if roundover() then 
+      local sql_str = string.format(
+        "UPDATE episodes SET done = 1, winner = %d WHERE id = %d", winnerteam(), row.id
+      )
+      db:query(sql_str)
+    end
     if row.cmd == "assertCommand" then
       assertExtCommand(1, tonumber(row.arg))
     else
       print("[Lua] Unknown cmd:", row.cmd)
     end
-    --db:execute(string.format(  --doesnt work, I need to find another way to do this
-    --  "UPDATE episodes SET done = 1 WHERE id = %d", row.id
-    --)
-  --)
   end
 end)

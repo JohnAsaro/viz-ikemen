@@ -84,7 +84,8 @@ class IkemenEnv(gym.Env):
             id   INTEGER PRIMARY KEY AUTOINCREMENT,
             cmd  TEXT    NOT NULL DEFAULT '',
             arg  INTEGER NOT NULL DEFAULT 0,
-            done INTEGER NOT NULL DEFAULT 0
+            done INTEGER NOT NULL DEFAULT 0,
+            winner INTEGER NOT NULL DEFAULT -1
         )
         """)
         conn.commit()
@@ -110,7 +111,7 @@ class IkemenEnv(gym.Env):
                 "UPDATE episodes SET cmd = ?, arg = ? WHERE id = ?",
                 (cmd, int(arg), active_cmd[0])
             )
-            print(f"Updated existing episode ID {active_cmd[0]}")
+            #print(f"Updated existing episode ID {active_cmd[0]}")
         else:
             # No active episode, insert a new one
             c.execute(
@@ -143,7 +144,7 @@ class IkemenEnv(gym.Env):
         return frm
 
     def reset(self, seed=None, options=None):
-        # pydirectinput.keyDown("f4"); pydirectinput.keyUp("f4"); time.sleep(0.1) # Must find a new way to reset
+        # pydirectinput.keyDown("f4"); pydirectinput.keyUp("f4"); time.sleep(0.1) # Must find a new way to reset (probably easy to do this through sqlite)
         frame = self._grab()
         self.stack = [frame]*4
         return np.stack(self.stack,0), {}
