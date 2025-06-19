@@ -62,6 +62,7 @@ class IkemenEnv(gym.Env):
         self.win = {"left": x, "top": y, "width": w, "height": h}
         self.init_db() 
         self.enqueue_command(cmd = "setup", arg = 0)
+
     # -----------------------------------------------------------------
     def init_db(self, overwrite=True):
         """Initialize the database, overwriting if it exists."""
@@ -123,19 +124,23 @@ class IkemenEnv(gym.Env):
         conn.close()
 
     def finish_episode(self):
-        """Mark row with that told Ryu what to do in the last episode as done."""
+        """Mark row with that told KFM what to do in the last episode as done."""
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         
-        # Find and mark the most recent command
-        c.execute("UPDATE episodes SET done = 1 WHERE id = (SELECT MAX(id) FROM episodes WHERE done = 0)")
-        
+        # Find the most recent episode that is not done, note the winner and mark as done
+        c.execute("UPDATE episodes SET done = 1 WHERE id = (SELECT MAX(id) FROM episodes WHERE done = 0) RETURNING winner")
+        result = c.fetchone()
+
         # Check if any row was affected
         if c.rowcount > 0:
             print("Marked episode as complete.")
         
         conn.commit()
         conn.close()
+
+        return result[0] if result else -1  # Return the winner or -1 if no episode was found
+    
     # ----------------------------------------------------------------
     def _grab(self):
         frm = np.array(self.sct.grab(self.win))[:,:,:3]
@@ -144,10 +149,11 @@ class IkemenEnv(gym.Env):
         return frm
 
     def reset(self, seed=None, options=None):
-        # pydirectinput.keyDown("f4"); pydirectinput.keyUp("f4"); time.sleep(0.1) # Must find a new way to reset (probably easy to do this through sqlite)
+        # Get initial state of screen
         frame = self._grab()
         self.stack = [frame]*4
         return np.stack(self.stack,0), {}
+    
     # -----------------------------------------------------------------
     def step(self, action):
         self.enqueue_command(cmd = "assertCommand", arg = action)
@@ -157,8 +163,7 @@ class IkemenEnv(gym.Env):
         done = False
         if self.proc.poll() is not None:  # process has exited
             done = True
-        trunc= False
-        return np.stack(self.stack,0), done, trunc, {}
+        return np.stack(self.stack,0), done
 
     def debug_show_grabs(self):
         frame = self._grab()
@@ -173,15 +178,16 @@ if __name__ == "__main__":
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running
             a = env.action_space.sample()
-            obs, done, trunc, _ = env.step(a)
+            obs, done = env.step(a)
             time.sleep(0.016)  # 60 FPS
             print(f"Enqueued command: assertCommand at step {i}")
             print(f"Action: {[ACTIONS[a]]}, Done: {done}")
             env.debug_show_grabs()
         else:
             break
-    env.finish_episode()               # Mark row as done in the database 
-    env.proc.terminate()           # close Ikemen when done
-    cv2.destroyAllWindows()        # close all OpenCV windows
+    if env.finish_episode() == 1:               # Mark row as done in the database and get the winner 
+        total_reward += 1.0
+    env.proc.terminate()           # Close Ikemen when done
+    cv2.destroyAllWindows()        # Close all OpenCV windows
     print(f"Total reward: {total_reward:.2f}")
     print("Environment closed.")

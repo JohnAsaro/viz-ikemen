@@ -113,21 +113,11 @@ function assertExtCommand(p, arg)
 			mapSet('ext_command', arg)
 	end
 end
-
-function logWinner(db)
-  local rows, qerr = db:query([[
-    SELECT id, winner FROM episodes WHERE done = 0;
-  ]])
-  db:execute(string.format(  
-  "UPDATE episodes SET winner = %d WHERE id = %d", winnerteam(), row.id
-  ))
-end
   
 -- End [Functions]
 
 -- Per-frame polling loop
 hook.add("loop", "external_interface", function()
-  --if roundover() then logWinner(db) end -- Log the winner if round is over
   
   local rows, qerr = db:query([[
     SELECT id, cmd, arg, winner FROM episodes WHERE done = 0;
@@ -140,10 +130,11 @@ hook.add("loop", "external_interface", function()
 
   for _, row in ipairs(rows) do
     if roundover() then 
-      local sql_str = string.format(
-        "UPDATE episodes SET done = 1, winner = %d WHERE id = %d", winnerteam(), row.id
+      db:query(
+        string.format(
+        "UPDATE episodes SET winner = %d WHERE id = %d", winnerteam(), row.id
       )
-      db:query(sql_str)
+      )
     end
     if row.cmd == "assertCommand" then
       assertExtCommand(1, tonumber(row.arg))

@@ -4,24 +4,24 @@ import time
 from ikemen_wrapper import IkemenEnv      
 from commands import ACTIONS
 
-N_EPISODES = 25                         # how many matches to run
+N_EPISODES = 3                         # how many matches to run
 STEP_DELAY = 0.016                      # ≈60 FPS
 
 def run_episode(ai_level=4):
     """Play N 1-round matchs and return when Ikemen closes."""
     env = IkemenEnv(ai_level=ai_level)
+    reward = 0.0
     obs, _ = env.reset()
-    total_reward_episode = 0.0
-
-    while env.proc.poll() is None:      # loop until the IKEMEN window quits
+    while env.proc.poll() is None:      # Loop until the IKEMEN window quits
         a = env.action_space.sample()
-        obs, done, trunc, _ = env.step(a)
-        #print(f"Action: {[ACTIONS[a]]}, Done: {done}")
+        env.step(a)
+        print(f"Action: {[ACTIONS[a]]}")
         time.sleep(STEP_DELAY)
 
-    # process has exited (rounds limit reached); clean up
-    env.proc.wait()                     # reap zombie on Unix
-    return total_reward_episode
+    if env.finish_episode() == 1:               # Mark row as done in the database and get the winner 
+        reward += 1.0     
+    env.proc.terminate()           # Close Ikemen when done
+    return reward
 
 # ------------------------------------------------------------
 if __name__ == "__main__":  
