@@ -1,4 +1,4 @@
-# ikemen_wrapper.py
+# ikemen_wrapper_windows_11.py
 # Note: This wrapper uses win32api for screen capture, ikemen_wrapper_ubuntu will use x11 probably when I get around to it.
 
 import gymnasium as gym

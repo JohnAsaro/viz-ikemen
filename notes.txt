@@ -7,10 +7,14 @@
 
 - -stresstest can be used as frameskip from the command line
 
-- add the winner of the match through lua 
+- important right now
+    - to actually get the screen buffer properly in an efficent and cross platform way, ill have to mess with renderer.go
 
-- to actually get the screen buffer properly in an efficent and cross platform way, ill have to mess with renderer.go
+    - other way to do it is to make 2 scripts, 1 using win32api (done) and the other using x11
 
-- other way to do it is to make 2 scirpts, 1 using win32api and the other using x11
+    - the other other way to do it is to put everything in a docker container
 
-- the other other way to do it is to put everything in a docker container
+    - So as an addendum to the second thing, it would be a huge pain in the ass to maintain two wrappers, so i'm just going to
+    remove hardcoded screen capture capability from the wrapper itself, and move all of that into whatever file I do visual
+    reinforcement learning from, should be a very simple process tommorow and then I dont have to bother rewriting the
+    whole thing to work with x11, because its just supposed to be a little test code
