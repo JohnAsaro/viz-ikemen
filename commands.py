@@ -1,5 +1,3 @@
-
-
 # commands.py  -------------------------------------------
 
 ACTIONS = ["None", "Triple Kung Fu Palm", "Smash Kung Fu Upper", "Kung Fu Blocking (Air/High)", "Kung Fu Blocking (Low)",

@@ -1,7 +1,7 @@
 # Launch ikemen with a random action agent.
 
 import time
-from ikemen_wrapper import IkemenEnv      
+from ikemen_wrapper_base import IkemenEnv      
 from commands import ACTIONS
 
 N_EPISODES = 3                         # how many matches to run

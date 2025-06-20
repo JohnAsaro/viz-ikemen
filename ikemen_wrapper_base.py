@@ -1,15 +1,14 @@
-# ikemen_wrapper_windows_11.py
-# Note: This wrapper uses win32api for screen capture, ikemen_wrapper_ubuntu will use x11 probably when I get around to it.
+# ikemen_wrapper_base.py
+# Note: This wrapper assumes some external window capture utility is used and passed to functions that require it. 
+# If no external capture utility is needed, simply set `capture=False` in the `IkemenEnv` constructor, and do not pass a `WindowCapture` instance to the `reset` or `debug_show_capture` methods.
 
 import gymnasium as gym
-import numpy as np
 import cv2
 import time
 import subprocess 
 import os 
 from commands import ACTIONS
 import sqlite3
-from windowcapture import WindowCapture
 
 # Ikemen GO executable path
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -23,7 +22,7 @@ CHAR_DEF = os.path.relpath(
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=4, window_capture=True):
+    def __init__(self, ai_level=4, capture=False):
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
         
         cmd = [
@@ -50,12 +49,7 @@ class IkemenEnv(gym.Env):
 
         self.init_db() 
         self.enqueue_command(cmd = "setup", arg = 0)
-
-        if window_capture:
-            self.wc = WindowCapture("Ikemen GO") # Capture the Ikemen window
-            #self.observation_space = gym.spaces.Box(0,255, shape=(4,84,84), dtype=np.uint8)
-        else:
-            self.wc, self.observation_space = None, None
+        self.capture = capture
 
     # -----------------------------------------------------------------
     def init_db(self, overwrite=True):
@@ -137,22 +131,37 @@ class IkemenEnv(gym.Env):
     
     # ----------------------------------------------------------------
 
-    def reset(self):
+    def reset(self, wc):
+        """
+        Reset the environment and return the initial observation.
+        - wc: WindowCapture instance to capture the screen
+        """
         # Reset game/get initial state of screen
         # RESET GAME FUNCTION NOT IMPLEMENTED, PUT HERE WHEN IMPLEMENTED 
         # (although im only gonna put it in if there is another reason for me to interact with the game outside the episodes table 
         # besides that, because that would be a whole other query every frame for the loop just for something not that helpful)
-        if self.wc is not None:
-            return self.wc.get_screenshot()
+
+        if wc is not None and not self.capture:
+            print("Capture is disabled. Set capture=True to enable.")
+        else:
+            return wc.get_screenshot()
+        
         return None
     
     # -----------------------------------------------------------------
     def step(self, action):
         self.enqueue_command(cmd = "assertCommand", arg = action)
 
-    def debug_show_capture(self):
+    def debug_show_capture(self, wc):
+        """
+        Capture the screen and display it using OpenCV.
+        - wc: WindowCapture instance to capture the screen
+        """
+        if not self.capture:
+            print("Capture is disabled. Set capture=True to enable.")
+            return
         try:
-            frame = self.wc.get_screenshot()
+            frame = wc.get_screenshot()
         except Exception as e: # Theres going to be a frame or two when we try and capture nothing
             return
         cv2.imshow("Window", frame)
@@ -168,7 +177,6 @@ if __name__ == "__main__":
             time.sleep(0.016)  # 60 FPS
             print(f"Enqueued command: assertCommand at step {i}")
             print(f"Action: {[ACTIONS[a]]}")
-            env.debug_show_capture()
         else:
             break
     if env.finish_episode() == 1:               # Mark row as done in the database and get the winner 
