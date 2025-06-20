@@ -9,5 +9,5 @@
    - `external/script/external_interface.lua`
    - `external/script/main.lua`
    - `save/config.ini` (or just change your settings to the ones I have)
-   From the Ikemen repository keep (optional)
+5. From the Ikemen repository keep (optional)
    - `data/select.def`

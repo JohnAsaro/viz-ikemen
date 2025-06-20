@@ -12,3 +12,5 @@
 - to actually get the screen buffer properly in an efficent and cross platform way, ill have to mess with renderer.go
 
 - other way to do it is to make 2 scirpts, 1 using win32api and the other using x11
+
+- the other other way to do it is to put everything in a docker container
