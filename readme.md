@@ -8,6 +8,6 @@
 4. Paste the contents of folder A into folder B. The following files from this repository must be preserved:
    - `external/script/external_interface.lua`
    - `external/script/main.lua`
+   - `save/config.ini` (or just change your settings to the ones I have)
    From the Ikemen repository keep (optional)
-   - `save/config.ini`
    - `data/select.def`

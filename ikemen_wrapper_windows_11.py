@@ -1,14 +1,15 @@
 # ikemen_wrapper.py
+# Note: This wrapper uses win32api for screen capture, ikemen_wrapper_ubuntu will use x11 probably when I get around to it.
+
 import gymnasium as gym
 import numpy as np
 import cv2
-import mss
 import time
 import subprocess 
 import os 
 from commands import ACTIONS
-import pygetwindow as gw
 import sqlite3
+from windowcapture import WindowCapture
 
 # Ikemen GO executable path
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -20,21 +21,11 @@ CHAR_DEF = os.path.relpath(
     IKEMEN_DIR
 )
 
-def find_ikemen_rect():
-    # Look for any window title containing “Ikemen”
-    wins = [w for w in gw.getAllTitles() if "Ikemen" in w]
-    if not wins:
-        raise RuntimeError("Could not find an IKEMEN GO window on your desktop.")
-    # Grab the actual Window object
-    win = gw.getWindowsWithTitle(wins[0])[0]
-    return win.left, win.top, win.width, win.height
-
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=4):
+    def __init__(self, ai_level=4, window_capture=True):
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
-        self.observation_space = gym.spaces.Box(0,255, shape=(4,84,84), dtype=np.uint8)
-
+        
         cmd = [
             IKEMEN_EXE,
             "-p1", CHAR_DEF,                 # P1 Learner
@@ -45,23 +36,26 @@ class IkemenEnv(gym.Env):
             "-s", "stages/training.def",
             "-rounds", "1",
             "--nosound",
-            "--windowed", "--width", "320", "--height", "240",
+            "--windowed",
         ]
 
-        # launch Ikemen once, keep handle
+        # launch Ikemen, keep handle
         self.proc = subprocess.Popen(
             cmd,
             cwd=IKEMEN_DIR,                     # run inside Ikemen_GO folder
             stdout=subprocess.DEVNULL,          # keep console clean (optional)
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT    
         )
         time.sleep(2)                             # give window time
-        x, y, w, h = find_ikemen_rect()
-        # The capture is exactly at (x, y), with a size of (w, h)
-        self.sct  = mss.mss() # Screenshot
-        self.win = {"left": x, "top": y, "width": w, "height": h}
+
         self.init_db() 
         self.enqueue_command(cmd = "setup", arg = 0)
+
+        if window_capture:
+            self.wc = WindowCapture("Ikemen GO") # Capture the Ikemen window
+            #self.observation_space = gym.spaces.Box(0,255, shape=(4,84,84), dtype=np.uint8)
+        else:
+            self.wc, self.observation_space = None, None
 
     # -----------------------------------------------------------------
     def init_db(self, overwrite=True):
@@ -142,47 +136,39 @@ class IkemenEnv(gym.Env):
         return result[0] if result else -1  # Return the winner or -1 if no episode was found
     
     # ----------------------------------------------------------------
-    def _grab(self):
-        frm = np.array(self.sct.grab(self.win))[:,:,:3]
-        frm = cv2.cvtColor(frm, cv2.COLOR_BGR2GRAY)
-        frm = cv2.resize(frm, (84,84), interpolation=cv2.INTER_AREA)
-        return frm
 
-    def reset(self, seed=None, options=None):
-        # Get initial state of screen
-        frame = self._grab()
-        self.stack = [frame]*4
-        return np.stack(self.stack,0), {}
+    def reset(self):
+        # Reset game/get initial state of screen
+        # RESET GAME FUNCTION NOT IMPLEMENTED, PUT HERE WHEN IMPLEMENTED 
+        # (although im only gonna put it in if there is another reason for me to interact with the game outside the episodes table 
+        # besides that, because that would be a whole other query every frame for the loop just for something not that helpful)
+        if self.wc is not None:
+            return self.wc.get_screenshot()
+        return None
     
     # -----------------------------------------------------------------
     def step(self, action):
         self.enqueue_command(cmd = "assertCommand", arg = action)
-        frame = self._grab()
-        self.stack.pop(0); self.stack.append(frame)
 
-        done = False
-        if self.proc.poll() is not None:  # process has exited
-            done = True
-        return np.stack(self.stack,0), done
-
-    def debug_show_grabs(self):
-        frame = self._grab()
-        cv2.imshow("Full 84×84 Crop", frame)
-
+    def debug_show_capture(self):
+        try:
+            frame = self.wc.get_screenshot()
+        except Exception as e: # Theres going to be a frame or two when we try and capture nothing
+            return
+        cv2.imshow("Window", frame)
         cv2.waitKey(1) # Update OpenCV window every 1 ms
 
 if __name__ == "__main__":
     env = IkemenEnv(ai_level=1)
     total_reward = 0.0
-    obs, _ = env.reset()
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running
             a = env.action_space.sample()
-            obs, done = env.step(a)
+            env.step(a) # Random action
             time.sleep(0.016)  # 60 FPS
             print(f"Enqueued command: assertCommand at step {i}")
-            print(f"Action: {[ACTIONS[a]]}, Done: {done}")
-            env.debug_show_grabs()
+            print(f"Action: {[ACTIONS[a]]}")
+            env.debug_show_capture()
         else:
             break
     if env.finish_episode() == 1:               # Mark row as done in the database and get the winner 
