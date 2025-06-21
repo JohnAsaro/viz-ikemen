@@ -45,14 +45,13 @@ class IkemenEnv(gym.Env):
             stdout=subprocess.DEVNULL,          # keep console clean (optional)
             stderr=subprocess.STDOUT    
         )
-        time.sleep(2)                             # give window time
-
         self.init_db() 
-        self.enqueue_command(cmd = "setup", arg = 0)
         self.capture = capture
+        #time.sleep(2)                             # give window time
 
     # -----------------------------------------------------------------
-    def init_db(self, overwrite=True):
+
+    def init_db(self, overwrite=False):
         """Initialize the database, overwriting if it exists."""
         # Remove existing database if overwrite is True
         if overwrite and os.path.exists(DB_PATH):
@@ -65,7 +64,7 @@ class IkemenEnv(gym.Env):
         # Create the directory structure if it doesn't exist
         os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
         
-        # Connect and create tables
+        # Connect and create episodes table
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute("""
@@ -77,9 +76,26 @@ class IkemenEnv(gym.Env):
             winner INTEGER NOT NULL DEFAULT -1
         )
         """)
+
+        # Insert a default row if the episodes table is empty
+        c.execute("""
+        INSERT INTO episodes (cmd, arg, done, winner) 
+        SELECT 'setup', 0, 0, -1 
+        WHERE NOT EXISTS (SELECT 1 FROM episodes)
+        """)
+
+        # Create environment table
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS environment (
+            reset INTEGER NOT NULL DEFAULT 0
+        )
+        """)
+        
+        # Insert a default row if the environment table is empty
+        c.execute("INSERT INTO environment (reset) SELECT 0 WHERE NOT EXISTS (SELECT 1 FROM environment)") 
+
         conn.commit()
         conn.close()
-        
         print(f"Database initialized at {DB_PATH}")
 
     def enqueue_command(self, cmd, arg):
@@ -131,19 +147,29 @@ class IkemenEnv(gym.Env):
     
     # ----------------------------------------------------------------
 
-    def reset(self, wc):
+    def reset(self, wc=None):
         """
         Reset the environment and return the initial observation.
         - wc: WindowCapture instance to capture the screen
         """
         # Reset game/get initial state of screen
-        # RESET GAME FUNCTION NOT IMPLEMENTED, PUT HERE WHEN IMPLEMENTED 
-        # (although im only gonna put it in if there is another reason for me to interact with the game outside the episodes table 
-        # besides that, because that would be a whole other query every frame for the loop just for something not that helpful)
 
-        if wc is not None and not self.capture:
-            print("Capture is disabled. Set capture=True to enable.")
-        else:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        c.execute("SELECT reset FROM environment")
+        reset_env = c.fetchone()
+        
+        if reset_env is not None:
+            # RESET
+            c.execute(
+                "UPDATE environment SET reset = 1"
+            )
+        
+        conn.commit()
+        conn.close()
+
+        if self.capture:
             return wc.get_screenshot()
         
         return None
@@ -168,7 +194,7 @@ class IkemenEnv(gym.Env):
         cv2.waitKey(1) # Update OpenCV window every 1 ms
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=1)
+    env = IkemenEnv(ai_level=1, capture=False)
     total_reward = 0.0
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running
