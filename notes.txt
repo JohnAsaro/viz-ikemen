@@ -16,6 +16,9 @@
         - and I think the general idea of this would just be to either send this raw pixel data along a tcp port, or to just save it directly to the sqlite db.
         - I would prefer to just save it to the sqlite db to be perfectly honest, and thats probably totally fine I just have make sure the db is BEFORE the screenshot script thing is called.
         - Theres probably no need to request pixel input every frame, just make sure to clear the image db thing when its done.
-    
+        - Okay so the screenshot function does not work when tabbed out, thats okay, I can just be like "dont do that", this still seems like a good way to get this working cross platform tho.
+            - So the plan for now is add another function to script.go which is just a copy of screenshot, except get rid of all the png stuff and just have it return "img" after its processsed. 
+            - So that will be a lua thing, so we can have that pushed to the db every frame with done = 0 aswell as another column, then opencv renders each one at a time setting done = 1 as it goes along OR just have it delete the image from the db after its processed. 
     - other way to do it is to make 2 scripts, 1 using win32api (done) and the other using x11
     - the other other way to do it is to put everything in a docker container
+    
