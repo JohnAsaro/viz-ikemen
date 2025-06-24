@@ -149,6 +149,8 @@ class IkemenEnv(gym.Env):
         if c.rowcount > 0:
             print("Marked episode as complete.")
         
+        c.execute("DELETE FROM buffer")  # Clear the buffer table for the next episode
+
         conn.commit()
         conn.close()
 
@@ -194,9 +196,6 @@ class IkemenEnv(gym.Env):
         return result[0] if result else None  # Return the buffer data or None if no buffer was found
 
     def debug_show_capture(self):
-        if not self.capture:
-            print("Capture is disabled. Set capture=True to enable.")
-            return
         
         try:            # Connect to database and get the first buffer entry with done=0
             conn = sqlite3.connect(DB_PATH)
@@ -226,7 +225,7 @@ class IkemenEnv(gym.Env):
     # -----------------------------------------------------------------
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=1, capture=True)
+    env = IkemenEnv(ai_level=1)
     total_reward = 0.0
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running
