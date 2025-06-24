@@ -1,6 +1,4 @@
 # ikemen_wrapper_base.py
-# Note: This wrapper assumes some external window capture utility is used and passed to functions that require it. 
-# If no external capture utility is needed, simply set `capture=False` in the `IkemenEnv` constructor, and do not pass a `WindowCapture` instance to the `reset` or `debug_show_capture` methods.
 
 import gymnasium as gym
 import cv2
@@ -9,6 +7,7 @@ import subprocess
 import os 
 from commands import ACTIONS
 import sqlite3
+import numpy as np
 
 # Ikemen GO executable path
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -22,7 +21,7 @@ CHAR_DEF = os.path.relpath(
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=4, capture=False):
+    def __init__(self, ai_level=4):
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
         
         cmd = [
@@ -46,12 +45,11 @@ class IkemenEnv(gym.Env):
             stderr=subprocess.STDOUT    
         )
         self.init_db() 
-        self.capture = capture
         #time.sleep(2)                             # give window time
 
     # -----------------------------------------------------------------
 
-    def init_db(self, overwrite=False):
+    def init_db(self, overwrite=True):
         """Initialize the database, overwriting if it exists."""
         # Remove existing database if overwrite is True
         if overwrite and os.path.exists(DB_PATH):
@@ -90,9 +88,19 @@ class IkemenEnv(gym.Env):
             reset INTEGER NOT NULL DEFAULT 0
         )
         """)
-        
-        # Insert a default row if the environment table is empty
-        c.execute("INSERT INTO environment (reset) SELECT 0 WHERE NOT EXISTS (SELECT 1 FROM environment)") 
+          # Insert a default row if the environment table is empty
+        c.execute("INSERT INTO environment (reset) SELECT 0 WHERE NOT EXISTS (SELECT 1 FROM environment)")
+
+        # Create buffer table
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS buffer (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            width INTEGER NOT NULL,
+            height INTEGER NOT NULL,
+            buffer_data BLOB NOT NULL,
+            done INTEGER NOT NULL DEFAULT 0
+        )
+        """)
 
         conn.commit()
         conn.close()
@@ -117,6 +125,7 @@ class IkemenEnv(gym.Env):
                 (cmd, int(arg), active_cmd[0])
             )
             #print(f"Updated existing episode ID {active_cmd[0]}")
+            c.execute("INSERT INTO buffer (width, height, buffer_data, done) VALUES (-1, -1, x'', -1)") # Insert empty buffer row to signal new command
         else:
             # No active episode, insert a new one
             c.execute(
@@ -147,10 +156,9 @@ class IkemenEnv(gym.Env):
     
     # ----------------------------------------------------------------
 
-    def reset(self, wc=None):
+    def reset(self):
         """
         Reset the environment and return the initial observation.
-        - wc: WindowCapture instance to capture the screen
         """
         # Reset game/get initial state of screen
 
@@ -169,32 +177,56 @@ class IkemenEnv(gym.Env):
         conn.commit()
         conn.close()
 
-        if self.capture:
-            return wc.get_screenshot()
+        # TODO add an obs to return for compatibility with openai ppo models and stuff,
+        #  probably can just be an empty np file tho idk
         
         return None
     
-    # -----------------------------------------------------------------
+    # -----------------------------------------------------------------    
     def step(self, action):
         self.enqueue_command(cmd = "assertCommand", arg = action)
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("UPDATE buffer SET done = 1 WHERE id = (SELECT MIN(id) FROM buffer WHERE done = 0) RETURNING buffer_data")
+        result = c.fetchone()
+        conn.commit()
+        conn.close()
+        return result[0] if result else None  # Return the buffer data or None if no buffer was found
 
-    def debug_show_capture(self, wc):
-        """
-        Capture the screen and display it using OpenCV.
-        - wc: WindowCapture instance to capture the screen
-        """
+    def debug_show_capture(self):
         if not self.capture:
             print("Capture is disabled. Set capture=True to enable.")
             return
-        try:
-            frame = wc.get_screenshot()
-        except Exception as e: # Theres going to be a frame or two when we try and capture nothing
+        
+        try:            # Connect to database and get the first buffer entry with done=0
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
+            c.execute("SELECT id, width, height, buffer_data FROM buffer WHERE done = 0 LIMIT 1")
+            result = c.fetchone()
+            conn.close()
+            
+            if not result:
+                return  # No buffer data available
+            
+            buffer_id, width, height, buffer_data = result
+            
+            # Convert buffer_data BLOB to numpy array
+            frame_data = np.frombuffer(buffer_data, dtype=np.uint8)
+            frame = frame_data.reshape((height, width, 4)) # Data given in RGBA format
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)  # Convert to BGR for OpenCV
+            frame = np.flipud(frame)  # Flip the image vertically to correct orientation
+
+            cv2.imshow("Window", frame)
+            cv2.waitKey(16) # Update OpenCV window every frame
+                
+        except Exception as e:
+            print(f"Error reading screen buffer from database: {e}")
             return
-        cv2.imshow("Window", frame)
-        cv2.waitKey(1) # Update OpenCV window every 1 ms
+
+    # -----------------------------------------------------------------
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=1, capture=False)
+    env = IkemenEnv(ai_level=1, capture=True)
     total_reward = 0.0
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running
@@ -203,6 +235,7 @@ if __name__ == "__main__":
             time.sleep(0.016)  # 60 FPS
             print(f"Enqueued command: assertCommand at step {i}")
             print(f"Action: {[ACTIONS[a]]}")
+            env.debug_show_capture()
         else:
             break
     if env.finish_episode() == 1:               # Mark row as done in the database and get the winner 

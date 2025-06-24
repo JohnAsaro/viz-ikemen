@@ -85,6 +85,17 @@ hook.add("loop", "external_interface", function()
   end
 
   local rows, qerr = db:query([[
+    SELECT id, done FROM buffer;
+  ]])
+
+  for _, row in ipairs(rows) do
+    if row.done == -1 then -- Buffer not logged yet
+      db:query("DELETE FROM buffer WHERE id = " .. row.id) -- Clear entry
+      logScreenBuffer() -- Use log_entry.go, log screen buffer to db to replace placeholder entry
+    end
+  end
+
+  local rows, qerr = db:query([[
     SELECT id, cmd, arg, winner FROM episodes WHERE done = 0;
   ]])
 
@@ -97,14 +108,15 @@ hook.add("loop", "external_interface", function()
     if roundover() then 
       db:query(
         string.format(
-        "UPDATE episodes SET winner = %d WHERE id = %d", winnerteam(), row.id
+        "UPDATE episodes SET winner = %d WHERE id = %d", winnerteam(), row.id -- set winner if round is over
       )
       )
     end
-    if row.cmd == "assertCommand" then
+    if row.cmd == "assertCommand" then -- make KFM do the action corresponding to the number arg
       assertExtCommand(1, tonumber(row.arg))
     else
       print("[Lua] Unknown cmd:", row.cmd)
     end
   end
+
 end)
