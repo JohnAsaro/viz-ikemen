@@ -1,5 +1,5 @@
-# ikemen_wrapper_base.py
-
+# ikemen_wrapper_ppo.py
+# ikemen env used with PPO algorithm for visual reinforcement learning
 import gymnasium as gym
 import cv2
 import time
@@ -8,6 +8,10 @@ import os
 from commands import ACTIONS
 import sqlite3
 import numpy as np
+from stable_baselines3.common import env_checker #Import the env_checker class from stable_baselines3 to check the environment
+from stable_baselines3 import PPO #Import the PPO class for training
+from stable_baselines3.common.evaluation import evaluate_policy #Import the evaluate_policy function to evaluate the model
+import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -18,6 +22,8 @@ CHAR_DEF = os.path.relpath(
     os.path.join(BASE_DIR, "kfm_env", "kfm_env.def"),
     IKEMEN_DIR
 )
+RL_SAVES = os.path.join(os.path.abspath(__file__), "RL_SAVES") # Folder to save the trained models
+
 
 class IkemenEnv(gym.Env):
 
@@ -32,7 +38,7 @@ class IkemenEnv(gym.Env):
             "-p2.ai", str(ai_level),  
             "-p2.color", "3",
             "-s", "stages/training.def",
-            "-rounds", str(num_rounds), 
+            "-rounds", str(num_rounds + 1), # +1, ikemen closes when match is over, so we do this to continue to next episode env.reset()
             "-setvolume", "0",
             "-windowed",
             "-width", str(screen_width), # checks for windowed first, then if BOTH "-width" and "-height" are present
