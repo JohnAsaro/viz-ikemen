@@ -33,7 +33,7 @@ class IkemenEnv(gym.Env):
             "-p2.color", "3",
             "-s", "stages/training.def",
             "-rounds", str(num_rounds), 
-            "-setvolume", "0",
+            "-setvolume", "69",
             "-windowed",
             "-width", str(screen_width), # checks for windowed first, then if BOTH "-width" and "-height" are present
             "-height", str(screen_height), 
@@ -227,7 +227,7 @@ class IkemenEnv(gym.Env):
     # -----------------------------------------------------------------
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=1)
+    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480)
     total_reward = 0.0
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running
