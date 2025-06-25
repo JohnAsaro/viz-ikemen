@@ -357,7 +357,7 @@ end
 if main.flags['-speedtest'] ~= nil then
 	setGameSpeed(100 * gameOption('Config.Framerate'))
 end
-if main.flags['-nosound'] ~= nil then -- Does not work, use setvolume flag
+if main.flags['-nosound'] ~= nil then
 	modifyGameOption('Sound.MasterVolume', 0)
 end
 if main.flags['-togglelifebars'] ~= nil then
@@ -378,8 +378,10 @@ end
 if main.flags['-windowed'] ~= nil then
 	modifyGameOption('Video.Fullscreen', false)
 end
-if main.flags['-windowed'] ~= nil and main.flags['-width'] ~= nil and main.flags['-height'] ~= nil then
+if main.flags['-width'] then
 	modifyGameOption('Video.GameWidth', main.flags['-width'])
+end
+if main.flags['-height'] then 
 	modifyGameOption('Video.GameHeight', main.flags['-height'])
 end
 
