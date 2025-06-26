@@ -229,9 +229,9 @@ class IkemenEnv(gym.Env):
         conn.close()
         
         info = {"winner": self.winner} # Return winner of last episode in info dict
-        obs = np.zeros(self.observation_space.shape, dtype=np.uint8) # Initial observation (black screen)
+        observation = np.zeros(self.observation_space.shape, dtype=np.uint8) # Initial observation (black screen)
 
-        return (obs, info)
+        return (observation, info)
     
     # -----------------------------------------------------------------    
     # Take a step in the environment
@@ -255,17 +255,22 @@ class IkemenEnv(gym.Env):
         else:
             terminated = False 
 
-        if self.show_capture:
-            self.debug_show_capture()
-
         # Return variables
-        result = self.process_image(screen_buffer[0], self.screen_width, self.screen_height) # Buffer data to numpy array
+        observation = self.process_image(screen_buffer[0], self.screen_width, self.screen_height) # Buffer data to numpy array
+
+        if self.show_capture:
+            self.debug_show_capture(capture=observation)
+        
         reward = 1.0 if self.winner == 1 else 0.0 # Reward 1.0 if P1 (learner) wins, else 0.0
+        
         truncated = False # Not using truncation
+        
         info = {"winner": self.winner} # Return winner in info dict
+        
         if terminated: # Reset winner for next episode
             self.winner = -1
-        return (result, reward, terminated, truncated, info) # Return buffer_data as observation, reward=0.0, terminated=False, truncated=False, info={}
+        
+        return (observation, reward, terminated, truncated, info) # Return buffer_data as observation, reward=0.0, terminated=False, truncated=False, info={}
 
     # -----------------------------------------------------------------
     # Image processing 
@@ -288,30 +293,37 @@ class IkemenEnv(gym.Env):
     # -----------------------------------------------------------------
     # Debug 
 
-    def debug_show_capture(self):
+    def debug_show_capture(self, capture=None):
         
-        try: # Connect to database and get the first buffer entry with done=0
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute("SELECT buffer_data FROM buffer WHERE done = 0 LIMIT 1")
-            result = c.fetchone()
-            conn.close()
-            
-            if not result:
-                return  # No buffer data available
-            
-            # You can technically pull width and height from db if needed,
-            # and that would dynamically resize the window, but we use fixed size
-            # because why are you resizing the window while training anyway
+        """
+        Show the current screen capture using OpenCV.
+        - capture: Optional pre-fetched/pre-processed capture to display. If None, fetch from DB.
+        """
 
-            # Convert buffer_data BLOB to numpy array
-            frame = self.process_image(result[0], self.screen_width, self.screen_height)
+        try: 
+
+            if capture is not None:
+                frame = capture # Use provided capture if available
+            else:
+                # Connect to database and get the first buffer entry with done=0
+                conn = sqlite3.connect(DB_PATH)
+                c = conn.cursor()
+                c.execute("SELECT buffer_data FROM buffer WHERE done = 0 LIMIT 1")
+                result = c.fetchone()
+                conn.close()
+                if not result:
+                    return  # No buffer data available
+                # Convert buffer_data BLOB to numpy array
+                # You can technically pull width and height from db if needed,
+                # and that would dynamically resize the window, but we use fixed size
+                # because why are you resizing the window while training anyway
+                frame = self.process_image(result[0], self.screen_width, self.screen_height)
 
             cv2.imshow("Window", frame)
             cv2.waitKey(16) # Update OpenCV window every frame
                 
         except Exception as e:
-            print(f"Error reading screen buffer from database: {e}")
+            print(f"Error reading screen buffer {e}")
             return
 
     # -----------------------------------------------------------------
