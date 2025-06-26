@@ -74,13 +74,17 @@ end
 hook.add("loop", "external_interface", function()
   
   local rows, qerr = db:query([[
-    SELECT reset FROM environment;
+    SELECT reset, pause FROM environment;
   ]])
 
   for _, row in ipairs(rows) do
     if row.reset == 1 then
       reload() -- Reload the game if asserted from the DB
       db:query("UPDATE environment SET reset = 0")
+    end
+    if row.pause == 1 then
+      togglePause() -- Toggle pause if asserted from the DB
+      db:query("UPDATE environment SET pause = 0")
     end
   end
 
@@ -112,7 +116,7 @@ hook.add("loop", "external_interface", function()
       )
       )
     end
-    if row.cmd == "assertCommand" then -- make KFM do the action corresponding to the number arg
+    if row.cmd == "assertCommand" and row.arg ~= nil then -- make KFM do the action corresponding to the number arg
       assertExtCommand(1, tonumber(row.arg))
     else
       print("[Lua] Unknown cmd:", row.cmd)

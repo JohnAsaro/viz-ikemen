@@ -22,6 +22,15 @@ CHAR_DEF = os.path.relpath(
 class IkemenEnv(gym.Env):
 
     def __init__(self, ai_level=1, screen_width=640, screen_height=480):
+        """
+        Initialize the Ikemen GO environment.
+        
+        Parameters:
+        - ai_level: Difficulty level of the CPU opponent (1-8).
+        - screen_width: Width of the game window.
+        - screen_height: Height of the game window.
+        """
+
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
         
         cmd = [
@@ -87,7 +96,8 @@ class IkemenEnv(gym.Env):
         # Create environment table
         c.execute("""
         CREATE TABLE IF NOT EXISTS environment (
-            reset INTEGER NOT NULL DEFAULT 0
+            reset INTEGER NOT NULL DEFAULT 0,
+            pause INTEGER NOT NULL DEFAULT 0
         )
         """)
           # Insert a default row if the environment table is empty
@@ -185,6 +195,28 @@ class IkemenEnv(gym.Env):
         #  probably can just be an empty np file tho idk
         
         return None
+    
+    def toggle_pause(self):
+        """
+        Pause the environment.
+        """
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        c.execute("SELECT pause FROM environment")
+        pause = c.fetchone()
+        
+        if pause is not None:
+            # TOGGLE PAUSE
+            c.execute(
+                "UPDATE environment SET pause = 1"
+            )
+        
+        conn.commit()
+        conn.close()
+        
+        return
     
     # -----------------------------------------------------------------    
     def step(self, action):

@@ -30,14 +30,25 @@ RL_SAVES = "RL_SAVES" # Folder to save the trained models
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1):
+        """
+        Parameters:
+        - ai_level: Difficulty level of the CPU opponent (1-8).
+        - screen_width: Width of the game window.
+        - screen_height: Height of the game window.
+        - show_capture: If True, display the game screen using OpenCV for debugging.
+        - n_steps: If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
+        """
         
         # Constants
         self.winner = -1 # -1 = no winner, 1 = P1 wins, 2 = P2 wins
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.show_capture = show_capture
-        
+        self.n_steps = n_steps # If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
+        self.current_step = 0 # Current step in the episode
+        self.paused = False # Whether the environment is paused or not
+
         # Gym spaces
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(screen_height, screen_width, 3), dtype=np.uint8)
@@ -110,7 +121,8 @@ class IkemenEnv(gym.Env):
         # Create environment table
         c.execute("""
         CREATE TABLE IF NOT EXISTS environment (
-            reset INTEGER NOT NULL DEFAULT 0
+            reset INTEGER NOT NULL DEFAULT 0,
+            pause INTEGER NOT NULL DEFAULT 0
         )
         """)
           # Insert a default row if the environment table is empty
@@ -233,10 +245,42 @@ class IkemenEnv(gym.Env):
 
         return (observation, info)
     
+    def toggle_pause(self):
+        """
+        Pause the environment.
+        """
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        c.execute("SELECT pause FROM environment")
+        pause = c.fetchone()
+        
+        if pause is not None:
+            # TOGGLE PAUSE
+            c.execute(
+                "UPDATE environment SET pause = 1"
+            )
+        
+        conn.commit()
+        conn.close()
+        
+        return
+    
     # -----------------------------------------------------------------    
     # Take a step in the environment
 
     def step(self, action):
+        self.current_step += 1
+
+        if self.n_steps > 0 and self.current_step >= self.n_steps and self.paused is False:
+            self.toggle_pause() # Pause the environment if we reached the max number of steps
+            self.current_step = 0 # Reset step count for next episode 
+            self.paused = True # Set paused to True to stop the environment
+        elif self.paused is True:
+            self.paused = False # Unpause the environment if it was paused
+            self.toggle_pause() # Unpause the environment
+
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
@@ -374,7 +418,7 @@ class TrainAndLogCallback(BaseCallback):
         
         return True
 
-def train_PPO(env, timesteps=100000, check=10000):
+def train_PPO(env, timesteps=100000, check=10000, num_steps=2048):
     """
     Train a PPO model on the Ikemen environment
     - env: The Ikemen environment
@@ -387,7 +431,7 @@ def train_PPO(env, timesteps=100000, check=10000):
         env,
         verbose=1,
         learning_rate=3e-4,
-        n_steps=2048,
+        n_steps=num_steps,
         batch_size=64,
         n_epochs=10,
         gamma=0.99,
@@ -400,7 +444,8 @@ def train_PPO(env, timesteps=100000, check=10000):
 
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, show_capture=True)
+    n_steps = 2048 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=n_steps)
     #env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=10000, check=2500)
+    train_PPO(env, timesteps=10000, check=2500, num_steps=n_steps)  # Train the PPO model
 
