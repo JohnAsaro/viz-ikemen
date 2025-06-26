@@ -33,9 +33,9 @@ class IkemenEnv(gym.Env):
             "-p2.color", "3",
             "-s", "stages/training.def",
             "-rounds", str(num_rounds), 
-            "-setvolume", "69",
             "-windowed",
-            "-width", str(screen_width), # checks for windowed first, then if BOTH "-width" and "-height" are present
+            "-nosound",
+            "-width", str(screen_width), 
             "-height", str(screen_height), 
         ]
 
