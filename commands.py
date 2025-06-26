@@ -8,3 +8,4 @@ ACTIONS = ["None", "Triple Kung Fu Palm", "Smash Kung Fu Upper", "Kung Fu Blocki
             "Crouching Light Punch", "Crouching Strong Punch", "Crouching Light Kick", "Crouching Strong Kick", "Taunt",
             "Forward Throw", "Back Throw", "Walk Forward", "Walk Back", "Jump", "Crouch", "Jump Forward", "Jump Back",
             "Down Forward", "Down Back"]  # KFMs commands, index corresponds directly to the action mapping in external.zss
+

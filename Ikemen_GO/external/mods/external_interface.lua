@@ -7,6 +7,14 @@ local db, err = sqlite3.new()
 assert(db, err)
 assert(db:open(DB_PATH, { cache = "shared" }))
 
+-- Action Space (adjust if not using kfm)
+local action_space = {
+  [0] = true, [1] = true, [2] = true, [3] = true, [4] = true, [5] = true, [6] = true, [7] = true, [8] = true, [9] = true, [10] = true,
+  [11] = true, [12] = true, [13] = true, [14] = true, [15] = true, [16] = true, [17] = true, [18] = true, [19] = true, [20] = true,
+  [21] = true, [22] = true, [23] = true, [24] = true, [25] = true, [26] = true, [27] = true, [28] = true, [29] = true, [30] = true,
+  [31] = true, [32] = true, [33] = true, [34] = true, [35] = true, [36] = true, [37] = true, [38] = true, [39] = true, [40] = true,
+  [41] = true, [42] = true, [43] = true, [44] = true, [45] = true
+}
 -- [Functions]
 
 -- Info
@@ -116,8 +124,8 @@ hook.add("loop", "external_interface", function()
       )
       )
     end
-    if row.cmd == "assertCommand" and row.arg ~= nil then -- make KFM do the action corresponding to the number arg
-      assertExtCommand(1, tonumber(row.arg))
+    if row.cmd == "assertCommand" and action_space[row.arg] then -- make KFM do the action corresponding to the number arg
+      assertExtCommand(1, row.arg)
     else
       print("[Lua] Unknown cmd:", row.cmd)
     end
