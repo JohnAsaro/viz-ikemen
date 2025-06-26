@@ -21,7 +21,7 @@ CHAR_DEF = os.path.relpath(
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, num_rounds=1, screen_width=640, screen_height=480):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480):
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
         
         cmd = [
@@ -32,7 +32,7 @@ class IkemenEnv(gym.Env):
             "-p2.ai", str(ai_level),  
             "-p2.color", "3",
             "-s", "stages/training.def",
-            "-rounds", str(num_rounds), 
+            "-rounds", "1", 
             "-windowed",
             "-nosound",
             "-width", str(screen_width), 

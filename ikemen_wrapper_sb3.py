@@ -30,13 +30,14 @@ RL_SAVES = "RL_SAVES" # Folder to save the trained models
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, num_rounds=1, screen_width=640, screen_height=480):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False):
         
         # Constants
         self.winner = -1 # -1 = no winner, 1 = P1 wins, 2 = P2 wins
         self.screen_width = screen_width
         self.screen_height = screen_height
-
+        self.show_capture = show_capture
+        
         # Gym spaces
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(screen_height, screen_width, 3), dtype=np.uint8)
@@ -50,7 +51,7 @@ class IkemenEnv(gym.Env):
             "-p2.ai", str(ai_level),  
             "-p2.color", "3",
             "-s", "stages/training.def",
-            "-rounds", str(num_rounds + 1), # +1, ikemen closes when match is over, so we do this to continue to next episode env.reset()
+            "-rounds", "10", # Hardcoded to only evaluate 1 round, we do this many to give the algorithms time to rollout new policies
             "-nosound",
             "-windowed",
             "-width", str(screen_width), 
@@ -254,6 +255,9 @@ class IkemenEnv(gym.Env):
         else:
             terminated = False 
 
+        if self.show_capture:
+            self.debug_show_capture()
+
         # Return variables
         result = self.process_image(screen_buffer[0], self.screen_width, self.screen_height) # Buffer data to numpy array
         reward = 1.0 if self.winner == 1 else 0.0 # Reward 1.0 if P1 (learner) wins, else 0.0
@@ -286,7 +290,7 @@ class IkemenEnv(gym.Env):
 
     def debug_show_capture(self):
         
-        try:            # Connect to database and get the first buffer entry with done=0
+        try: # Connect to database and get the first buffer entry with done=0
             conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
             c.execute("SELECT buffer_data FROM buffer WHERE done = 0 LIMIT 1")
@@ -296,13 +300,12 @@ class IkemenEnv(gym.Env):
             if not result:
                 return  # No buffer data available
             
-            buffer_data = result 
             # You can technically pull width and height from db if needed,
             # and that would dynamically resize the window, but we use fixed size
             # because why are you resizing the window while training anyway
 
             # Convert buffer_data BLOB to numpy array
-            frame = self.process_image(buffer_data, self.screen_width, self.screen_height)
+            frame = self.process_image(result[0], self.screen_width, self.screen_height)
 
             cv2.imshow("Window", frame)
             cv2.waitKey(16) # Update OpenCV window every frame
@@ -359,7 +362,7 @@ class TrainAndLogCallback(BaseCallback):
         
         return True
 
-def train_PPO(env, timesteps=100000, check=25000):
+def train_PPO(env, timesteps=100000, check=10000):
     """
     Train a PPO model on the Ikemen environment
     - env: The Ikemen environment
@@ -385,7 +388,7 @@ def train_PPO(env, timesteps=100000, check=25000):
 
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480)
+    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, show_capture=True)
     #env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=100000, check=25000)
+    train_PPO(env, timesteps=10000, check=2500)
 

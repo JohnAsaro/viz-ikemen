@@ -5,7 +5,6 @@
 
 - so I guess just learning of visual info? you CAN give it health reward shaping later but idk if that will help
 
-- -stresstest can be used as frameskip from the command line
 
 - we can specify the amount of rounds we want to do when we initialize the env, actual load the game with one more round than that, 
 so we can just reset the env through the reset cmd instead of relaunching the whole thing
@@ -13,3 +12,7 @@ so we can just reset the env through the reset cmd instead of relaunching the wh
 - with my current screen buffer setup it will still send buffer if the window is covered, just not if its tabbed out, so make
 note somewhere in the docs that you cant tab out but everything else should be fine, resizing the window also might mess with some 
 training algorithms
+
+TODO: 
+- -stresstest can be used as frameskip from the command line (or can be copied and reworked to a function that lets you do vizdoom like frameskip)
+- make amount of rounds a paramater instead of it being hardcoded one round
