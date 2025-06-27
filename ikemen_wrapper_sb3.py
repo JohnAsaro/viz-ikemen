@@ -157,12 +157,12 @@ class IkemenEnv(gym.Env):
         
         if active_cmd:
             # Update the existing active command
+            c.execute("INSERT INTO buffer (width, height, buffer_data, done) VALUES (-1, -1, x'', -1)") # Insert empty buffer row to signal new screen capture
             c.execute(
                 "UPDATE episodes SET cmd = ?, arg = ? WHERE id = ?",
                 (cmd, int(arg), active_cmd[0])
             )
             #print(f"Updated existing episode ID {active_cmd[0]}")
-            c.execute("INSERT INTO buffer (width, height, buffer_data, done) VALUES (-1, -1, x'', -1)") # Insert empty buffer row to signal new command
         else:
             # No active episode, insert a new one
             c.execute(
@@ -273,10 +273,10 @@ class IkemenEnv(gym.Env):
     def step(self, action):
         self.current_step += 1
 
-        if self.n_steps > 0 and self.current_step >= self.n_steps and self.paused is False:
+        if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0 and self.paused is False:
             self.toggle_pause() # Pause the environment if we reached the max number of steps
-            self.current_step = 0 # Reset step count for next episode 
             self.paused = True # Set paused to True to stop the environment
+            print("here")
         elif self.paused is True:
             self.paused = False # Unpause the environment if it was paused
             self.toggle_pause() # Unpause the environment
@@ -286,8 +286,10 @@ class IkemenEnv(gym.Env):
         c = conn.cursor()
         c.execute("UPDATE buffer SET done = 1 WHERE id = (SELECT MIN(id) FROM buffer WHERE done = 0) RETURNING buffer_data") # Process image
         screen_buffer = c.fetchone()
+
         if not screen_buffer: # No buffer data available
             conn.close()
+            print(f"No screen buffer data available at step {self.current_step}, returning black screen.")
             return np.zeros(self.observation_space.shape, dtype=np.uint8), 0.0, False, False, {} # Return black screen as observation, reward=0.0, terminated=False, truncated=False, info={}
         conn.commit()
         conn.close()
@@ -418,12 +420,35 @@ class TrainAndLogCallback(BaseCallback):
         
         return True
 
+def make_new_model_path(base_dir="RL_SAVES/models", prefix="PPO_"):
+    """
+    Create a new model path with an incremented number.
+    - base_dir: The base directory where the model will be saved.
+    - prefix: The prefix for the model directory.
+    - Returns: The new model path.
+    """
+
+    os.makedirs(base_dir, exist_ok=True)
+    existing = {name for name in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, name)) and name.startswith(prefix)}
+    
+    # Find the smallest available number
+    i = 1
+    while f"{prefix}{i}" in existing:
+        i += 1
+
+    new_path = os.path.join(base_dir, f"{prefix}{i}")
+    os.makedirs(new_path)
+    return new_path
+
 def train_PPO(env, timesteps=100000, check=10000, num_steps=2048):
     """
     Train a PPO model on the Ikemen environment
     - env: The Ikemen environment
     """
-    callback = TrainAndLogCallback(check_freq=check, save_path=os.path.join(RL_SAVES, "models")) # Callback to save the model every 'check' timesteps
+
+    # Create a new model path
+    model_path = make_new_model_path(base_dir=os.path.join(RL_SAVES, "models"), prefix="PPO_") # Create a new model path with an incremented number
+    callback = TrainAndLogCallback(check_freq=check, save_path=model_path) # Callback to save the model every 'check' timesteps
 
     # Create PPO model
     model = PPO(
@@ -445,7 +470,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048):
 
 if __name__ == "__main__":
     n_steps = 2048 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=False, n_steps=n_steps)
-    #env_checker.check_env(env)  # Check the environment
+    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps)
+    # env_checker.check_env(env)  # Check the environment
     train_PPO(env, timesteps=100000, check=10000, num_steps=n_steps)  # Train the PPO model
 
