@@ -17,3 +17,4 @@ TODO:
 - -stresstest can be used as frameskip from the command line (or can be copied and reworked to a function that lets you do vizdoom like frameskip)
 - make amount of rounds a paramater instead of it being hardcoded one round
 - look into the replay saving feature (if there is one, I think there is)
+- maybe see if you can add a way to adjust the game framerate through launch options in the command line

@@ -53,6 +53,9 @@ class IkemenEnv(gym.Env):
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(screen_height, screen_width, 3), dtype=np.uint8)
         
+        # Redundancy buffer for the screen capture
+        self.last_buffer = None
+
         # Game parameters
         cmd = [
             IKEMEN_EXE,
@@ -276,7 +279,6 @@ class IkemenEnv(gym.Env):
         if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0 and self.paused is False:
             self.toggle_pause() # Pause the environment if we reached the max number of steps
             self.paused = True # Set paused to True to stop the environment
-            print("here")
         elif self.paused is True:
             self.paused = False # Unpause the environment if it was paused
             self.toggle_pause() # Unpause the environment
@@ -287,10 +289,16 @@ class IkemenEnv(gym.Env):
         c.execute("UPDATE buffer SET done = 1 WHERE id = (SELECT MIN(id) FROM buffer WHERE done = 0) RETURNING buffer_data") # Process image
         screen_buffer = c.fetchone()
 
-        if not screen_buffer: # No buffer data available
+        if self.last_buffer is None and not screen_buffer: # No buffer data available
             conn.close()
             print(f"No screen buffer data available at step {self.current_step}, returning black screen.")
             return np.zeros(self.observation_space.shape, dtype=np.uint8), 0.0, False, False, {} # Return black screen as observation, reward=0.0, terminated=False, truncated=False, info={}
+        elif not screen_buffer: # No new buffer data, use the last one
+            screen_buffer = self.last_buffer
+            # print(f"No new screen buffer data at step {self.current_step}, using last captures data.")
+        else:
+            self.last_buffer = screen_buffer # Store the current buffer data for next step
+
         conn.commit()
         conn.close()
 
