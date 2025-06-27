@@ -132,12 +132,12 @@ class IkemenEnv(gym.Env):
         
         if active_cmd:
             # Update the existing active command
+            c.execute("INSERT INTO buffer (width, height, buffer_data, done) VALUES (-1, -1, x'', -1)") # Insert empty buffer row to signal new command
             c.execute(
                 "UPDATE episodes SET cmd = ?, arg = ? WHERE id = ?",
                 (cmd, int(arg), active_cmd[0])
             )
             #print(f"Updated existing episode ID {active_cmd[0]}")
-            c.execute("INSERT INTO buffer (width, height, buffer_data, done) VALUES (-1, -1, x'', -1)") # Insert empty buffer row to signal new command
         else:
             # No active episode, insert a new one
             c.execute(

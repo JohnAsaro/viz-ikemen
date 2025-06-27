@@ -104,6 +104,7 @@ hook.add("loop", "external_interface", function()
     if row.done == -1 then -- Buffer not logged yet
       db:query("DELETE FROM buffer WHERE id = " .. row.id) -- Clear entry
       logScreenBuffer() -- Use log_entry.go, log screen buffer to db to replace placeholder entry
+      -- Fun fact: This is actually faster than updating the -1 entry directly
     end
   end
 
