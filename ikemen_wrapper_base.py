@@ -131,13 +131,13 @@ class IkemenEnv(gym.Env):
         active_cmd = c.fetchone()
         
         if active_cmd:
+            c.execute("INSERT INTO buffer (width, height, buffer_data, done) VALUES (-1, -1, x'', -1)") # Insert empty buffer row to signal new command
             # Update the existing active command
             c.execute(
                 "UPDATE episodes SET cmd = ?, arg = ? WHERE id = ?",
                 (cmd, int(arg), active_cmd[0])
             )
             #print(f"Updated existing episode ID {active_cmd[0]}")
-            c.execute("INSERT INTO buffer (width, height, buffer_data, done) VALUES (-1, -1, x'', -1)") # Insert empty buffer row to signal new command
         else:
             # No active episode, insert a new one
             c.execute(
@@ -230,6 +230,9 @@ class IkemenEnv(gym.Env):
         return result[0] if result else None  # Return the buffer data or None if no buffer was found
 
     def debug_show_capture(self):
+
+        # TODO this is like a second behind now after I messed with the buffer system, either need to fix this
+        # or just merge this and sb3 wrapper so I don't have to mantain two things that work differently but achieve the same goal
         
         try:            # Connect to database and get the first buffer entry with done=0
             conn = sqlite3.connect(DB_PATH)

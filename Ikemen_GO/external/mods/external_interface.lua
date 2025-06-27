@@ -102,7 +102,6 @@ hook.add("loop", "external_interface", function()
 
   for _, row in ipairs(rows) do
     if row.done == -1 then -- Buffer not logged yet
-      db:query("DELETE FROM buffer WHERE id = " .. row.id) -- Clear entry
       logScreenBuffer() -- Use log_entry.go, log screen buffer to db to replace placeholder entry
     end
   end

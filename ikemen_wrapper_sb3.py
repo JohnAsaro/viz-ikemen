@@ -478,7 +478,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048):
 
 if __name__ == "__main__":
     n_steps = 2048 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps)
+    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, show_capture=True, n_steps=n_steps)
     # env_checker.check_env(env)  # Check the environment
     train_PPO(env, timesteps=100000, check=10000, num_steps=n_steps)  # Train the PPO model
 
