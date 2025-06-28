@@ -475,10 +475,37 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048):
 
     model.learn(total_timesteps=timesteps, callback=callback, progress_bar=True) # Train the model
 
+def test_ppo(env, model_path, n_episodes=10):
+    """
+    Test the trained PPO model on the Ikemen environment
+    - env: The Ikemen environment
+    """ 
+    total_reward = 0.0  # Start total reward at 0
+    model = PPO.load(model_path)  # Load the trained model
+
+    for episode in range(n_episodes):  # For each episode
+        episode_reward = 0.0
+        print(f'Episode: {episode + 1}')  # Print the episode number
+        obs, _ = env.reset()  # Reset the environment and get only the observation
+        # print("Shape:", obs.shape)
+        # print("Strides:", obs.strides)
+        obs = obs.copy() # Work around negative stride error 
+        done = False  # Start done at false
+        while not done:  # While the game isn't done
+            action, _ = model.predict(obs)  # Get the action
+            obs, reward, done, truncated, info = env.step(action)  # Take the action
+            obs = obs.copy() # Work around negative stride error
+            episode_reward += reward  # Add the reward to the total reward
+        total_reward += episode_reward
+        print(f'Episode: {episode + 1}, Reward: {episode_reward}, Current Total Reward: {total_reward}')  #Print the episode and total reward
+        time.sleep(2)  #Sleep for 2 seconds
+
+
 
 if __name__ == "__main__":
     n_steps = 2048 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, show_capture=True, n_steps=n_steps)
+    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps)
     # env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=100000, check=10000, num_steps=n_steps)  # Train the PPO model
+    # train_PPO(env, timesteps=500000, check=100000, num_steps=n_steps)  # Train the PPO model
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_2", "best_model_500000.zip"), n_episodes=10)  # Test the trained model
 
