@@ -1,0 +1,1 @@
+for some reason the game paused itself at around 2 mil steps, gotta add some checks so that doesnt happen in the future

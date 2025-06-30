@@ -1,0 +1,1 @@
+turning off pause feature to see if that helps anything

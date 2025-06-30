@@ -463,13 +463,13 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048):
         "CnnPolicy",  # CNN policy for image observations
         env,
         verbose=1,
-        learning_rate=3e-4,
+        learning_rate=0.00001,
         n_steps=num_steps,
         batch_size=64,
         n_epochs=10,
         gamma=0.99,
         gae_lambda=0.95,
-        clip_range=0.2,
+        clip_range=0.1,
         tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
     )
 
@@ -503,9 +503,9 @@ def test_ppo(env, model_path, n_episodes=10):
 
 
 if __name__ == "__main__":
-    n_steps = 2048 # Number of steps to take before revaluting the policy
+    n_steps = 8192 # Number of steps to take before revaluting the policy
     env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps)
     # env_checker.check_env(env)  # Check the environment
-    # train_PPO(env, timesteps=500000, check=100000, num_steps=n_steps)  # Train the PPO model
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_2", "best_model_500000.zip"), n_episodes=10)  # Test the trained model
+    # train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_4", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
 
