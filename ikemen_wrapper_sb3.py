@@ -286,8 +286,11 @@ class IkemenEnv(gym.Env):
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("UPDATE buffer SET done = 1 WHERE id = (SELECT MIN(id) FROM buffer WHERE done = 0) RETURNING buffer_data") # Process image
+        # Get the buffer_data from the maximum id where done = 0
+        c.execute("SELECT buffer_data FROM buffer WHERE id = (SELECT MAX(id) FROM buffer WHERE done = 0)")
         screen_buffer = c.fetchone()
+        # Set all buffers where done = 0 to done = 1
+        c.execute("UPDATE buffer SET done = 1 WHERE done = 0")
 
         if self.last_buffer is None and not screen_buffer: # No buffer data available
             conn.close()
