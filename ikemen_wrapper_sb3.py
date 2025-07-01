@@ -47,7 +47,7 @@ class IkemenEnv(gym.Env):
         self.show_capture = show_capture
         self.n_steps = n_steps # If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
         self.current_step = 0 # Current step in the episode
-        self.paused = False # Whether the environment is paused or not
+        self.paused = 0 # Whether the environment is paused or not
 
         # Gym spaces
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
@@ -125,7 +125,8 @@ class IkemenEnv(gym.Env):
         c.execute("""
         CREATE TABLE IF NOT EXISTS environment (
             reset INTEGER NOT NULL DEFAULT 0,
-            pause INTEGER NOT NULL DEFAULT 0
+            pause INTEGER NOT NULL DEFAULT 0,
+            ispaused INTEGER NOT NULL DEFAULT 0
         )
         """)
           # Insert a default row if the environment table is empty
@@ -248,7 +249,7 @@ class IkemenEnv(gym.Env):
 
         return (observation, info)
     
-    def toggle_pause(self):
+    def pause(self):
         """
         Pause the environment.
         """
@@ -256,11 +257,34 @@ class IkemenEnv(gym.Env):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         
-        c.execute("SELECT pause FROM environment")
-        pause = c.fetchone()
+        c.execute("SELECT pause, ispaused FROM environment")
+        pause, ispaused = c.fetchone()
         
-        if pause is not None:
-            # TOGGLE PAUSE
+        if pause is not None and ispaused == 0:
+            # PAUSE
+            c.execute(
+                "UPDATE environment SET pause = 1"
+            )
+        
+        conn.commit()
+        conn.close()
+        
+        return
+    
+
+    def unpause(self):
+        """
+        Pause the environment.
+        """
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        c.execute("SELECT pause, ispaused FROM environment")
+        pause, ispaused = c.fetchone()
+        
+        if pause is not None and ispaused == 1:
+            # UNPAUSE
             c.execute(
                 "UPDATE environment SET pause = 1"
             )
@@ -275,13 +299,11 @@ class IkemenEnv(gym.Env):
 
     def step(self, action):
         self.current_step += 1
+        self.unpause() # Unpause the environment if it was paused
+        # Note: We do this EVERY time in case there is a freak accident and the environment is paused when it shouldn't be
 
-        if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0 and self.paused is False:
-            self.toggle_pause() # Pause the environment if we reached the max number of steps
-            self.paused = True # Set paused to True to stop the environment
-        elif self.paused is True:
-            self.paused = False # Unpause the environment if it was paused
-            self.toggle_pause() # Unpause the environment
+        if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0:
+            self.pause() # Pause the environment if we reached the max number of steps
 
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(DB_PATH)
@@ -506,9 +528,9 @@ def test_ppo(env, model_path, n_episodes=10):
 
 
 if __name__ == "__main__":
-    n_steps = 8192 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps)
+    n_steps = 128 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, show_capture=True, n_steps=n_steps)
     # env_checker.check_env(env)  # Check the environment
-    # train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_4", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
+    train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
+    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_4", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
 

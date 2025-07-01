@@ -94,6 +94,8 @@ hook.add("loop", "external_interface", function()
       togglePause() -- Toggle pause if asserted from the DB
       db:query("UPDATE environment SET pause = 0")
     end
+    local paused = paused() 
+    db:query(string.format("UPDATE environment SET ispaused = %d", paused and 1 or 0)) -- Update ispaused state in the DB
   end
 
   local rows, qerr = db:query([[
