@@ -224,8 +224,11 @@ class IkemenEnv(gym.Env):
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("UPDATE buffer SET done = 1 WHERE id = (SELECT MIN(id) FROM buffer WHERE done = 0) RETURNING buffer_data")
+       # Get the buffer_data from the maximum id where done = 0
+        c.execute("SELECT buffer_data FROM buffer WHERE id = (SELECT MAX(id) FROM buffer WHERE done = 0)")
         result = c.fetchone()
+        # Set all buffers where done = 0 to done = 1
+        c.execute("UPDATE buffer SET done = 1 WHERE done = 0")
         conn.commit()
         conn.close()
         return result[0] if result else None  # Return the buffer data or None if no buffer was found
@@ -270,9 +273,9 @@ if __name__ == "__main__":
             a = env.action_space.sample()
             env.step(a) # Random action
             time.sleep(0.016)  # 60 FPS
-            print(f"Enqueued command: assertCommand at step {i}")
-            print(f"Action: {[ACTIONS[a]]}")
-            env.debug_show_capture()
+            #print(f"Enqueued command: assertCommand at step {i}")
+            #print(f"Action: {[ACTIONS[a]]}")
+            #env.debug_show_capture()
         else:
             break
     if env.finish_episode() == 1:               # Mark row as done in the database and get the winner 

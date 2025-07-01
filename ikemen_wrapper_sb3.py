@@ -30,7 +30,7 @@ RL_SAVES = "RL_SAVES" # Folder to save the trained models
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False):
         """
         Parameters:
         - ai_level: Difficulty level of the CPU opponent (1-8).
@@ -38,6 +38,7 @@ class IkemenEnv(gym.Env):
         - screen_height: Height of the game window.
         - show_capture: If True, display the game screen using OpenCV for debugging.
         - n_steps: If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
+        - showcase: If True, use a larger screen (640x420) size for showcasing the environment, if true, actual screen width trained must be some resolution that can be scaled up or down to 640x420.
         """
         
         # Constants
@@ -47,7 +48,7 @@ class IkemenEnv(gym.Env):
         self.show_capture = show_capture
         self.n_steps = n_steps # If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
         self.current_step = 0 # Current step in the episode
-        self.paused = 0 # Whether the environment is paused or not
+        self.showcase = showcase # True if showcase mode is on
 
         # Gym spaces
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
@@ -57,20 +58,36 @@ class IkemenEnv(gym.Env):
         self.last_buffer = None
 
         # Game parameters
-        cmd = [
-            IKEMEN_EXE,
-            "-p1", CHAR_DEF,                 # P1 Learner
-            "-p1.color", "1",
-            "-p2", CHAR_DEF,                 # P2 CPU
-            "-p2.ai", str(ai_level),  
-            "-p2.color", "3",
-            "-s", "stages/training.def",
-            "-rounds", "10", # Hardcoded to only evaluate 1 round, we do this many to give the algorithms time to rollout new policies
-            "-nosound",
-            "-windowed",
-            "-width", str(screen_width), 
-            "-height", str(screen_height), 
-        ]
+        if not showcase:
+            cmd = [
+                IKEMEN_EXE,
+                "-p1", CHAR_DEF,                 # P1 Learner
+                "-p1.color", "1",
+                "-p2", CHAR_DEF,                 # P2 CPU
+                "-p2.ai", str(ai_level),  
+                "-p2.color", "3",
+                "-s", "stages/training.def",
+                "-rounds", "10", # Hardcoded to only evaluate 1 round
+                "-nosound",
+                "-windowed",
+                "-width", str(screen_width), 
+                "-height", str(screen_height), 
+            ]
+        else:
+            cmd = [
+                IKEMEN_EXE,
+                "-p1", CHAR_DEF,                 # P1 Learner
+                "-p1.color", "1",
+                "-p2", CHAR_DEF,                 # P2 CPU
+                "-p2.ai", str(ai_level),  
+                "-p2.color", "3",
+                "-s", "stages/training.def",
+                "-rounds", "10", # Hardcoded to only evaluate 1 round
+                "-nosound",
+                "-windowed",
+                "-width", str(640), 
+                "-height", str(420), 
+            ]
 
         # Launch Ikemen, keep handle
         self.proc = subprocess.Popen(
@@ -363,10 +380,22 @@ class IkemenEnv(gym.Env):
         """
 
         frame_data = np.frombuffer(buffer_data, dtype=np.uint8)
-        frame = frame_data.reshape((height, width, 4)) # Data given in RGBA format
+        
+        # Determine actual dimensions for reshaping
+        if self.showcase:
+            # In showcase mode, the game runs at 640x420
+            actual_width, actual_height = 640, 420
+        else:
+            actual_width, actual_height = width, height
+            
+        frame = frame_data.reshape((actual_height, actual_width, 4)) # Data given in RGBA format
         frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)  # Convert to BGR for OpenCV
         frame = np.flipud(frame)  # Flip the image vertically to correct orientation
-
+        
+        if self.showcase:
+            # Resize from 640x420 to the target screen dimensions
+            frame = cv2.resize(frame, (self.screen_width, self.screen_height), interpolation=cv2.INTER_AREA)
+            
         return frame
     
     # -----------------------------------------------------------------
@@ -512,8 +541,6 @@ def test_ppo(env, model_path, n_episodes=10):
         episode_reward = 0.0
         print(f'Episode: {episode + 1}')  # Print the episode number
         obs, _ = env.reset()  # Reset the environment and get only the observation
-        # print("Shape:", obs.shape)
-        # print("Strides:", obs.strides)
         obs = obs.copy() # Work around negative stride error 
         done = False  # Start done at false
         while not done:  # While the game isn't done
@@ -525,12 +552,10 @@ def test_ppo(env, model_path, n_episodes=10):
         print(f'Episode: {episode + 1}, Reward: {episode_reward}, Current Total Reward: {total_reward}')  #Print the episode and total reward
         time.sleep(2)  #Sleep for 2 seconds
 
-
-
 if __name__ == "__main__":
     n_steps = 128 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, show_capture=True, n_steps=n_steps)
+    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=False, n_steps=n_steps, showcase=True)  # Create the Ikemen environment
     # env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
-    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_4", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
+    # train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_4", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
 
