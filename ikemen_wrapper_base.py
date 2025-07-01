@@ -21,7 +21,7 @@ CHAR_DEF = os.path.relpath(
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, step_delay=0.0):
         """
         Initialize the Ikemen GO environment.
         
@@ -29,10 +29,12 @@ class IkemenEnv(gym.Env):
         - ai_level: Difficulty level of the CPU opponent (1-8).
         - screen_width: Width of the game window.
         - screen_height: Height of the game window.
+        - step_delay: How long we wait between actions in seconds, this is so we don't overwhelm the game with actions.
         """
 
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
-        
+        self.step_delay = step_delay  # How long we wait between actions in seconds, this is so we don't overwhelm the game with actions
+
         cmd = [
             IKEMEN_EXE,
             "-p1", CHAR_DEF,                 # P1 Learner
@@ -97,7 +99,8 @@ class IkemenEnv(gym.Env):
         c.execute("""
         CREATE TABLE IF NOT EXISTS environment (
             reset INTEGER NOT NULL DEFAULT 0,
-            pause INTEGER NOT NULL DEFAULT 0
+            pause INTEGER NOT NULL DEFAULT 0,
+            ispaused INTEGER NOT NULL DEFAULT 0
         )
         """)
           # Insert a default row if the environment table is empty
@@ -231,6 +234,8 @@ class IkemenEnv(gym.Env):
         c.execute("UPDATE buffer SET done = 1 WHERE done = 0")
         conn.commit()
         conn.close()
+        time.sleep(self.step_delay)  # Wait for the specified step delay before returning
+        
         return result[0] if result else None  # Return the buffer data or None if no buffer was found
 
     def debug_show_capture(self):
@@ -266,16 +271,15 @@ class IkemenEnv(gym.Env):
     # -----------------------------------------------------------------
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480)
+    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, step_delay=0.048)  # 1 step every 3 frames, ≈60 FPS
     total_reward = 0.0
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running
             a = env.action_space.sample()
             env.step(a) # Random action
-            time.sleep(0.016)  # 60 FPS
             #print(f"Enqueued command: assertCommand at step {i}")
             #print(f"Action: {[ACTIONS[a]]}")
-            #env.debug_show_capture()
+            env.debug_show_capture()
         else:
             break
     if env.finish_episode() == 1:               # Mark row as done in the database and get the winner 

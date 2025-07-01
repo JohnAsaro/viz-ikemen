@@ -30,7 +30,7 @@ RL_SAVES = "RL_SAVES" # Folder to save the trained models
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0):
         """
         Parameters:
         - ai_level: Difficulty level of the CPU opponent (1-8).
@@ -39,6 +39,7 @@ class IkemenEnv(gym.Env):
         - show_capture: If True, display the game screen using OpenCV for debugging.
         - n_steps: If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
         - showcase: If True, use a larger screen (640x420) size for showcasing the environment, if true, actual screen width trained must be some resolution that can be scaled up or down to 640x420.
+        - step_delay: How long we wait between actions in seconds, this is so we don't overwhelm the game with actions.
         """
         
         # Constants
@@ -49,6 +50,7 @@ class IkemenEnv(gym.Env):
         self.n_steps = n_steps # If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
         self.current_step = 0 # Current step in the episode
         self.showcase = showcase # True if showcase mode is on
+        self.step_delay = step_delay # How long we wait between actions in seconds, this is so we don't overwhelm the game with actions
 
         # Gym spaces
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
@@ -366,6 +368,8 @@ class IkemenEnv(gym.Env):
         if terminated: # Reset winner for next episode
             self.winner = -1
         
+        time.sleep(self.step_delay) # Wait for the specified step delay 
+
         return (observation, reward, terminated, truncated, info) # Return buffer_data as observation, reward=0.0, terminated=False, truncated=False, info={}
 
     # -----------------------------------------------------------------
@@ -553,9 +557,9 @@ def test_ppo(env, model_path, n_episodes=10):
         time.sleep(2)  #Sleep for 2 seconds
 
 if __name__ == "__main__":
-    n_steps = 128 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=False, n_steps=n_steps, showcase=True)  # Create the Ikemen environment
+    n_steps = 2048 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps, showcase=True, step_delay = 0.048)  # Create the Ikemen environment
     # env_checker.check_env(env)  # Check the environment
-    # train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_4", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
+    train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
+    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
 

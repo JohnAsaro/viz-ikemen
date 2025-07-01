@@ -75,12 +75,13 @@ function assertExtCommand(p, arg)
 			mapSet('ext_command', arg)
 	end
 end
-  
+
 -- End [Functions]
 
 -- Per-frame polling loop
 hook.add("loop", "external_interface", function()
   
+  -- ENVIORNMENT
   local rows, qerr = db:query([[
     SELECT reset, pause FROM environment;
   ]])
@@ -98,6 +99,7 @@ hook.add("loop", "external_interface", function()
     db:query(string.format("UPDATE environment SET ispaused = %d", paused and 1 or 0)) -- Update ispaused state in the DB
   end
 
+  -- SCREEN BUFFER
   local rows, qerr = db:query([[
     SELECT id, done FROM buffer;
   ]])
@@ -107,6 +109,8 @@ hook.add("loop", "external_interface", function()
       logScreenBuffer() -- Use log_entry.go, log screen buffer to db to replace placeholder entry
     end
   end
+
+  -- EPISODES
 
   local rows, qerr = db:query([[
     SELECT id, cmd, arg, winner FROM episodes WHERE done = 0;

@@ -5,7 +5,7 @@ from ikemen_wrapper_base import IkemenEnv
 from commands import ACTIONS
 
 N_EPISODES = 3                         # how many matches to run
-STEP_DELAY = 0.016                      # ≈60 FPS
+STEP_DELAY = 0.048                      # 1 every 3 frames, ≈60 FPS
 
 def run_episode(ai_level=4):
     """Play N 1-round matchs and return when Ikemen closes."""
