@@ -521,13 +521,14 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048):
         "CnnPolicy",  # CNN policy for image observations
         env,
         verbose=1,
-        learning_rate=0.00001,
+        learning_rate=0.0001,
         n_steps=num_steps,
         batch_size=64,
         n_epochs=10,
         gamma=0.99,
         gae_lambda=0.95,
         clip_range=0.1,
+        device="auto",  # Use GPU if available
         tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
     )
 
@@ -553,12 +554,12 @@ def test_ppo(env, model_path, n_episodes=10):
             obs = obs.copy() # Work around negative stride error
             episode_reward += reward  # Add the reward to the total reward
         total_reward += episode_reward
-        print(f'Episode: {episode + 1}, Reward: {episode_reward}, Current Total Reward: {total_reward}')  #Print the episode and total reward
-        time.sleep(2)  #Sleep for 2 seconds
+        print(f'Episode: {episode + 1}, Reward: {episode_reward}, Current Total Reward: {total_reward}')  # Print the episode and total reward
+        time.sleep(2)  # Sleep for 2 seconds
 
 if __name__ == "__main__":
     n_steps = 2048 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps, showcase=True, step_delay = 0.048)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.0167)  # Create the Ikemen environment
     # env_checker.check_env(env)  # Check the environment
     train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
     # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
