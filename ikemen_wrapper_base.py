@@ -11,8 +11,8 @@ import numpy as np
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
-IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO.exe")
-IKEMEN_DIR = os.path.join(BASE_DIR, "Ikemen_GO")          # folder that contains Ikemen_GO.exe
+IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO")
+IKEMEN_DIR = os.path.join(BASE_DIR, "Ikemen_GO")          # folder that contains Ikemen_GO
 DB_PATH = os.path.join(IKEMEN_DIR, "external", "mods", "bridge.db")  # path to the database file
 CHAR_DEF = os.path.relpath(
     os.path.join(BASE_DIR, "kfm_env", "kfm_env.def"),

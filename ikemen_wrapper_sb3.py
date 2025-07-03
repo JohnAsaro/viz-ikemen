@@ -18,8 +18,8 @@ import os #To save the model to the correct pathfrom stable_baselines3.common.ca
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
-IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO.exe")
-IKEMEN_DIR = os.path.join(BASE_DIR, "Ikemen_GO")          # folder that contains Ikemen_GO.exe
+IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO")
+IKEMEN_DIR = os.path.join(BASE_DIR, "Ikemen_GO")          # folder that contains Ikemen_GO
 DB_PATH = os.path.join(IKEMEN_DIR, "external", "mods", "bridge.db")  # path to the database file
 CHAR_DEF = os.path.relpath(
     os.path.join(BASE_DIR, "kfm_env", "kfm_env.def"),
@@ -580,6 +580,6 @@ if __name__ == "__main__":
     n_steps = 2048 # Number of steps to take before revaluting the policy
     env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps, showcase=True, step_delay = 0.0167)  # Create the Ikemen environment
     # env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=2000000, check=250000, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000.zip"))  # Train the PPO model
-    #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000"), n_episodes=10)  # Test the trained model
+    # train_PPO(env, timesteps=2000000, check=250000, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000.zip"))  # Train the PPO model
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
 

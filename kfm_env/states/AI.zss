@@ -272,10 +272,10 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 		#jump in landing attacks can be used to start combos from a successful jump attack (600-640)
 		#Using the $AI_JumpIn variable, we can inform the AI about how much time they have to
 		#start a combo by linking a ground attack.
-		if $AI_JI > 9 && $p2dx = [35, 60] && $grounded {
+		if $AI_JI > 9 && $p2dx = [35, 60] && $grounded && aiLevel > 1 { # NERF: BEHAVIOR REMOVED WHEN AI IS LEVEL 1
 			changeState{value: cond($p2dx < 50, 240, 210)}
 		}
-		if $AI_JI > 3 && $p2dx <= 55 && $grounded {
+		if $AI_JI > 3 && $p2dx <= 55 && $grounded && aiLevel > 1 { # NERF: BEHAVIOR REMOVED WHEN AI IS LEVEL 1
 			changeState{value: cond(enemyNear,stateType = S, cond($p2dx > 40, 230, 200), cond($p2dx < 30, 400, 430))}
 		}
 
@@ -284,7 +284,7 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 		#without high risk. The attacks below meet that criteria but can be changed if more attacks are added later.
 		#pokes
 		if $p2dx = [45, 60] && enemyNear,moveType != H && $grounded && random < (250 * (aiLevelF ** 2 / 48.0)) {
-			if $p2dx = [30, 60+(floor($trvelx*.4)*5)] && random%4 = 0 {
+			if $p2dx = [30, 60+(floor($trvelx*.4)*5)] && random%4 = 0 && aiLevel > 1 || random < 400 {  # NERF: IF AI LEVEL 1, 40% CHECK MUST BE PASSED
 				let att2 = 210;
 			} else if $p2dx = [30, 50+(floor($trvelx*.4)*5)] && random%4 = 1 {
 				let att2 = 240;
@@ -298,7 +298,7 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 
 		#-----------------------------------------------------------------------
 		#OTG - attacks that can hit a fallen opponent.
-		if (enemyNear,stateType = L || enemyNear,stateNo = 52) && $jugpt < 13 && $p2dx = [-2, 45] && (!$nojug || enemyNear,stateNo = 52) {
+		if (enemyNear,stateType = L || enemyNear,stateNo = 52) && $jugpt < 13 && $p2dx = [-2, 45] && (!$nojug || enemyNear,stateNo = 52) && aiLevel > 1 { # NERF: BEHAVIOR REMOVED WHEN AI IS LEVEL 1 
 			changeState{value: cond($jugpt < 8 && enemyNear,time < 20, 440, 430)}
 		}
 
@@ -365,9 +365,9 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 #===============================================================================
 #this section of AI is meant for attacks to be done after an attack defined above connects either as a hit
 #or blocked by the opponent.
-# NERF: IF AI LEVEL 1, 70% CHECK MUST BE PASSED
+# NERF: IF AI LEVEL 1, 60% CHECK MUST BE PASSED
 
-} else if moveContact = [1, 3] && hitPauseTime = 0 && stateType != A && aiLevel > 1 || random < 700 {
+} else if moveContact = [1, 3] && hitPauseTime = 0 && stateType != A && aiLevel > 1 || random < 600 {
 
 	#---------------------------------------------------------------------------
 	#These are freeform random combo fillers. They have very basic conditions and
@@ -465,7 +465,7 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 	#as a reminder $SC is used to identify the same check a human player has to meet to perform this
 	#cancel. we then check if a heavy attack or even a light attack can be used if the opponent is
 	#close to losing. This will gurantee kfm's victory usually.
-	if ($SC || ($heavy && (enemyNear,life < 350) || $lights)) && moveHit && $jugpt < 14 && random < (700 * (aiLevelF ** 2 / 48.0)) && aiLevel > 1{ # NERF, BEHAVIOR REMOVED WHEN AI IS LEVEL 1
+	if ($SC || ($heavy && (enemyNear,life < 350) || $lights)) && moveHit && $jugpt < 14 && random < (700 * (aiLevelF ** 2 / 48.0)) && aiLevel > 1{ # NERF: BEHAVIOR REMOVED WHEN AI IS LEVEL 1
 		if power >= 1000 {
 			if $p2dx = [-5, 25] && ($p2dy = [-75, -1] || $grounded) {
 				changeState{value: 3050}

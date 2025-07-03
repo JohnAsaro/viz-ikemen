@@ -15,7 +15,6 @@ Ikemen_GO/save/stats.json
 !Ikemen_GO/save/config.ini
 !Ikemen_GO/data/
 Ikemen_GO/data/*
-!Ikemen_GO/data/select.def
 !Ikemen_GO/external/script/
 Ikemen_GO/external/script/*
 !Ikemen_GO/external/script/main.lua

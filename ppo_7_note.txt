@@ -1,4 +1,4 @@
 Turned n_steps back down to 2048 and learning rate up to 0.0003, 
 Also 3m is too many timesteps, if it hasnt learned anything in 2M something is wrong.
 Also nerfing KFMs AI (see comments in AI.zss).
-Bootstrapping off of PPO_3 1.5m step model.
+Bootstrapping off of PPO_3 1.5m step model...maybe
