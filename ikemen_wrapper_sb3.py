@@ -506,31 +506,50 @@ def make_new_model_path(base_dir="RL_SAVES/models", prefix="PPO_"):
     os.makedirs(new_path)
     return new_path
 
-def train_PPO(env, timesteps=100000, check=10000, num_steps=2048):
+def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=None):
     """
     Train a PPO model on the Ikemen environment
     - env: The Ikemen environment
+    - timesteps: Total number of timesteps to train the model
+    - check: Frequency to save the model
+    - num_steps: Number of steps to take before re-evaluating the policy
+    - model_path: Path to an existing model to load, if None, a new model will be created
     """
 
-    # Create a new model path
-    model_path = make_new_model_path(base_dir=os.path.join(RL_SAVES, "models"), prefix="PPO_") # Create a new model path with an incremented number
-    callback = TrainAndLogCallback(check_freq=check, save_path=model_path) # Callback to save the model every 'check' timesteps
+    verbose = 1 # Verbosity level for the model training
+    learning_rate = 0.0003 # Learning rate for the PPO model
+    batch_size = 64 # Batch size for the PPO model
+    n_epochs = 10 # Number of epochs for the PPO model
+    gamma = 0.99 # Discount factor for the PPO model
+    gae_lambda = 0.95 # GAE lambda for the PPO model
+    clip_range = 0.1 # Clipping range for the PPO model
+    device = "cpu" # PPO works well on cpu, but can be changed to "cuda" for GPU training
+    tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
 
-    # Create PPO model
-    model = PPO(
-        "CnnPolicy",  # CNN policy for image observations
-        env,
-        verbose=1,
-        learning_rate=0.0001,
-        n_steps=num_steps,
-        batch_size=64,
-        n_epochs=10,
-        gamma=0.99,
-        gae_lambda=0.95,
-        clip_range=0.1,
-        device="auto",  # Use GPU if available
-        tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
-    )
+    if model_path is None: # If no model path is provided, create a new one
+
+        # Create PPO model
+        model = PPO(
+            "CnnPolicy",  # CNN policy for image observations
+            env,
+            verbose=verbose,
+            learning_rate=learning_rate,
+            n_steps=num_steps,
+            batch_size=batch_size,
+            n_epochs=n_epochs,
+            gamma=gamma,
+            gae_lambda=gae_lambda,
+            clip_range=clip_range,
+            device=device,
+            tensorboard_log=tensorboard_log # Tensorboard log path
+        )
+
+    else: 
+        # Load existing PPO model
+        model = PPO.load(model_path, env, device=device)
+
+    new_model_path = make_new_model_path(base_dir=os.path.join(RL_SAVES, "models"), prefix="PPO_") # Create a new model path with an incremented number
+    callback = TrainAndLogCallback(check_freq=check, save_path=new_model_path) # Callback to save the model every 'check' timesteps
 
     model.learn(total_timesteps=timesteps, callback=callback, progress_bar=True) # Train the model
 
@@ -559,8 +578,8 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 2048 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.0167)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=160, screen_height=120, show_capture=True, n_steps=n_steps, showcase=True, step_delay = 0.0167)  # Create the Ikemen environment
     # env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
-    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
+    train_PPO(env, timesteps=2000000, check=250000, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000.zip"))  # Train the PPO model
+    #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000"), n_episodes=10)  # Test the trained model
 

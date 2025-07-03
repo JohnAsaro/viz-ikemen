@@ -16,6 +16,6 @@ training algorithms
 TODO: 
 - -stresstest can be used as frameskip from the command line (or can be copied and reworked to a function that lets you do vizdoom like frameskip)
 - make amount of rounds a paramater instead of it being hardcoded one round
-- look into the replay saving feature (if there is one, I think there is)
 - maybe see if you can add a way to adjust the game framerate through launch options in the command line
-- make a thing in env sqlite db that tells you if the game is paused either using sys.ispaused or flipping a bit whenever toggled, so we KNOW we are unpausing and pausing when we are supposed to 
+- maybe make callbacks episode based so you can have standard models to test against other agents?????
+- reward shaping with metadata can help but I dont wanna do that
