@@ -7,6 +7,8 @@ import cv2
 import time
 import subprocess 
 import os 
+import platform
+import shutil
 from commands import ACTIONS
 import sqlite3
 import numpy as np
@@ -30,16 +32,17 @@ RL_SAVES = "RL_SAVES" # Folder to save the trained models
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False):
         """
         Parameters:
         - ai_level: Difficulty level of the CPU opponent (1-8).
         - screen_width: Width of the game window.
         - screen_height: Height of the game window.
-        - show_capture: If True, display the game screen using OpenCV for debugging.
+        - show_capture: If True, display the screen capture using OpenCV.
         - n_steps: If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
         - showcase: If True, use a larger screen (640x420) size for showcasing the environment, if true, actual screen width trained must be some resolution that can be scaled up or down to 640x420.
         - step_delay: How long we wait between actions in seconds, this is so we don't overwhelm the game with actions.
+        - headless: If True, run the game without the window open.
         """
         
         # Constants
@@ -51,6 +54,7 @@ class IkemenEnv(gym.Env):
         self.current_step = 0 # Current step in the episode
         self.showcase = showcase # True if showcase mode is on
         self.step_delay = step_delay # How long we wait between actions in seconds, this is so we don't overwhelm the game with actions
+        self.headless = headless 
 
         # Gym spaces
         self.action_space      = gym.spaces.Discrete(len(ACTIONS))
@@ -59,9 +63,19 @@ class IkemenEnv(gym.Env):
         # Redundancy buffer for the screen capture
         self.last_buffer = None
 
+        # Sanity check
+        if headless and showcase:
+            raise RuntimeError("You can't showcase and be headless at the same time, choose one or the other!")
+
+        if headless and platform.system() != "Linux":
+            raise EnvironmentError("Headless mode is currently only supported on Linux systems.")
+        
+        if headless and not shutil.which("xvfb-run"):
+            raise EnvironmentError("xvfb-run is required for headless mode but was not found. Try installing it with: sudo apt install xvfb")
+
         # Game parameters
-        if not showcase:
-            cmd = [
+        
+        cmd = [
                 IKEMEN_EXE,
                 "-p1", CHAR_DEF,                 # P1 Learner
                 "-p1.color", "1",
@@ -72,28 +86,25 @@ class IkemenEnv(gym.Env):
                 "-rounds", "10", # Hardcoded to only evaluate 1 round
                 "-nosound",
                 "-windowed",
-                "-width", str(screen_width), 
-                "-height", str(screen_height), 
-            ]
-        else:
-            cmd = [
-                IKEMEN_EXE,
-                "-p1", CHAR_DEF,                 # P1 Learner
-                "-p1.color", "1",
-                "-p2", CHAR_DEF,                 # P2 CPU
-                "-p2.ai", str(ai_level),  
-                "-p2.color", "3",
-                "-s", "stages/training.def",
-                "-rounds", "10", # Hardcoded to only evaluate 1 round
-                "-nosound",
-                "-windowed",
-                "-width", str(640), 
-                "-height", str(420), 
             ]
 
-        # Launch Ikemen, keep handle
+        # Showcase
+
+        if showcase:
+            cmd += ["-width", "640", "-height", "420"] # Showcase in 640x420, adjust with real screen width and height of the model in mind
+        else:
+            cmd += ["-width", str(screen_width), "-height", str(screen_height)]
+
+        # Headless
+
+        if headless:
+            full_cmd = ["xvfb-run", "-a"] + cmd
+        else:
+            full_cmd = cmd
+
+        # Launch Ikemen
         self.proc = subprocess.Popen(
-            cmd,
+            full_cmd,
             cwd=IKEMEN_DIR,                     # run inside Ikemen_GO folder
             stdout=subprocess.DEVNULL,          # keep console clean (optional)
             stderr=subprocess.STDOUT    
@@ -335,7 +346,8 @@ class IkemenEnv(gym.Env):
 
         if self.last_buffer is None and not screen_buffer: # No buffer data available
             conn.close()
-            print(f"No screen buffer data available at step {self.current_step}, returning black screen.")
+            if not self.headless:
+                print(f"No screen buffer data available at step {self.current_step}, returning black screen.")
             return np.zeros(self.observation_space.shape, dtype=np.uint8), 0.0, False, False, {} # Return black screen as observation, reward=0.0, terminated=False, truncated=False, info={}
         elif not screen_buffer: # No new buffer data, use the last one
             screen_buffer = self.last_buffer
@@ -578,7 +590,7 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 2048 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.0167)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.0167, headless = True)  # Create the Ikemen environment
     # env_checker.check_env(env)  # Check the environment
     train_PPO(env, timesteps=2000000, check=250000, num_steps=n_steps)  # Train the PPO model
     # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_3", "best_model_1500000.zip"), n_episodes=10)  # Test the trained model
