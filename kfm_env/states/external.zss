@@ -167,20 +167,14 @@ if ctrl { # If we have control of the character, prevents us from doing actions 
         assertCommand{name: "y"; buffer.time: 1}
     }
 
-    #-| Taunt |---------------------------------------------------------
-
-    if map(ext_command) = 35{ # Taunt
-        assertCommand{name: "start"; buffer.time: 1}
-    }
-
     #-| Throws |---------------------------------------------------------
 
-    if map(ext_command) = 36{ # Forward Throw
+    if map(ext_command) = 35{ # Forward Throw
         assertInput{flag: R}
         assertCommand{name: "holdfwd"; buffer.time: 1}
         assertCommand{name: "y"; buffer.time: 1}
     }
-    if map(ext_command) = 37{ # Back Throw
+    if map(ext_command) = 36{ # Back Throw
         assertInput{flag: L}
         assertCommand{name: "holdback"; buffer.time: 1}
         assertCommand{name: "y"; buffer.time: 1}
@@ -188,41 +182,47 @@ if ctrl { # If we have control of the character, prevents us from doing actions 
 
     #-| 8 Cardinal Directions |---------------------------------------------------------
 
-    if map(ext_command) = 38{ # Walk Forward
+    if map(ext_command) = 37{ # Walk Forward
         assertInput{flag: R}
         assertCommand{name: "holdfwd"; buffer.time: 1}
     }
-    if map(ext_command) = 39{ # Walk Back
+    if map(ext_command) = 38{ # Walk Back
         assertInput{flag: L}
         assertCommand{name: "holdback"; buffer.time: 1}
     }
-    if map(ext_command) = 40{ # Jump
+    if map(ext_command) = 39{ # Jump
         assertInput{flag: U}
         assertCommand{name: "holdup"; buffer.time: 1}
     }
-    if map(ext_command) = 41{ # Crouch
+    if map(ext_command) = 40{ # Crouch
         assertInput{flag: D}
         assertCommand{name: "holddown"; buffer.time: 1}
     }
 
-    if map(ext_command) = 42{ # Jump Forward
+    if map(ext_command) = 41{ # Jump Forward
         assertInput{flag: R; flag2: U}
         assertCommand{name: "holdup"; buffer.time: 1}
         assertCommand{name: "holdfwd"; buffer.time: 1}
     }
-    if map(ext_command) = 43{ # Jump Back
+    if map(ext_command) = 42{ # Jump Back
         assertInput{flag: L; flag2: U}
         assertCommand{name: "holdup"; buffer.time: 1}
         assertCommand{name: "holdback"; buffer.time: 1}
     }
-    if map(ext_command) = 44{ # Down Forward
+    if map(ext_command) = 43{ # Down Forward
         assertInput{flag: R; flag2: D}
         assertCommand{name: "holddown"; buffer.time: 1}
         assertCommand{name: "holdfwd"; buffer.time: 1}
     }
-    if map(ext_command) = 45{ # Down Back
+    if map(ext_command) = 44{ # Down Back
         assertInput{flag: L; flag2: D}
         assertCommand{name: "holddown"; buffer.time: 1}
         assertCommand{name: "holdback"; buffer.time: 1}
+    }
+
+  #-| Taunt |---------------------------------------------------------
+
+    if map(ext_command) = 45{ # Taunt
+        assertCommand{name: "start"; buffer.time: 1}
     }
 }
