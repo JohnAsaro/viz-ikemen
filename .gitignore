@@ -14,11 +14,8 @@ Ikemen_GO/external/mods/bridge.db
 !Ikemen_GO/save/
 Ikemen_GO/save/stats.json
 !Ikemen_GO/save/config.ini
-!Ikemen_GO/data/
-Ikemen_GO/data/*
 !Ikemen_GO/external/script/
 Ikemen_GO/external/script/*
 !Ikemen_GO/external/script/main.lua
-ppo_test.py
 RL_SAVES/*
 !RL_SAVES/tensorboard/
