@@ -137,7 +137,7 @@ if ctrl && !enemyNear,ctrl && (enemyNear,getHitVar(hittime) > 0) {
 if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 || stateNo = 1330 || stateNo = 1330 || stateNo = 1350) {
 	if stateType != A {
 		#--|Reversals|-----------------------------------------------------------
-		if (enemyNear,moveType = A) && enemyNear,time > 1 && aiLevel > 1 || random < 500 { # NERF: IF AI LEVEL 1, 50% CHECK MUST BE PASSED
+		if (enemyNear,moveType = A) && enemyNear,time > 1 && aiLevel > 1 || random < 100 { # NERF: IF AI LEVEL 1, 10% CHECK MUST BE PASSED
 
 			#------------|SUPERS|---------------------------------------------------
 			if power >= 1500 {
@@ -240,7 +240,7 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 		#-----------------------------------------------------------------------
 		#light attacks (200,230,400,430)
 		if $p2dx < 55 + (floor($trvelx * .4) * 5) && !$AI_JI && !$nojug && (!map(gurt) || $p2dx > 35) && ($p2dx > 25 || random <= (225 * (aiLevelF ** 2 / 48.0)) || enemyNear,stateType = A) &&
-			(enemyNear,stateNo != [1025, 1028] || (enemyNear,moveType != H || $CC > 3 && $hitfall && enemyNear,stateNo != [1025, 1028])) {
+			(enemyNear,stateNo != [1025, 1028] || (enemyNear,moveType != H || $CC > 3 && $hitfall && enemyNear,stateNo != [1025, 1028])) && aiLevel > 1 || random < 50 {  # NERF: IF AI LEVEL 1, 5% CHECK MUST BE PASSED
 			if ($grounded || $p2dy = [-40+(floor(enemyNear,vel y*.4)*-10), -15]) && $p2dx < 45 {
 				let att = cond($p2dy < -40 || enemyNear,stateType = S, 200, 400);
 				if $att = 400 && $p2dx < 35 + (floor($trvelx * .4) * 5) || $att != 400 {
@@ -259,7 +259,7 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 		#we do not include 440 or 410 here because they are defined elsewhere in a more
 		#specialized way that focuses on what they are capable of doing in a match.
 		if $p2dx < 60 + (floor($trvelx * .4) * 5) && !$AI_JI && (!$nojug || $p2dy > -10) && (!map(gurt) || $p2dx > 35) && random <= (425 * (aiLevelF ** 2 / 48.0)) &&
-			(enemyNear,stateNo != [1025, 1028] || enemyNear,moveType != H) {
+			(enemyNear,stateNo != [1025, 1028] || enemyNear,moveType != H) && aiLevel > 1 || random < 50 {  # NERF: IF AI LEVEL 1, 5% CHECK MUST BE PASSED
 			if ($grounded || $p2dy = [-50 + (floor(enemyNear,vel y*.6)*-10), -25]) {
 				let att = cond($p2dy > -10 || enemyNear,stateType = S, 240, 210);
 				if $att = 240 && $p2dx < 45 + (floor($trvelx * .4) * 5) || $att != 240 {
@@ -283,8 +283,8 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 		#The term "poke" is used to refer to attacks that can usually attack opponents from a safe distance
 		#without high risk. The attacks below meet that criteria but can be changed if more attacks are added later.
 		#pokes
-		if $p2dx = [45, 60] && enemyNear,moveType != H && $grounded && random < (250 * (aiLevelF ** 2 / 48.0)) {
-			if $p2dx = [30, 60+(floor($trvelx*.4)*5)] && random%4 = 0 && aiLevel > 1 || random < 400 {  # NERF: IF AI LEVEL 1, 40% CHECK MUST BE PASSED
+		if $p2dx = [45, 60] && enemyNear,moveType != H && $grounded && random < (250 * (aiLevelF ** 2 / 48.0)) && aiLevel > 1 || random < 50 {  # NERF: IF AI LEVEL 1, 5% CHECK MUST BE PASSED
+			if $p2dx = [30, 60+(floor($trvelx*.4)*5)] && random%4 = 0 { 
 				let att2 = 210;
 			} else if $p2dx = [30, 50+(floor($trvelx*.4)*5)] && random%4 = 1 {
 				let att2 = 240;
@@ -365,9 +365,9 @@ if (ctrl && stateNo != 105 || stateNo = 20 || stateNo = 100 || stateNo = 1310 ||
 #===============================================================================
 #this section of AI is meant for attacks to be done after an attack defined above connects either as a hit
 #or blocked by the opponent.
-# NERF: IF AI LEVEL 1, 60% CHECK MUST BE PASSED
+# NERF: IF AI LEVEL 1, 50% CHECK MUST BE PASSED TO CONTINUE A COMBO AFTER A HIT
 
-} else if moveContact = [1, 3] && hitPauseTime = 0 && stateType != A && aiLevel > 1 || random < 600 {
+} else if moveContact = [1, 3] && hitPauseTime = 0 && stateType != A && aiLevel > 1 || random < 500 {
 
 	#---------------------------------------------------------------------------
 	#These are freeform random combo fillers. They have very basic conditions and

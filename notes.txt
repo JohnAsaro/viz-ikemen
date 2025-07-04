@@ -19,3 +19,4 @@ TODO:
 - maybe see if you can add a way to adjust the game framerate through launch options in the command line
 - maybe make callbacks episode based so you can have standard models to test against other agents?????
 - reward shaping with metadata can help but I dont wanna do that
+- maybe try brute forcing hyperparameters with optuna?

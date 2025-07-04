@@ -1,0 +1,6 @@
+ Changed gamespeed to 9 (105 fps internal gamespeed), 
+ changed rendering fps to 105, 
+ training in headless, 
+ nerfed kfm again,
+ 3m steps I guess,
+ n_steps up to 8192 (with the speed up should be like 5ish episodes per eval)
