@@ -99,6 +99,7 @@ class IkemenEnv(gym.Env):
 
         if headless:
             full_cmd = ["xvfb-run", "-a"] + cmd
+            print("WARNING: HEADLESS MODE HAS ONLY BEEN TESTED ON DEBAIN BASED SYSTEMS.")
         else:
             full_cmd = cmd
 
