@@ -17,6 +17,8 @@ from stable_baselines3 import PPO #Import the PPO class for training
 from stable_baselines3.common.evaluation import evaluate_policy #Import the evaluate_policy function to evaluate the model
 from stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
 import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
+if platform.system() == "Linux": # Signal for headless pausing
+    import signal
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -42,9 +44,13 @@ class IkemenEnv(gym.Env):
         - n_steps: If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
         - showcase: If True, use a larger screen (640x480) size for showcasing the environment, if true, actual screen width trained must be some resolution that can be scaled up or down to 640x480.
         - step_delay: How long we wait between actions in seconds, this is so we don't overwhelm the game with actions.
+        - Note: This should be set to different values on whether or not you are training headlessly, 
+        - if you are headless, this should be set to the minimum delay you can get to where each episode is still logged, 
+        - this will vary by system and take some trial and error to find,
+        - if you are training with show_capture on or not headlessly, this should be set to 1/fps. 
         - headless: If True, run the game without the window open.
         - speed: How fast the game runs, 1 = run the game 5 frames faster, 2 = 10, etc...
-        - fps: How many frames per second game is rendered at
+        - fps: How many frames per second game is rendered at, should be set to 60 + speed*9.
         """
         
         # Constants
@@ -333,6 +339,10 @@ class IkemenEnv(gym.Env):
     # Take a step in the environment
 
     def step(self, action):
+        
+        if self.headless: # We run really fast in headless 
+            os.kill(self.proc.pid, signal.SIGSTOP) # So we stop during each step to make sure the game and the program are communicating
+
         self.current_step += 1
         self.unpause() # Unpause the environment if it was paused
         # Note: We do this EVERY time in case there is a freak accident and the environment is paused when it shouldn't be
@@ -386,7 +396,10 @@ class IkemenEnv(gym.Env):
             self.winner = -1
         
         time.sleep(self.step_delay) # Wait for the specified step delay 
-
+        
+        if self.headless:
+            os.kill(self.proc.pid, signal.SIGCONT) # Unpause
+        
         return (observation, reward, terminated, truncated, info) # Return buffer_data as observation, reward=0.0, terminated=False, truncated=False, info={}
 
     # -----------------------------------------------------------------
@@ -449,7 +462,7 @@ class IkemenEnv(gym.Env):
                 frame = self.process_image(result[0], self.screen_width, self.screen_height)
 
             cv2.imshow("Window", frame)
-            cv2.waitKey(16) # Update OpenCV window every frame
+            cv2.waitKey(1) # Update OpenCV window every frame
                 
         except Exception as e:
             print(f"Error reading screen buffer {e}")
@@ -533,6 +546,23 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     - model_path: Path to an existing model to load, if None, a new model will be created
     """
 
+    episodes_log_path = os.path.join(RL_SAVES, "episodes_log.db")
+
+    # Initialize the log DB if needed
+    conn = sqlite3.connect(episodes_log_path)
+    c = conn.cursor()
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS episodes (
+        id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        cmd  TEXT    NOT NULL DEFAULT '',
+        arg  INTEGER NOT NULL DEFAULT 0,
+        done INTEGER NOT NULL DEFAULT 0,
+        winner INTEGER NOT NULL DEFAULT -1
+    )
+    """)
+    conn.commit()
+    conn.close()
+
     verbose = 1 # Verbosity level for the model training
     learning_rate = 0.0003 # Learning rate for the PPO model
     batch_size = 64 # Batch size for the PPO model
@@ -594,10 +624,10 @@ def test_ppo(env, model_path, n_episodes=10):
         time.sleep(2)  # Sleep for 2 seconds
 
 if __name__ == "__main__":
-    n_steps = 8192 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.00119047619, headless = True, speed = 126, fps = 840)  # Create the Ikemen environment
+    n_steps = 2048 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01, headless = True, speed = 126, fps = 840)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
-    # train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_8", "best_model_3000000.zip"))  # Train the PPO model
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_8", "best_model_3000000.zip"), n_episodes=10)  # Test the trained model
+    train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
+    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_8", "best_model_3000000.zip"), n_episodes=10)  # Test the trained model
 

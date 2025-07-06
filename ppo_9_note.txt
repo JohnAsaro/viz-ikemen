@@ -1,0 +1,8 @@
+new params:
+
+headless
+n_steps=32768 (roughly 96 games per eval)
+step_delay=0.01 (shortest step delay I could find that guarantees rounds are properly processed)
+speed=126 (14x speed)
+fps=840 (matching speed)
+timesteps=5000000
