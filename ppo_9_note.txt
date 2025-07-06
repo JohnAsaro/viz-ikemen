@@ -1,8 +1,9 @@
 new params:
 
-headless
-n_steps=32768 (roughly 96 games per eval)
-step_delay=0.01 (shortest step delay I could find that guarantees rounds are properly processed)
+headless but show capture on, doing this because last time I ran it fully headless it crashed like 14 hrs in and idk how to fix it
+n_steps=131072 (roughly 120 games per eval)
+step_delay=0.00119047619 (1/840)
 speed=126 (14x speed)
 fps=840 (matching speed)
-timesteps=5000000
+timesteps=8000000
+So roughly 7324 games should be played
