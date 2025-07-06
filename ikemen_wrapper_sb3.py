@@ -34,7 +34,7 @@ RL_SAVES = "RL_SAVES" # Folder to save the trained models
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False, speed = 1, fps = 60):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False, speed = 1, fps = 60, log_episode_result=True):
         """
         Parameters:
         - ai_level: Difficulty level of the CPU opponent (1-8).
@@ -51,6 +51,7 @@ class IkemenEnv(gym.Env):
         - headless: If True, run the game without the window open.
         - speed: How fast the game runs, 1 = run the game 5 frames faster, 2 = 10, etc...
         - fps: How many frames per second game is rendered at, should be set to 60 + speed*9.
+        - log_episode_result: True if you want to save the episodes column results in bridge.db for logging later.
         """
         
         # Constants
@@ -63,6 +64,9 @@ class IkemenEnv(gym.Env):
         self.showcase = showcase # True if showcase mode is on
         self.step_delay = step_delay # How long we wait between actions in seconds, this is so we don't overwhelm the game with actions
         self.headless = headless 
+        self.log_episode_result = log_episode_result
+        self.episodes_log_path = os.path.join(RL_SAVES, "current_episode_log.db") # TODO: Make this dynamically increase like tensorboard and model directories do
+        self.batch_id = 1 # Batch id for logging
 
         # Gym spaces
         self.action_space      = gym.spaces.Discrete(len(ACTIONS) - 1) # -1 after actions to disable taunt
@@ -349,6 +353,24 @@ class IkemenEnv(gym.Env):
 
         if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0:
             self.pause() # Pause the environment if we reached the max number of steps
+            if self.log_episode_result:
+                with sqlite3.connect(DB_PATH) as src_conn, sqlite3.connect(self.episodes_log_path) as log_conn:
+                    src_cursor = src_conn.cursor()
+                    log_cursor = log_conn.cursor()
+
+                    # Select all episodes (or filter if needed)
+                    src_cursor.execute("SELECT id, done, winner FROM episodes WHERE done = 1")
+                    episodes = src_cursor.fetchall()
+                    episodes_with_batch = [(eid, winner, self.batch_id) for (eid, done, winner) in episodes]
+
+                    # Insert into log DB
+                    log_cursor.executemany("""
+                        INSERT OR IGNORE INTO episodes (id, winner, batch_id)
+                        VALUES (?, ?, ?)
+                    """, episodes_with_batch)
+
+                    self.batch_id += 1 
+                    log_conn.commit()
 
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(DB_PATH)
@@ -546,7 +568,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     - model_path: Path to an existing model to load, if None, a new model will be created
     """
 
-    episodes_log_path = os.path.join(RL_SAVES, "episodes_log.db")
+    episodes_log_path = os.path.join(RL_SAVES, "current_episode_log.db") # TODO: Make this make its own directory with PPO matching models and tensorboard number
 
     # Initialize the log DB if needed
     conn = sqlite3.connect(episodes_log_path)
@@ -554,10 +576,8 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     c.execute("""
     CREATE TABLE IF NOT EXISTS episodes (
         id   INTEGER PRIMARY KEY AUTOINCREMENT,
-        cmd  TEXT    NOT NULL DEFAULT '',
-        arg  INTEGER NOT NULL DEFAULT 0,
-        done INTEGER NOT NULL DEFAULT 0,
-        winner INTEGER NOT NULL DEFAULT -1
+        winner INTEGER NOT NULL DEFAULT -1,
+        batch_id INTEGER NOT NULL DEFAULT 1
     )
     """)
     conn.commit()
@@ -624,7 +644,7 @@ def test_ppo(env, model_path, n_episodes=10):
         time.sleep(2)  # Sleep for 2 seconds
 
 if __name__ == "__main__":
-    n_steps = 2048 # Number of steps to take before revaluting the policy
+    n_steps = 1024 # Number of steps to take before revaluting the policy
     env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01, headless = True, speed = 126, fps = 840)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
