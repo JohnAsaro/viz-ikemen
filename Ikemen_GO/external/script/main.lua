@@ -352,7 +352,7 @@ if main.flags['-ailevel'] ~= nil then
 	modifyGameOption('Options.Difficulty', math.max(1, math.min(tonumber(main.flags['-ailevel']), 8)))
 end
 if main.flags['-speed'] ~= nil and tonumber(main.flags['-speed']) > 0 then
-	setGameSpeed(tonumber(main.flags['-speed']) * gameOption('Config.Framerate') / 100)
+	modifyGameOption('Options.GameSpeed', main.flags['-speed'])
 end
 if main.flags['-speedtest'] ~= nil then
 	setGameSpeed(100 * gameOption('Config.Framerate'))

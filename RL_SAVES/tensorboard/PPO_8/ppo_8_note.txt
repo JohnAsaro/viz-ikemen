@@ -5,3 +5,6 @@
  3m steps I guess,
  n_steps up to 8192 (with the speed up should be like 5ish episodes per eval),
  disabling taunt from action space because its a waste of time and adds nothing to the ai except slowing down training
+
+
+ Pretty good results, 3m step model seems to win about 80% of the time
