@@ -32,7 +32,7 @@ RL_SAVES = "RL_SAVES" # Folder to save the trained models
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False, speed = 1):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False, speed = 1, fps = 60):
         """
         Parameters:
         - ai_level: Difficulty level of the CPU opponent (1-8).
@@ -44,6 +44,7 @@ class IkemenEnv(gym.Env):
         - step_delay: How long we wait between actions in seconds, this is so we don't overwhelm the game with actions.
         - headless: If True, run the game without the window open.
         - speed: How fast the game runs, 1 = run the game 5 frames faster, 2 = 10, etc...
+        - fps: How many frames per second game is rendered at
         """
         
         # Constants
@@ -83,6 +84,7 @@ class IkemenEnv(gym.Env):
                 "-p2", CHAR_DEF,                 # P2 CPU
                 "-p2.ai", str(ai_level),  
                 "-speed", str(speed),
+                "-fps", str(fps),
                 "-p2.color", "3",
                 "-s", "stages/training.def",
                 "-rounds", "10", # Hardcoded to only evaluate 1 round
@@ -593,7 +595,7 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 8192 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=True, step_delay = 0.00952380952, headless = False, speed = 9)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.00119047619, headless = True, speed = 126, fps = 840)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
     # train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_8", "best_model_3000000.zip"))  # Train the PPO model

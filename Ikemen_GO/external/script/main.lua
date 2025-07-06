@@ -354,6 +354,9 @@ end
 if main.flags['-speed'] ~= nil and tonumber(main.flags['-speed']) > 0 then
 	modifyGameOption('Options.GameSpeed', main.flags['-speed'])
 end
+if main.flags['-fps'] ~= nil and tonumber(main.flags['-fps']) > 0 then
+	modifyGameOption('Config.Framerate', tonumber(main.flags['-fps']))
+end
 if main.flags['-speedtest'] ~= nil then
 	setGameSpeed(100 * gameOption('Config.Framerate'))
 end
