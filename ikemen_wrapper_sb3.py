@@ -40,7 +40,7 @@ class IkemenEnv(gym.Env):
         - screen_height: Height of the game window.
         - show_capture: If True, display the screen capture using OpenCV.
         - n_steps: If training for a fixed number of steps, set this to that number; otherwise, -1 for infinite.
-        - showcase: If True, use a larger screen (640x420) size for showcasing the environment, if true, actual screen width trained must be some resolution that can be scaled up or down to 640x420.
+        - showcase: If True, use a larger screen (640x480) size for showcasing the environment, if true, actual screen width trained must be some resolution that can be scaled up or down to 640x480.
         - step_delay: How long we wait between actions in seconds, this is so we don't overwhelm the game with actions.
         - headless: If True, run the game without the window open.
         """
@@ -91,7 +91,7 @@ class IkemenEnv(gym.Env):
         # Showcase
 
         if showcase:
-            cmd += ["-width", "640", "-height", "420"] # Showcase in 640x420, adjust with real screen width and height of the model in mind
+            cmd += ["-width", "640", "-height", "480"] # Showcase in 640x480, adjust with real screen width and height of the model in mind
         else:
             cmd += ["-width", str(screen_width), "-height", str(screen_height)]
 
@@ -400,8 +400,8 @@ class IkemenEnv(gym.Env):
         
         # Determine actual dimensions for reshaping
         if self.showcase:
-            # In showcase mode, the game runs at 640x420
-            actual_width, actual_height = 640, 420
+            # In showcase mode, the game runs at 640x480
+            actual_width, actual_height = 640, 480
         else:
             actual_width, actual_height = width, height
             
@@ -410,7 +410,7 @@ class IkemenEnv(gym.Env):
         frame = np.flipud(frame)  # Flip the image vertically to correct orientation
         
         if self.showcase:
-            # Resize from 640x420 to the target screen dimensions
+            # Resize from 640x480 to the target screen dimensions
             frame = cv2.resize(frame, (self.screen_width, self.screen_height), interpolation=cv2.INTER_AREA)
             
         return frame
@@ -591,9 +591,9 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 8192 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00952380952, headless = False)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=True, step_delay = 0.00952380952, headless = False)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
-    # train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
+    # train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_8", "best_model_3000000.zip"))  # Train the PPO model
     test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_8", "best_model_3000000.zip"), n_episodes=10)  # Test the trained model
 
