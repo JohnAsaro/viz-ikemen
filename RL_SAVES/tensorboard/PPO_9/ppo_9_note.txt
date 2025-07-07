@@ -7,3 +7,6 @@ speed=126 (14x speed)
 fps=840 (matching speed)
 timesteps=8000000
 So roughly 7324 games should be played
+
+
+Note: Crashed around 2621440 steps/1945 games played and idk why
