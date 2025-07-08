@@ -1,0 +1,18 @@
+Just going to try and recreate PPO 8 but with better logging and faster env and headless off maybe that will help
+Also im changing clip_range back up to 0.2 because it seems to be doing a really bad job learning NEW things
+Also larger batch size to accommodate the larger clip range
+Also setting gamma to 1 because why wouldnt it be 1 in a deterministic env 
+
+    n_steps = 16384 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00555555555, headless = False, speed = 24, fps = 180)  # Create the Ikemen environment
+
+
+    verbose = 1 # Verbosity level for the model training
+    learning_rate = 0.0003 # Learning rate for the PPO model
+    batch_size = 64 # Batch size for the PPO model
+    n_epochs = 10 # Number of epochs for the PPO model
+    gamma = 1.0 # Discount factor for the PPO model
+    gae_lambda = 0.95 # GAE lambda for the PPO model
+    clip_range = 0.2 # Clipping range for the PPO model
+    device = "cpu" # PPO works well on cpu, but can be changed to "cuda" for GPU training
+    tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path

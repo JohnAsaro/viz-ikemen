@@ -587,9 +587,9 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     learning_rate = 0.0003 # Learning rate for the PPO model
     batch_size = 64 # Batch size for the PPO model
     n_epochs = 10 # Number of epochs for the PPO model
-    gamma = 0.99 # Discount factor for the PPO model
+    gamma = 1.0 # Discount factor for the PPO model, since no reward shaping, 1.0 because just win/lose
     gae_lambda = 0.95 # GAE lambda for the PPO model
-    clip_range = 0.1 # Clipping range for the PPO model
+    clip_range = 0.2 # Clipping range for the PPO model
     device = "cpu" # PPO works well on cpu, but can be changed to "cuda" for GPU training
     tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
 
@@ -644,10 +644,10 @@ def test_ppo(env, model_path, n_episodes=10):
         time.sleep(2)  # Sleep for 2 seconds
 
 if __name__ == "__main__":
-    n_steps = 131072 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.00119047619, headless = True, speed = 126, fps = 840)  # Create the Ikemen environment
+    n_steps = 16384 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00555555555, headless = False, speed = 24, fps = 180)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=8000000, check=250000, num_steps=n_steps)  # Train the PPO model
+    train_PPO(env, timesteps=3000000, check=250000, num_steps=n_steps)  # Train the PPO model
     # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_8", "best_model_3000000.zip"), n_episodes=10)  # Test the trained model
 
