@@ -1,0 +1,21 @@
+Just going to try and recreate PPO 8 but with better logging and faster env and headless off maybe that will help
+Also larger batch size
+Also setting gamma and gae_lambda to 1 because why wouldnt it be 1 in a deterministic win/lose env with sparse reward only based on that
+n_epochs down to 5 to reduce overfitting towards bad models like we might have saw before when clip range was at 0.2
+Changing ai level to 2 because the random first iteration is winning too easily
+
+    n_steps = 32768 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00555555555, headless = False, speed = 24, fps = 180)  # Create the Ikemen environment
+
+
+    verbose = 1 # Verbosity level for the model training
+    learning_rate = 0.0003 # Learning rate for the PPO model
+    batch_size = 64 # Batch size for the PPO model
+    n_epochs = 5 # Number of epochs for the PPO model
+    gamma = 1.0 # Discount factor for the PPO model, since no reward shaping, 1.0 because just win/lose
+    gae_lambda = 1.0 # GAE lambda for the PPO model, sparse reward so 1.0
+    clip_range = 0.1 # Clipping range for the PPO model
+    device = "cpu" # PPO works well on cpu, but can be changed to "cuda" for GPU training
+    tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
+
+5m steps
