@@ -14,9 +14,8 @@ note somewhere in the docs that you cant tab out but everything else should be f
 training algorithms
 
 TODO: 
-- -stresstest can be used as frameskip from the command line (or can be copied and reworked to a function that lets you do vizdoom like frameskip)
+- make revaluations based on some amount of rounds rather than some amount of steps
 - make amount of rounds a paramater instead of it being hardcoded one round
 - maybe see if you can add a way to adjust the game framerate through launch options in the command line
-- maybe make callbacks episode based so you can have standard models to test against other agents?????
 - reward shaping with metadata can help but I dont wanna do that
 - maybe try brute forcing hyperparameters with optuna?
