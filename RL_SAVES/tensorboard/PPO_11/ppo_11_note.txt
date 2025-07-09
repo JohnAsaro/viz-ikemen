@@ -42,4 +42,5 @@ REDUCED CLIP RANGE TO 0.1
 
 train_PPO(env, timesteps=1000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_13", "best_model_131072.zip"))  # Train the PPO model
 
-ran to 524288.
+ran to 524288
+

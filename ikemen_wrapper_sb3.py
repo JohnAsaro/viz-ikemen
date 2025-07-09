@@ -628,6 +628,21 @@ def test_ppo(env, model_path, n_episodes=10):
     total_reward = 0.0  # Start total reward at 0
     model = PPO.load(model_path)  # Load the trained model
 
+    episodes_log_path = os.path.join(RL_SAVES, "current_episode_log.db") # TODO: Make this make its own directory with PPO matching models and tensorboard number
+
+    # Initialize the log DB if needed
+    conn = sqlite3.connect(episodes_log_path)
+    c = conn.cursor()
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS episodes (
+        id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        winner INTEGER NOT NULL DEFAULT -1,
+        batch_id INTEGER NOT NULL DEFAULT 1
+    )
+    """)
+    conn.commit()
+    conn.close()
+
     for episode in range(n_episodes):  # For each episode
         episode_reward = 0.0
         print(f'Episode: {episode + 1}')  # Print the episode number
@@ -645,8 +660,8 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 32768 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=True, step_delay = 0.00555555555, headless = False, speed = 0, fps = 60)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00555555555, headless = False, speed = 0, fps = 60, log_episode_result=True)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
     # train_PPO(env, timesteps=1000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_13", "best_model_131072.zip"))  # Train the PPO model
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_14", "best_model_425984.zip"), n_episodes=10)  # Test the trained model
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_14", "best_model_425984.zip"), n_episodes=999)  # Test the trained model
