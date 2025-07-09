@@ -25,9 +25,20 @@ PPO 11 = BATCHES 1-9
 ppo 12:
 train_PPO(env, timesteps=3000000, check=100000, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_11", "best_model_300000.zip"))  # Train the PPO model
 
-PPO 12 = BATCHES 1-3, IN LOG WILL BE BATCHES 10-12
+PPO 12 = BATCHES 1-6, IN LOG WILL BE BATCHES 10-15
 
-STOPPED AT 100000, for PPO 13 SAVE EVERY ITERATION TO PREVENT AKWARD FALLOFFS
+STOPPED AT 200000, for PPO 13 SAVE EVERY ITERATION TO PREVENT AKWARD FALLOFFS
 
 PPO 13: 
 train_PPO(env, timesteps=1000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_12", "best_model_200000.zip"))  # Train the PPO model
+
+PPO 13 = BATCHES 1-5, IN LOG WILL BE BATCHES 16-20
+
+BEST GEN AT 131072/batch 4
+
+PPO 14:
+
+REDUCED CLIP RANGE TO 0.1
+
+train_PPO(env, timesteps=1000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_13", "best_model_131072.zip"))  # Train the PPO model
+
