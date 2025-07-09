@@ -484,7 +484,7 @@ class IkemenEnv(gym.Env):
                 frame = self.process_image(result[0], self.screen_width, self.screen_height)
 
             cv2.imshow("Window", frame)
-            cv2.waitKey(1) # Update OpenCV window every frame
+            cv2.waitKey(5) # Update OpenCV window every frame
                 
         except Exception as e:
             print(f"Error reading screen buffer {e}")
@@ -645,8 +645,8 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 32768 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00555555555, headless = False, speed = 24, fps = 180)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=True, step_delay = 0.00555555555, headless = False, speed = 0, fps = 60)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=1000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_13", "best_model_131072.zip"))  # Train the PPO model
-    #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_10", "best_model_3000000.zip"), n_episodes=10)  # Test the trained model
+    # train_PPO(env, timesteps=1000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_13", "best_model_131072.zip"))  # Train the PPO model
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_14", "best_model_425984.zip"), n_episodes=10)  # Test the trained model

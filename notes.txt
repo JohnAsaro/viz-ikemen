@@ -14,6 +14,7 @@ note somewhere in the docs that you cant tab out but everything else should be f
 training algorithms
 
 TODO: 
+- clean this repo asap its just messy rn because i wanna get this presentation done
 - make revaluations based on some amount of rounds rather than some amount of steps
 - make amount of rounds a paramater instead of it being hardcoded one round
 - maybe see if you can add a way to adjust the game framerate through launch options in the command line
