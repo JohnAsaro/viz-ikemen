@@ -2,11 +2,19 @@
 # ikemen environment written to work with stable_baselines3 algorithms
 # uses PPO for training as an example
 
+import os 
+
+# Toggle NNPACK usage
+USE_NNPACK = True
+if not USE_NNPACK:
+    os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
+    os.environ["TORCH_CPP_LOG_LEVEL"] = "ERROR"
+
 import gymnasium as gym
 import cv2
 import time
 import subprocess 
-import os 
 import platform
 import shutil
 from commands import ACTIONS
