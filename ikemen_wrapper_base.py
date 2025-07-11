@@ -271,7 +271,7 @@ class IkemenEnv(gym.Env):
     # -----------------------------------------------------------------
 
 if __name__ == "__main__":
-    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, step_delay=0.0167)  # 1 step every 3 frames, ≈60 FPS
+    env = IkemenEnv(ai_level=1, screen_width=640, screen_height=480, step_delay=0.00555555555)  # 1 step every 3 frames, ≈60 FPS
     total_reward = 0.0
     for i in range(1, 6001):           # 1000 seconds at 60 FPS
         if env.proc.poll() is None: # Process is still running

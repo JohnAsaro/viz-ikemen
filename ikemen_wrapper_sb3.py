@@ -484,7 +484,7 @@ class IkemenEnv(gym.Env):
                 frame = self.process_image(result[0], self.screen_width, self.screen_height)
 
             cv2.imshow("Window", frame)
-            cv2.waitKey(5) # Update OpenCV window every frame
+            cv2.waitKey(16) # Update OpenCV window every frame
                 
         except Exception as e:
             print(f"Error reading screen buffer {e}")
@@ -589,7 +589,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     n_epochs = 10 # Number of epochs for the PPO model
     gamma = 1.0 # Discount factor for the PPO model, since no reward shaping, 1.0 because just win/lose
     gae_lambda = 1.0 # GAE lambda for the PPO model, sparse reward so 1.0
-    clip_range = 0.1 # Clipping range for the PPO model
+    clip_range = 0.15 # Clipping range for the PPO model
     device = "cpu" # PPO works well on cpu, but can be changed to "cuda" for GPU training
     tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
 
@@ -660,8 +660,8 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 32768 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00555555555, headless = False, speed = 24, fps = 180, log_episode_result=True)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=True)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=8000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_15", "best_model_5013504.zip"))  # Train the PPO model
-    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_14", "best_model_425984.zip"), n_episodes=999)  # Test the trained model
+    # train_PPO(env, timesteps=8000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_15", "best_model_5013504.zip"))  # Train the PPO model
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
