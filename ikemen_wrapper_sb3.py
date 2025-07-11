@@ -660,8 +660,8 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 32768 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00555555555, headless = False, speed = 0, fps = 60, log_episode_result=True)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.00555555555, headless = False, speed = 24, fps = 180, log_episode_result=True)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
-    # train_PPO(env, timesteps=1000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_13", "best_model_131072.zip"))  # Train the PPO model
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_14", "best_model_425984.zip"), n_episodes=999)  # Test the trained model
+    train_PPO(env, timesteps=8000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_15", "best_model_5013504.zip"))  # Train the PPO model
+    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_14", "best_model_425984.zip"), n_episodes=999)  # Test the trained model
