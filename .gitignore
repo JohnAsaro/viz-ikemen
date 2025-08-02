@@ -22,3 +22,7 @@ RL_SAVES/*
 !RL_SAVES/tensorboard/
 !RL_SAVES/plot_episodes.ipynb
 !RL_SAVES/current_episode_log.db
+presentation_stuff
+plot_4_presentation.ipynb
+presentation_model_test.csv
+presentation_win_loss_ratio.ipynb

@@ -3,9 +3,6 @@
 
 - ai starts at lvl 1, which is random input, work up to lvl 4
 
-- so I guess just learning of visual info? you CAN give it health reward shaping later but idk if that will help
-
-
 - we can specify the amount of rounds we want to do when we initialize the env, actual load the game with one more round than that, 
 so we can just reset the env through the reset cmd instead of relaunching the whole thing
 
@@ -16,6 +13,5 @@ training algorithms
 TODO: 
 - make revaluations based on some amount of rounds rather than some amount of steps
 - make amount of rounds a paramater instead of it being hardcoded one round
-- maybe see if you can add a way to adjust the game framerate through launch options in the command line
 - reward shaping with metadata can help but I dont wanna do that
 - maybe try brute forcing hyperparameters with optuna?
