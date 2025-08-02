@@ -6,19 +6,16 @@ import gymnasium as gym
 import cv2
 import time
 import subprocess 
+import threading
 import os 
 import platform
 import shutil
 from commands import ACTIONS
 import sqlite3
 import numpy as np
-from stable_baselines3.common import env_checker #Import the env_checker class from stable_baselines3 to check the environment
 from stable_baselines3 import PPO #Import the PPO class for training
-from stable_baselines3.common.evaluation import evaluate_policy #Import the evaluate_policy function to evaluate the model
 from stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
 import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
-if platform.system() == "Linux": # Signal for headless pausing
-    import signal
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -31,6 +28,33 @@ CHAR_DEF = os.path.relpath(
 )
 RL_SAVES = "RL_SAVES" # Folder to save the trained models
 
+# For the Ikemen environment, we will use a display thread to show the screen capture passed to the model
+class DisplayThread(threading.Thread):
+    def __init__(self, window_name="Window", fps=60):
+        super().__init__()
+        self.window_name = window_name
+        self.fps = fps
+        self.frame = None
+        self.running = True
+        self.lock = threading.Lock()
+        self.daemon = True  # Thread exits when main program exits
+
+    def update_frame(self, frame):
+        with self.lock:
+            self.frame = frame.copy()
+
+    def run(self):
+        while self.running:
+            time.sleep(1.0 / self.fps)
+            with self.lock:
+                if self.frame is not None:
+                    try:
+                        cv2.imshow(self.window_name, self.frame)
+                        if cv2.waitKey(1) & 0xFF == 27:  # ESC
+                            self.running = False
+                    except Exception as e:
+                        print(f"[DisplayThread] OpenCV error: {e}")
+        cv2.destroyAllWindows()
 
 class IkemenEnv(gym.Env):
 
@@ -75,6 +99,10 @@ class IkemenEnv(gym.Env):
         # Redundancy buffer for the screen capture
         self.last_buffer = None
 
+        # Initialize the display thread if show_capture is True
+        if show_capture:
+            self.display_thread = DisplayThread()
+        
         # Sanity check
         if headless and showcase:
             raise RuntimeError("You can't showcase and be headless at the same time, choose one or the other!")
@@ -110,7 +138,8 @@ class IkemenEnv(gym.Env):
             cmd += ["-width", str(screen_width), "-height", str(screen_height)]
 
         # Headless
-
+        if show_capture and headless:
+            self.display_thread.start()
         if headless:
             full_cmd = ["xvfb-run", "-a"] + cmd
             print("WARNING: HEADLESS MODE HAS ONLY BEEN TESTED ON DEBAIN BASED SYSTEMS.")
@@ -343,9 +372,6 @@ class IkemenEnv(gym.Env):
     # Take a step in the environment
 
     def step(self, action):
-        
-        if self.headless: # We run really fast in headless 
-            os.kill(self.proc.pid, signal.SIGSTOP) # So we stop during each step to make sure the game and the program are communicating
 
         self.current_step += 1
         self.unpause() # Unpause the environment if it was paused
@@ -406,7 +432,8 @@ class IkemenEnv(gym.Env):
         observation = self.process_image(screen_buffer[0], self.screen_width, self.screen_height) # Buffer data to numpy array
 
         if self.show_capture:
-            self.debug_show_capture(capture=observation)
+            #self.debug_show_capture(capture=observation)
+            self.display_thread.update_frame(observation)
         
         reward = 1.0 if self.winner == 1 else 0.0 # Reward 1.0 if P1 (learner) wins, else 0.0
         
@@ -418,9 +445,6 @@ class IkemenEnv(gym.Env):
             self.winner = -1
         
         time.sleep(self.step_delay) # Wait for the specified step delay 
-        
-        if self.headless:
-            os.kill(self.proc.pid, signal.SIGCONT) # Unpause
         
         return (observation, reward, terminated, truncated, info) # Return buffer_data as observation, reward=0.0, terminated=False, truncated=False, info={}
 
@@ -590,7 +614,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     gamma = 1.0 # Discount factor for the PPO model, since no reward shaping, 1.0 because just win/lose
     gae_lambda = 1.0 # GAE lambda for the PPO model, sparse reward so 1.0
     clip_range = 0.15 # Clipping range for the PPO model
-    device = "cpu" # PPO works well on cpu, but can be changed to "cuda" for GPU training
+    device = "auto" # PPO works well on cpu, but can be changed to "cuda" for GPU training
     tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
 
     if model_path is None: # If no model path is provided, create a new one
@@ -660,8 +684,8 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 32768 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=True)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = True, speed = 126, fps = 840, log_episode_result=True)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
-    # train_PPO(env, timesteps=8000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_15", "best_model_5013504.zip"))  # Train the PPO model
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
+    train_PPO(env, timesteps=8000000, check=32768, num_steps=n_steps)  # Train the PPO model
+    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
