@@ -690,7 +690,7 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
     n_steps = 8192 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=60, screen_height=40, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.00833333333, headless = True, speed = 126, fps = 840, log_episode_result=True)  # Create the Ikemen environment
+    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.00833333333, headless = True, speed = 126, fps = 840, log_episode_result=True)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
     train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model

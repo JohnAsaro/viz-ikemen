@@ -1,4 +1,4 @@
-# Launch ikemen with a random action agent.
+# Launch ikemen with a random action agent, use ikemen_wrapper_base.py
 
 import time
 from ikemen_wrapper_base import IkemenEnv      
