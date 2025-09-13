@@ -64,7 +64,7 @@ class DisplayThread(threading.Thread):
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False, speed = 1, fps = 60, log_episode_result=True):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False, speed = 0, fps = 60, log_episode_result=True):
         """
         Parameters:
         - ai_level: Difficulty level of the CPU opponent (1-8).
@@ -403,6 +403,7 @@ class IkemenEnv(gym.Env):
 
                     self.batch_id += 1 
                     log_conn.commit()
+            self.reset() # Reset the environment, as we have reached the max number of steps
 
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(DB_PATH)
@@ -689,8 +690,8 @@ def test_ppo(env, model_path, n_episodes=10):
         time.sleep(2)  # Sleep for 2 seconds
 
 if __name__ == "__main__":
-    n_steps = 8192 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.00833333333, headless = True, speed = 126, fps = 840, log_episode_result=True)  # Create the Ikemen environment
+    n_steps = 2048 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = True, speed = 0, fps = 60, log_episode_result=False)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 are wonkey on windows
     # env_checker.check_env(env)  # Check the environment
     train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model

@@ -1,19 +1,14 @@
+NOTES: 
 
-- only give reward if your guy wins, so reward 1 if win else no
-
-- ai starts at lvl 1, which is random input, work up to lvl 4
-
-- we can specify the amount of rounds we want to do when we initialize the env, actual load the game with one more round than that, 
-so we can just reset the env through the reset cmd instead of relaunching the whole thing
-
-- with my current screen buffer setup it will still send buffer if the window is covered, just not if its tabbed out (tabbed out works on linux), so make
-note somewhere in the docs that you cant tab out but everything else should be fine, resizing the window also might mess with some 
-training algorithms
+- Don't reszie the window it breaks it
+- Don't resize window 
+- Headless only works on linux
+- The game doesnt seem to process the end of rounds properly when it is running really fast and headlessly
 
 TODO: 
     -- important: make it so that multiple instances can be run in parallel
 
-- make revaluations based on some amount of rounds rather than some amount of steps
+LESS IMPORTANT:
 - make amount of rounds a paramater instead of it being hardcoded one round
 - reward shaping with metadata can help but I dont wanna do that
 - maybe try brute forcing hyperparameters with optuna?

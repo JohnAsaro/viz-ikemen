@@ -88,7 +88,7 @@ hook.add("loop", "external_interface", function()
 
   for _, row in ipairs(rows) do
     if row.reset == 1 then
-      reload() -- Reload the game if asserted from the DB
+      roundReset() -- Reload the game if asserted from the DB
       db:query("UPDATE environment SET reset = 0")
     end
     if row.pause == 1 then
