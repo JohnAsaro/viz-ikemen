@@ -387,7 +387,9 @@ end
 if main.flags['-height'] then 
 	modifyGameOption('Video.GameHeight', main.flags['-height'])
 end
-
+if main.flags['-instance_id'] ~= nil then
+	setInstanceID(main.flags['-instance_id']) -- Set the instance ID in Go side
+end
 
 --motif
 main.motifDef = gameOption('Config.Motif')

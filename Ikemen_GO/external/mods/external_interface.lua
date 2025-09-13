@@ -1,6 +1,12 @@
 -- external_interface.lua
 local sqlite3 = require("sqlite3")
-local DB_PATH = "external/mods/bridge.db"
+
+-- Setup
+local instance_id = getInstanceID()
+if instance_id == nil then
+  instance_id = "1A" -- Default instance ID if not provided
+end
+local DB_PATH = string.format("external/mods/bridges/bridge_%s.db", instance_id)
 
 -- Open the DB (will create if it doesn't exist)
 local db, err = sqlite3.new()
@@ -56,6 +62,10 @@ function debugInfo()
   for i, v in ipairs(main.t_cmd) do
     print("  [" .. i .. "] = " .. tostring(v))
   end
+
+  print("-instance_id:", main.flags['-instance_id'])
+
+  
 end
 
 -- Action Handlers
@@ -80,7 +90,7 @@ end
 
 -- Per-frame polling loop
 hook.add("loop", "external_interface", function()
-  
+
   -- ENVIORNMENT
   local rows, qerr = db:query([[
     SELECT reset, pause FROM environment;

@@ -27,7 +27,6 @@ import os #To save the model to the correct pathfrom stable_baselines3.common.ca
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
 IKEMEN_EXE = os.path.join(BASE_DIR, "Ikemen_GO", "Ikemen_GO")
 IKEMEN_DIR = os.path.join(BASE_DIR, "Ikemen_GO")          # folder that contains Ikemen_GO
-DB_PATH = os.path.join(IKEMEN_DIR, "external", "mods", "bridge.db")  # path to the database file
 CHAR_DEF = os.path.relpath(
     os.path.join(BASE_DIR, "kfm_env", "kfm_env.def"),
     IKEMEN_DIR
@@ -64,7 +63,7 @@ class DisplayThread(threading.Thread):
 
 class IkemenEnv(gym.Env):
 
-    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False, speed = 0, fps = 60, log_episode_result=True):
+    def __init__(self, ai_level=1, screen_width=640, screen_height=480, show_capture=False, n_steps=-1, showcase=False, step_delay=0.0, headless = False, speed = 0, fps = 60, log_episode_result=True, instance_id="1A"):
         """
         Parameters:
         - ai_level: Difficulty level of the CPU opponent (1-8).
@@ -82,6 +81,7 @@ class IkemenEnv(gym.Env):
         - speed: How fast the game runs, 1 = run the game 5 frames faster, 2 = 10, etc...
         - fps: How many frames per second game is rendered at, should be set to 60 + speed*9.
         - log_episode_result: True if you want to save the episodes column results in bridge.db for logging later.
+        - instance_id: Instance ID to differentiate multiple instances of Ikemen running simultaneously.
         """
         
         # Constants
@@ -97,6 +97,7 @@ class IkemenEnv(gym.Env):
         self.log_episode_result = log_episode_result
         self.episodes_log_path = os.path.join(RL_SAVES, "current_episode_log.db") # TODO: Make this dynamically increase like tensorboard and model directories do
         self.batch_id = 1 # Batch id for logging
+        self.DB_PATH = os.path.join(IKEMEN_DIR, "external", "mods", "bridges", f"bridge_{instance_id}.db")  # Path to the database file
 
         # Gym spaces
         self.action_space      = gym.spaces.Discrete(len(ACTIONS) - 1) # -1 after actions to disable taunt
@@ -130,6 +131,7 @@ class IkemenEnv(gym.Env):
                 "-speed", str(speed),
                 "-fps", str(fps),
                 "-p2.color", "3",
+                "-instance_id", str(instance_id),
                 "-s", "stages/training.def",
                 "-rounds", "10", # Hardcoded to only evaluate 1 round
                 "-nosound",
@@ -171,18 +173,18 @@ class IkemenEnv(gym.Env):
     def init_db(self, overwrite=True):
         """Initialize the database, overwriting if it exists."""
         # Remove existing database if overwrite is True
-        if overwrite and os.path.exists(DB_PATH):
+        if overwrite and os.path.exists(self.DB_PATH):
             try:
-                os.remove(DB_PATH)
-                print(f"Removed existing database at {DB_PATH}")
+                os.remove(self.DB_PATH)
+                print(f"Removed existing database at {self.DB_PATH}")
             except Exception as e:
                 print(f"Failed to remove existing database: {e}")
         
         # Create the directory structure if it doesn't exist
-        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        os.makedirs(os.path.dirname(self.DB_PATH), exist_ok=True)
         
         # Connect and create episodes table
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
         c.execute("""
         CREATE TABLE IF NOT EXISTS episodes (
@@ -225,14 +227,14 @@ class IkemenEnv(gym.Env):
 
         conn.commit()
         conn.close()
-        print(f"Database initialized at {DB_PATH}")
+        print(f"Database initialized at {self.DB_PATH}")
 
     def enqueue_command(self, cmd, arg):
         """
         - Update the existing episodes command column
         - If no episode active, insert a new episode 
         """
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
         
         # Check if there's any active episode (done=0)
@@ -267,7 +269,7 @@ class IkemenEnv(gym.Env):
         - Mark self.winner with the winner for reward calculation.
         - Return: True if we have a winner, False otherwise.
         """
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
         
         # Query the most recent episode that is not done
@@ -286,7 +288,7 @@ class IkemenEnv(gym.Env):
         """
         -Mark row with that told KFM what to do in the last episode as done.
         """
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
         
         # Find the most recent episode that is not done, note the winner and mark as done
@@ -309,7 +311,7 @@ class IkemenEnv(gym.Env):
         """
         # Reset game/get initial state of screen
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
         
         c.execute("SELECT reset FROM environment")
@@ -334,7 +336,7 @@ class IkemenEnv(gym.Env):
         Pause the environment.
         """
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
         
         c.execute("SELECT pause, ispaused FROM environment")
@@ -357,7 +359,7 @@ class IkemenEnv(gym.Env):
         Pause the environment.
         """
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
         
         c.execute("SELECT pause, ispaused FROM environment")
@@ -386,7 +388,7 @@ class IkemenEnv(gym.Env):
         if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0:
             self.pause() # Pause the environment if we reached the max number of steps
             if self.log_episode_result:
-                with sqlite3.connect(DB_PATH) as src_conn, sqlite3.connect(self.episodes_log_path) as log_conn:
+                with sqlite3.connect(self.DB_PATH) as src_conn, sqlite3.connect(self.episodes_log_path) as log_conn:
                     src_cursor = src_conn.cursor()
                     log_cursor = log_conn.cursor()
 
@@ -406,7 +408,7 @@ class IkemenEnv(gym.Env):
             self.reset() # Reset the environment, as we have reached the max number of steps
 
         self.enqueue_command(cmd = "assertCommand", arg = action)
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
         # Get the buffer_data from the maximum id where done = 0
         c.execute("SELECT buffer_data FROM buffer WHERE id = (SELECT MAX(id) FROM buffer WHERE done = 0)")
@@ -501,7 +503,7 @@ class IkemenEnv(gym.Env):
                 frame = capture # Use provided capture if available
             else:
                 # Connect to database and get the first buffer entry with done=0
-                conn = sqlite3.connect(DB_PATH)
+                conn = sqlite3.connect(self.DB_PATH)
                 c = conn.cursor()
                 c.execute("SELECT buffer_data FROM buffer WHERE done = 0 LIMIT 1")
                 result = c.fetchone()
@@ -690,9 +692,12 @@ def test_ppo(env, model_path, n_episodes=10):
         time.sleep(2)  # Sleep for 2 seconds
 
 if __name__ == "__main__":
+
     n_steps = 2048 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=True, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = True, speed = 0, fps = 60, log_episode_result=False)  # Create the Ikemen environment
-    # Note: Screen width and height below 160x120 are wonkey on windows
+    instances = 10
+    for i in range(1, instances):
+        env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
+    # Note: Screen width and height below 160x120 doesn't work well on windows
     # env_checker.check_env(env)  # Check the environment
-    train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
-    # test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
+    # train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
