@@ -693,11 +693,10 @@ def test_ppo(env, model_path, n_episodes=10):
 
 if __name__ == "__main__":
 
-    n_steps = 2048 # Number of steps to take before revaluting the policy
-    instances = 10
-    for i in range(1, instances):
-        env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
+    n_steps = 8192 # Number of steps to take before revaluting the policy
+    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
     # Note: Screen width and height below 160x120 doesn't work well on windows
     # env_checker.check_env(env)  # Check the environment
     # train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
     test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
+
