@@ -22,6 +22,8 @@ import numpy as np
 from stable_baselines3 import PPO #Import the PPO class for training
 from stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
 import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
+import multiprocessing #To use multiple processes for training
+from functools import partial #To use partial functions
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -145,9 +147,11 @@ class IkemenEnv(gym.Env):
         else:
             cmd += ["-width", str(screen_width), "-height", str(screen_height)]
 
-        # Headless
-        if show_capture and headless:
+        # Show Capture
+        if show_capture:
             self.display_thread.start()
+
+        # Headless
         if headless:
             full_cmd = ["xvfb-run", "-a"] + cmd
             print("WARNING: HEADLESS MODE HAS ONLY BEEN TESTED ON DEBAIN BASED SYSTEMS.")
@@ -691,12 +695,31 @@ def test_ppo(env, model_path, n_episodes=10):
         print(f'Episode: {episode + 1}, Reward: {episode_reward}, Current Total Reward: {total_reward}')  # Print the episode and total reward
         time.sleep(2)  # Sleep for 2 seconds
 
-if __name__ == "__main__":
 
-    n_steps = 8192 # Number of steps to take before revaluting the policy
-    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
+def run_test_instance(instance_id, n_steps=8192, model_path=None, n_episodes=999):
+    """
+    Run a single instance of the Ikemen environment to test.
+    """
+    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=True, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=instance_id)  # Create the Ikemen environment
+    return test_ppo(env, model_path=model_path, n_episodes=n_episodes)  # Test the trained model
+
+def run_train_instance(instance_id, n_steps=8192, timesteps=2048000, check=8192):
+    """
+    Run a single instance of the Ikemen environment to train
+    """
+    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=instance_id)  # Create the Ikemen environment
+    return train_PPO(env, timesteps=timesteps, check=check, num_steps=n_steps)  # Train the PPO model
+
+
+if __name__ == "__main__":
+    
+    #n_steps = 8192 # Number of steps to take before revaluting the policy
+    #env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
+    #test = test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
+    #train = train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
     # Note: Screen width and height below 160x120 doesn't work well on windows
     # env_checker.check_env(env)  # Check the environment
-    # train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
-
+    instances = 2
+    with multiprocessing.Pool(processes=instances) as pool:
+        #pool.map(partial(run_test_instance, n_steps=2048, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999), range(instances))
+        pool.map(partial(run_train_instance, n_steps=8192, timesteps=2048000, check=8192), range(instances))

@@ -721,4 +721,5 @@ if __name__ == "__main__":
     # env_checker.check_env(env)  # Check the environment
     instances = 2
     with multiprocessing.Pool(processes=instances) as pool:
-        pool.map(partial(run_test_instance, n_steps=2048, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999), range(instances))
+        #pool.map(partial(run_test_instance, n_steps=2048, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999), range(instances))
+        pool.map(partial(run_train_instance, n_steps=8192, timesteps=2048000, check=8192), range(instances))
