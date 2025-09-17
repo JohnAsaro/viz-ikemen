@@ -22,8 +22,7 @@ import numpy as np
 from stable_baselines3 import PPO #Import the PPO class for training
 from stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
 import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
-import multiprocessing #To use multiple processes for training
-from functools import partial #To use partial functions
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv #To use multiple environments for training
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -623,7 +622,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     verbose = 1 # Verbosity level for the model training
     learning_rate = 0.0001 # Learning rate for the PPO model
     batch_size = 64 # Batch size for the PPO model
-    n_epochs = 10 # Number of epochs for the PPO model
+    n_epochs = 8 # Number of epochs for the PPO model
     gamma = 1.0 # Discount factor for the PPO model, since no reward shaping, 1.0 because just win/lose
     gae_lambda = 1.0 # GAE lambda for the PPO model, sparse reward so 1.0
     clip_range = 0.15 # Clipping range for the PPO model
@@ -695,31 +694,34 @@ def test_ppo(env, model_path, n_episodes=10):
         print(f'Episode: {episode + 1}, Reward: {episode_reward}, Current Total Reward: {total_reward}')  # Print the episode and total reward
         time.sleep(2)  # Sleep for 2 seconds
 
-
-def run_test_instance(instance_id, n_steps=8192, model_path=None, n_episodes=999):
-    """
-    Run a single instance of the Ikemen environment to test.
-    """
-    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=True, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=instance_id)  # Create the Ikemen environment
-    return test_ppo(env, model_path=model_path, n_episodes=n_episodes)  # Test the trained model
-
-def run_train_instance(instance_id, n_steps=8192, timesteps=2048000, check=8192):
-    """
-    Run a single instance of the Ikemen environment to train
-    """
-    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=instance_id)  # Create the Ikemen environment
-    return train_PPO(env, timesteps=timesteps, check=check, num_steps=n_steps)  # Train the PPO model
-
+def make_env(instance_id, n_steps=8192, ai_level=1):
+    def _init():
+        return IkemenEnv(
+            ai_level=ai_level,
+            screen_width=80,
+            screen_height=60,
+            show_capture=True,
+            n_steps=n_steps,
+            showcase=False,
+            step_delay=0.01666666666,
+            headless=True,
+            speed=0,
+            fps=60,
+            log_episode_result=True, # BROKEN RN TODO: FIX
+            instance_id=str(instance_id)  # unique ID per env
+        )
+    return _init
 
 if __name__ == "__main__":
     
-    #n_steps = 8192 # Number of steps to take before revaluting the policy
+    n_steps = 24 # Number of steps to take before revaluting the policy
     #env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
     #test = test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
     #train = train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
     # Note: Screen width and height below 160x120 doesn't work well on windows
-    # env_checker.check_env(env)  # Check the environment
-    instances = 2
-    with multiprocessing.Pool(processes=instances) as pool:
-        #pool.map(partial(run_test_instance, n_steps=2048, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999), range(instances))
-        pool.map(partial(run_train_instance, n_steps=8192, timesteps=2048000, check=8192), range(instances))
+    instances = 8
+    env = SubprocVecEnv([make_env(i) for i in range(instances)]) # train env
+    train_PPO(env, timesteps=2048000, check=n_steps, num_steps=n_steps)
+    #env = DummyVecEnv([make_env("test")]) # test env
+    #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999) 
+    
