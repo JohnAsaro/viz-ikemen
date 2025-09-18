@@ -407,6 +407,9 @@ class IkemenEnv(gym.Env):
 
                     self.batch_id += 1 
                     log_conn.commit()
+                    log_conn.close()
+                    src_conn.close()
+
             self.reset() # Reset the environment, as we have reached the max number of steps       
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(self.DB_PATH)
@@ -702,22 +705,22 @@ def make_env(instance_id, n_steps=8192, ai_level=1):
             n_steps=n_steps,
             showcase=False,
             step_delay=0.01666666666,
-            headless=False,
+            headless=True,
             speed=0,
             fps=60,
-            log_episode_result=True, # BROKEN RN TODO: FIX
+            log_episode_result=False, # BROKEN RN TODO: FIX
             instance_id=str(instance_id)  # unique ID per env
         )
     return _init
 
 if __name__ == "__main__":
     
-    n_steps = 128 # Number of steps to take before revaluting the policy
+    n_steps = 2048 # Number of steps to take before revaluting the policy
     #env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
     #test = test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
     #train = train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
     # Note: Screen width and height below 160x120 doesn't work well on windows
-    instances = 1
+    instances = 8
     env = SubprocVecEnv([make_env(i, n_steps=n_steps) for i in range(instances)]) # train env
     train_PPO(env, timesteps=2048000, check=n_steps, num_steps=n_steps)
     #env = DummyVecEnv([make_env("test")]) # test env
