@@ -387,7 +387,6 @@ class IkemenEnv(gym.Env):
         self.current_step += 1
         self.unpause() # Unpause the environment if it was paused
         # Note: We do this EVERY time in case there is a freak accident and the environment is paused when it shouldn't be
-
         if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0:
             self.pause() # Pause the environment if we reached the max number of steps
             if self.log_episode_result:
@@ -408,8 +407,7 @@ class IkemenEnv(gym.Env):
 
                     self.batch_id += 1 
                     log_conn.commit()
-            self.reset() # Reset the environment, as we have reached the max number of steps
-
+            self.reset() # Reset the environment, as we have reached the max number of steps       
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
@@ -452,7 +450,7 @@ class IkemenEnv(gym.Env):
         truncated = False # Not using truncation
         
         info = {"winner": self.winner} # Return winner in info dict
-        
+            
         if terminated: # Reset winner for next episode
             self.winner = -1
         
@@ -700,11 +698,11 @@ def make_env(instance_id, n_steps=8192, ai_level=1):
             ai_level=ai_level,
             screen_width=80,
             screen_height=60,
-            show_capture=True,
+            show_capture=False,
             n_steps=n_steps,
             showcase=False,
             step_delay=0.01666666666,
-            headless=True,
+            headless=False,
             speed=0,
             fps=60,
             log_episode_result=True, # BROKEN RN TODO: FIX
@@ -714,13 +712,13 @@ def make_env(instance_id, n_steps=8192, ai_level=1):
 
 if __name__ == "__main__":
     
-    n_steps = 24 # Number of steps to take before revaluting the policy
+    n_steps = 128 # Number of steps to take before revaluting the policy
     #env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
     #test = test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
     #train = train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
     # Note: Screen width and height below 160x120 doesn't work well on windows
-    instances = 8
-    env = SubprocVecEnv([make_env(i) for i in range(instances)]) # train env
+    instances = 1
+    env = SubprocVecEnv([make_env(i, n_steps=n_steps) for i in range(instances)]) # train env
     train_PPO(env, timesteps=2048000, check=n_steps, num_steps=n_steps)
     #env = DummyVecEnv([make_env("test")]) # test env
     #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999) 

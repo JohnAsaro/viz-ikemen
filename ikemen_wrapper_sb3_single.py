@@ -1,3 +1,5 @@
+# LEGACY, PRETTY MUCH ONLY AROUND RN SO I CAN LOOK AT PPO 1-16
+
 # ikemen_wrapper_sb3.py
 # ikemen environment written to work with stable_baselines3 algorithms
 # uses PPO for training as an example
@@ -700,14 +702,16 @@ def run_test_instance(instance_id, n_steps=8192, model_path=None, n_episodes=999
     """
     Run a single instance of the Ikemen environment to test.
     """
-    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=True, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=instance_id)  # Create the Ikemen environment
+    # LOG EPISODE RESULT IS BROKEN, TODO: FIX IT
+    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=True, instance_id=instance_id)  # Create the Ikemen environment
     return test_ppo(env, model_path=model_path, n_episodes=n_episodes)  # Test the trained model
 
 def run_train_instance(instance_id, n_steps=8192, timesteps=2048000, check=8192):
     """
     Run a single instance of the Ikemen environment to train
     """
-    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=instance_id)  # Create the Ikemen environment
+    # LOG EPISODE RESULT IS BROKEN, TODO: FIX IT
+    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = True, speed = 0, fps = 60, log_episode_result=False, instance_id=instance_id)  # Create the Ikemen environment
     return train_PPO(env, timesteps=timesteps, check=check, num_steps=n_steps)  # Train the PPO model
 
 
@@ -722,4 +726,4 @@ if __name__ == "__main__":
     instances = 2
     with multiprocessing.Pool(processes=instances) as pool:
         #pool.map(partial(run_test_instance, n_steps=2048, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999), range(instances))
-        pool.map(partial(run_train_instance, n_steps=8192, timesteps=2048000, check=8192), range(instances))
+        pool.map(partial(run_train_instance, n_steps=2048, timesteps=2048000, check=2048), range(instances))
