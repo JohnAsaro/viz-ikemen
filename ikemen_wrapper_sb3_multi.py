@@ -306,7 +306,18 @@ class IkemenEnv(gym.Env):
 
         conn.commit()
         conn.close()
-            
+
+        if self.log_episode_result and self.winner in (1, 2):
+            with sqlite3.connect(self.episodes_log_path) as log_conn:
+                log_cursor = log_conn.cursor()
+
+                # Insert into log DB
+                log_cursor.execute("""
+                    INSERT INTO episodes (winner, batch_id)
+                    VALUES (?, ?)
+                """, (self.winner, self.batch_id))
+
+                log_conn.commit()
 
     def reset(self, seed=None):
         """
@@ -389,28 +400,9 @@ class IkemenEnv(gym.Env):
         # Note: We do this EVERY time in case there is a freak accident and the environment is paused when it shouldn't be
         if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0:
             self.pause() # Pause the environment if we reached the max number of steps
-            if self.log_episode_result:
-                with sqlite3.connect(self.DB_PATH) as src_conn, sqlite3.connect(self.episodes_log_path) as log_conn:
-                    src_cursor = src_conn.cursor()
-                    log_cursor = log_conn.cursor()
-
-                    # Select all episodes (or filter if needed)
-                    src_cursor.execute("SELECT id, done, winner FROM episodes WHERE done = 1")
-                    episodes = src_cursor.fetchall()
-                    episodes_with_batch = [(eid, winner, self.batch_id) for (eid, done, winner) in episodes]
-
-                    # Insert into log DB
-                    log_cursor.executemany("""
-                        INSERT OR IGNORE INTO episodes (id, winner, batch_id)
-                        VALUES (?, ?, ?)
-                    """, episodes_with_batch)
-
-                    self.batch_id += 1 
-                    log_conn.commit()
-                    log_conn.close()
-                    src_conn.close()
-
-            self.reset() # Reset the environment, as we have reached the max number of steps       
+            self.batch_id += 1 
+            self.reset() # Reset the environment, as we have reached the max number of steps
+   
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
@@ -708,7 +700,7 @@ def make_env(instance_id, n_steps=8192, ai_level=1):
             headless=True,
             speed=0,
             fps=60,
-            log_episode_result=False, # BROKEN RN TODO: FIX
+            log_episode_result=True, 
             instance_id=str(instance_id)  # unique ID per env
         )
     return _init
