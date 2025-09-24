@@ -388,6 +388,9 @@ class IkemenEnv(gym.Env):
         conn.commit()
         conn.close()
         
+        if ispaused == 1:
+            self.reset() # Reset the environment when unpausing 
+
         return
     
     # -----------------------------------------------------------------    
@@ -401,7 +404,6 @@ class IkemenEnv(gym.Env):
         if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0:
             self.pause() # Pause the environment if we reached the max number of steps
             self.batch_id += 1 
-            self.reset() # Reset the environment, as we have reached the max number of steps
    
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(self.DB_PATH)
@@ -618,7 +620,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     n_epochs = 8 # Number of epochs for the PPO model
     gamma = 1.0 # Discount factor for the PPO model, since no reward shaping, 1.0 because just win/lose
     gae_lambda = 1.0 # GAE lambda for the PPO model, sparse reward so 1.0
-    clip_range = 0.15 # Clipping range for the PPO model
+    clip_range = 0.1 # Clipping range for the PPO model
     device = "auto" # PPO works well on cpu, but can be changed to "cuda" for GPU training
     tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
 
@@ -708,13 +710,12 @@ def make_env(instance_id, n_steps=8192, ai_level=1):
 if __name__ == "__main__":
     
     n_steps = 2048 # Number of steps to take before revaluting the policy
-    #env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
     #test = test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
     #train = train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
     # Note: Screen width and height below 160x120 doesn't work well on windows
     instances = 8
     env = SubprocVecEnv([make_env(i, n_steps=n_steps) for i in range(instances)]) # train env
     train_PPO(env, timesteps=2048000, check=n_steps, num_steps=n_steps)
-    #env = DummyVecEnv([make_env("test")]) # test env
-    #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999) 
+    #env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
+    #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_17", "best_model_256000"), n_episodes=999) 
     
