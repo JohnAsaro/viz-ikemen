@@ -1,5 +1,0 @@
-cont from     train_PPO(env, timesteps=5000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_14", "best_model_425984.zip"))  # Train the PPO model
-same other params
-
-result: results are all over the place, im just gonna run it again picking up at 5m from this one
-

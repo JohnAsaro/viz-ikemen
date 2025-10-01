@@ -1,6 +1,6 @@
 # viz-ikemen
 
-Viz Ikemen is a game AI platform that can be used to train bots to play the game Ikemen GO entirely with visual information. Ikemen GO is an open source fighting game built in the GO programming language. Viz-ikemen uses the games "VS" mode as an enviornment to train an agent learner to battle the CPU opponents that exist in Ikemen GO.
+Viz Ikemen is a game AI enviornment that can be used to train bots to play the game Ikemen GO entirely with visual information. Ikemen GO is an open source fighting game built in the GO programming language. Viz-ikemen uses the games "VS" mode as an enviornment to train an agent learner to battle the CPU opponents that exist in Ikemen GO.
 
 
 ## Setup Instructions

@@ -3,13 +3,7 @@ NOTES:
 - Don't reszie the window it breaks it
 - Don't resize window 
 - Headless only works on linux
-- The game doesnt seem to process the end of rounds properly when it is running really fast and headlessly
 
-TODO: 
-- Fix pause function when n_steps is reached so that the enviornment actually resets then aswell
-- fix log episode result in multi
 
-LESS IMPORTANT:
-- make amount of rounds a paramater instead of it being hardcoded one round
-- maybe try brute forcing hyperparameters with optuna?
+TODO:
 - turn into full fledged library

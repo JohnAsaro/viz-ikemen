@@ -1,3 +1,0 @@
-Added redundancy for pauses, and some fixes to improve fps while training, 3 frame delay between inputs, rerunning PPO 5 now with the pausing turned on obv.
-
-Sort of terminated this early because it was taking too long, gonna make it 1 frame delay between inputs.
