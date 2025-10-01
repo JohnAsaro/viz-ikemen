@@ -1,8 +1,8 @@
-# LEGACY, PRETTY MUCH ONLY AROUND RN SO I CAN LOOK AT PPO 1-16
-
 # ikemen_wrapper_sb3.py
 # ikemen environment written to work with stable_baselines3 algorithms
 # uses PPO for training as an example
+
+import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
 
 # Toggle NNPACK usage
 USE_NNPACK = True
@@ -10,7 +10,7 @@ if not USE_NNPACK:
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
     os.environ["TORCH_CPP_LOG_LEVEL"] = "ERROR"
-
+    
 import gymnasium as gym
 import cv2
 import time
@@ -21,11 +21,9 @@ import shutil
 from commands import ACTIONS
 import sqlite3
 import numpy as np
-from stable_baselines3 import PPO #Import the PPO class for training
-from stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
-import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
-import multiprocessing #To use multiple processes for training
-from functools import partial #To use partial functions
+from stable_baselines3 import PPO 
+from stable_baselines3.common.callbacks import BaseCallback 
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -104,7 +102,7 @@ class IkemenEnv(gym.Env):
         self.DB_PATH = os.path.join(IKEMEN_DIR, "external", "mods", "bridges", f"bridge_{instance_id}.db")  # Path to the database file
 
         # Gym spaces
-        self.action_space      = gym.spaces.Discrete(len(ACTIONS) - 1) # -1 after actions to disable taunt
+        self.action_space      = gym.spaces.Discrete(len(ACTIONS) - 1) # -1 after actions to disable taunt, done for faster training
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(screen_height, screen_width, 3), dtype=np.uint8)
         
         # Redundancy buffer for the screen capture
@@ -309,7 +307,18 @@ class IkemenEnv(gym.Env):
 
         conn.commit()
         conn.close()
-            
+
+        if self.log_episode_result and self.winner in (1, 2):
+            with sqlite3.connect(self.episodes_log_path) as log_conn:
+                log_cursor = log_conn.cursor()
+
+                # Insert into log DB
+                log_cursor.execute("""
+                    INSERT INTO episodes (winner, batch_id)
+                    VALUES (?, ?)
+                """, (self.winner, self.batch_id))
+
+                log_conn.commit()
 
     def reset(self, seed=None):
         """
@@ -331,7 +340,6 @@ class IkemenEnv(gym.Env):
         
         conn.commit()
         conn.close()
-        
         info = {"winner": self.winner} # Return winner of last episode in info dict
         observation = np.zeros(self.observation_space.shape, dtype=np.uint8) # Initial observation (black screen)
 
@@ -380,6 +388,9 @@ class IkemenEnv(gym.Env):
         conn.commit()
         conn.close()
         
+        if ispaused == 1:
+            self.reset() # Reset when unpausing
+
         return
     
     # -----------------------------------------------------------------    
@@ -390,29 +401,10 @@ class IkemenEnv(gym.Env):
         self.current_step += 1
         self.unpause() # Unpause the environment if it was paused
         # Note: We do this EVERY time in case there is a freak accident and the environment is paused when it shouldn't be
-
         if self.n_steps > 0 and self.current_step > 0 and self.current_step % self.n_steps == 0:
             self.pause() # Pause the environment if we reached the max number of steps
-            if self.log_episode_result:
-                with sqlite3.connect(self.DB_PATH) as src_conn, sqlite3.connect(self.episodes_log_path) as log_conn:
-                    src_cursor = src_conn.cursor()
-                    log_cursor = log_conn.cursor()
-
-                    # Select all episodes (or filter if needed)
-                    src_cursor.execute("SELECT id, done, winner FROM episodes WHERE done = 1")
-                    episodes = src_cursor.fetchall()
-                    episodes_with_batch = [(eid, winner, self.batch_id) for (eid, done, winner) in episodes]
-
-                    # Insert into log DB
-                    log_cursor.executemany("""
-                        INSERT OR IGNORE INTO episodes (id, winner, batch_id)
-                        VALUES (?, ?, ?)
-                    """, episodes_with_batch)
-
-                    self.batch_id += 1 
-                    log_conn.commit()
-            self.reset() # Reset the environment, as we have reached the max number of steps
-
+            self.batch_id += 1 
+   
         self.enqueue_command(cmd = "assertCommand", arg = action)
         conn = sqlite3.connect(self.DB_PATH)
         c = conn.cursor()
@@ -449,13 +441,19 @@ class IkemenEnv(gym.Env):
         if self.show_capture:
             #self.debug_show_capture(capture=observation)
             self.display_thread.update_frame(observation)
-        
-        reward = 1.0 if self.winner == 1 else 0.0 # Reward 1.0 if P1 (learner) wins, else 0.0
+
+        # Reward 1.0 if P1 (learner) wins, if P2 (CPU) wins, -1.0, else 0.0
+        if self.winner == 1:
+            reward = 1.0  
+        elif self.winner == 2:
+            reward = -1.0
+        else: # No winner (reset early due to step cut off)
+            reward = 0.0
         
         truncated = False # Not using truncation
         
         info = {"winner": self.winner} # Return winner in info dict
-        
+            
         if terminated: # Reset winner for next episode
             self.winner = -1
         
@@ -484,13 +482,13 @@ class IkemenEnv(gym.Env):
             actual_width, actual_height = width, height
             
         frame = frame_data.reshape((actual_height, actual_width, 4)) # Data given in RGBA format
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)  # Convert to BGR for OpenCV
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2RGB)  # Convert from RGBA to RGB <- I don't think this will help but whatever
         frame = np.flipud(frame)  # Flip the image vertically to correct orientation
-        
+    
         if self.showcase:
             # Resize from 640x480 to the target screen dimensions
             frame = cv2.resize(frame, (self.screen_width, self.screen_height), interpolation=cv2.INTER_AREA)
-            
+
         return frame
     
     # -----------------------------------------------------------------
@@ -535,7 +533,7 @@ class IkemenEnv(gym.Env):
 # ------------------------------------------------------------------
 # PPO Training and evaluation
 
-class TrainAndLogCallback(BaseCallback):
+class TrainAndLogCallback(BaseCallback): # Save best model
     
     def __init__(self, check_freq, save_path, verbose = 1):
 
@@ -572,7 +570,7 @@ class TrainAndLogCallback(BaseCallback):
         
     def _on_step(self): #Check the model after each step
         if self.n_calls % self.check_freq == 0:
-            model_path = os.path.join(self.save_path, 'best_model_{}'.format(self.n_calls))
+            model_path = os.path.join(self.save_path, 'model_{}'.format(self.n_calls))
             self.model.save(model_path)
         
         return True
@@ -623,12 +621,12 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     conn.close()
 
     verbose = 1 # Verbosity level for the model training
-    learning_rate = 0.0001 # Learning rate for the PPO model
+    learning_rate = 0.0003 # Learning rate for the PPO model
     batch_size = 64 # Batch size for the PPO model
-    n_epochs = 10 # Number of epochs for the PPO model
-    gamma = 1.0 # Discount factor for the PPO model, since no reward shaping, 1.0 because just win/lose
-    gae_lambda = 1.0 # GAE lambda for the PPO model, sparse reward so 1.0
-    clip_range = 0.15 # Clipping range for the PPO model
+    n_epochs = 8 # Number of epochs for the PPO model
+    gamma = 0.99 # Discount factor for the PPO model
+    gae_lambda = 0.95 # GAE lambda for the PPO model
+    clip_range = 0.1 # Clipping range for the PPO model
     device = "auto" # PPO works well on cpu, but can be changed to "cuda" for GPU training
     tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
 
@@ -685,45 +683,43 @@ def test_ppo(env, model_path, n_episodes=10):
     for episode in range(n_episodes):  # For each episode
         episode_reward = 0.0
         print(f'Episode: {episode + 1}')  # Print the episode number
-        obs, _ = env.reset()  # Reset the environment and get only the observation
+        obs = env.reset()  # Reset the environment and get only the observation
         obs = obs.copy() # Work around negative stride error 
         done = False  # Start done at false
         while not done:  # While the game isn't done
             action, _ = model.predict(obs)  # Get the action
-            obs, reward, done, truncated, info = env.step(action)  # Take the action
+            obs, reward, done, truncated = env.step(action)  # Take the action
             obs = obs.copy() # Work around negative stride error
-            episode_reward += reward  # Add the reward to the total reward
+            episode_reward += int(reward)  # Add the reward to the total reward
         total_reward += episode_reward
         print(f'Episode: {episode + 1}, Reward: {episode_reward}, Current Total Reward: {total_reward}')  # Print the episode and total reward
         time.sleep(2)  # Sleep for 2 seconds
 
-
-def run_test_instance(instance_id, n_steps=8192, model_path=None, n_episodes=999):
-    """
-    Run a single instance of the Ikemen environment to test.
-    """
-    # LOG EPISODE RESULT IS BROKEN, TODO: FIX IT
-    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=True, instance_id=instance_id)  # Create the Ikemen environment
-    return test_ppo(env, model_path=model_path, n_episodes=n_episodes)  # Test the trained model
-
-def run_train_instance(instance_id, n_steps=8192, timesteps=2048000, check=8192):
-    """
-    Run a single instance of the Ikemen environment to train
-    """
-    # LOG EPISODE RESULT IS BROKEN, TODO: FIX IT
-    env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = True, speed = 0, fps = 60, log_episode_result=False, instance_id=instance_id)  # Create the Ikemen environment
-    return train_PPO(env, timesteps=timesteps, check=check, num_steps=n_steps)  # Train the PPO model
-
+def make_env(instance_id = "test", n_steps=8192, ai_level=1, showcase=False, log_episode_result=False):
+    def _init():
+        return IkemenEnv(
+            ai_level=ai_level,
+            screen_width=80,
+            screen_height=60,
+            show_capture=False,
+            n_steps=n_steps,
+            showcase=showcase,
+            step_delay=0.01666666666,
+            headless=False,
+            speed=0,
+            fps=60,
+            log_episode_result=log_episode_result, 
+            instance_id=str(instance_id)  # unique ID per env
+        )
+    return _init
 
 if __name__ == "__main__":
     
-    #n_steps = 8192 # Number of steps to take before revaluting the policy
-    #env = IkemenEnv(ai_level=2, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
-    #test = test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999)  # Test the trained model
-    #train = train_PPO(env, timesteps=2048000, check=8192, num_steps=n_steps)  # Train the PPO model
-    # Note: Screen width and height below 160x120 doesn't work well on windows
-    # env_checker.check_env(env)  # Check the environment
-    instances = 2
-    with multiprocessing.Pool(processes=instances) as pool:
-        #pool.map(partial(run_test_instance, n_steps=2048, model_path=os.path.join(RL_SAVES, "models", "PPO_16", "best_model_1507328"), n_episodes=999), range(instances))
-        pool.map(partial(run_train_instance, n_steps=2048, timesteps=2048000, check=2048), range(instances))
+    n_steps = 8192 # Number of steps to take before revaluting the policy
+    #env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
+    #instances = 8
+    #env = SubprocVecEnv([make_env(i, n_steps=n_steps, log_episode_result=True) for i in range(instances)]) # train env
+    #train_PPO(env, timesteps=4096000*4, check=n_steps, num_steps=n_steps)
+    env = DummyVecEnv([make_env(instance_id ="test", showcase=True, log_episode_result=False)]) # test env
+    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_1", "model_2048000"), n_episodes=999)  # Test the trained model
+    
