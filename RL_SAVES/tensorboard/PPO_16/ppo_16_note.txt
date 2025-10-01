@@ -1,5 +1,0 @@
-just running back 15, but trying clip range 0.15
-
-    train_PPO(env, timesteps=8000000, check=32768, num_steps=n_steps, model_path=os.path.join(RL_SAVES, "models", "PPO_15", "best_model_5013504.zip"))  # Train the PPO model
-
-result: Batch 45 = 100% winrate!!!!!! (best_model_1507328)

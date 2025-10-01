@@ -1,0 +1,5 @@
+In this folder is the model saved by BaseCallback after training an agent in the Viz Ikemen environment for 2048000 timesteps using PPO. (model_2048000.zip)
+Parameters can be found in parameters.txt.
+In tensorboard/PPO_1 you can find the tensorboard logs from the training.
+training_episodes_log.db is a log of each episodes winners and losers, organized by batch.
+plot_episodes.ipynb plots training_episodes_log.db, and fits it to a n = 3 degree poly curve.

@@ -2,13 +2,15 @@
 # ikemen environment written to work with stable_baselines3 algorithms
 # uses PPO for training as an example
 
+import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
+
 # Toggle NNPACK usage
 USE_NNPACK = True
 if not USE_NNPACK:
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
     os.environ["TORCH_CPP_LOG_LEVEL"] = "ERROR"
-
+    
 import gymnasium as gym
 import cv2
 import time
@@ -19,10 +21,9 @@ import shutil
 from commands import ACTIONS
 import sqlite3
 import numpy as np
-from stable_baselines3 import PPO #Import the PPO class for training
-from stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
-import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
-from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv #To use multiple environments for training
+from stable_baselines3 import PPO 
+from stable_baselines3.common.callbacks import BaseCallback 
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
 # Constants
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))   # change to the parent folder where you placed your Ikemen_GO folder if you don't want to install Ikemen_GO in the same folder as this repository
@@ -339,7 +340,6 @@ class IkemenEnv(gym.Env):
         
         conn.commit()
         conn.close()
-        
         info = {"winner": self.winner} # Return winner of last episode in info dict
         observation = np.zeros(self.observation_space.shape, dtype=np.uint8) # Initial observation (black screen)
 
@@ -441,8 +441,14 @@ class IkemenEnv(gym.Env):
         if self.show_capture:
             #self.debug_show_capture(capture=observation)
             self.display_thread.update_frame(observation)
-        
-        reward = 1.0 if self.winner == 1 else 0.0 # Reward 1.0 if P1 (learner) wins, else 0.0
+
+        # Reward 1.0 if P1 (learner) wins, if P2 (CPU) wins, -1.0, else 0.0
+        if self.winner == 1:
+            reward = 1.0  
+        elif self.winner == 2:
+            reward = -1.0
+        else: # No winner (reset early due to step cut off)
+            reward = 0.0
         
         truncated = False # Not using truncation
         
@@ -476,13 +482,13 @@ class IkemenEnv(gym.Env):
             actual_width, actual_height = width, height
             
         frame = frame_data.reshape((actual_height, actual_width, 4)) # Data given in RGBA format
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)  # Convert to BGR for OpenCV
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2RGB)  # Convert from RGBA to RGB <- I don't think this will help but whatever
         frame = np.flipud(frame)  # Flip the image vertically to correct orientation
-        
+    
         if self.showcase:
             # Resize from 640x480 to the target screen dimensions
             frame = cv2.resize(frame, (self.screen_width, self.screen_height), interpolation=cv2.INTER_AREA)
-            
+
         return frame
     
     # -----------------------------------------------------------------
@@ -527,7 +533,7 @@ class IkemenEnv(gym.Env):
 # ------------------------------------------------------------------
 # PPO Training and evaluation
 
-class TrainAndLogCallback(BaseCallback):
+class TrainAndLogCallback(BaseCallback): # Save best model
     
     def __init__(self, check_freq, save_path, verbose = 1):
 
@@ -564,7 +570,7 @@ class TrainAndLogCallback(BaseCallback):
         
     def _on_step(self): #Check the model after each step
         if self.n_calls % self.check_freq == 0:
-            model_path = os.path.join(self.save_path, 'best_model_{}'.format(self.n_calls))
+            model_path = os.path.join(self.save_path, 'model_{}'.format(self.n_calls))
             self.model.save(model_path)
         
         return True
@@ -615,7 +621,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     conn.close()
 
     verbose = 1 # Verbosity level for the model training
-    learning_rate = 0.0001 # Learning rate for the PPO model
+    learning_rate = 0.0003 # Learning rate for the PPO model
     batch_size = 64 # Batch size for the PPO model
     n_epochs = 8 # Number of epochs for the PPO model
     gamma = 1.0 # Discount factor for the PPO model, since no reward shaping, 1.0 because just win/lose
@@ -677,7 +683,7 @@ def test_ppo(env, model_path, n_episodes=10):
     for episode in range(n_episodes):  # For each episode
         episode_reward = 0.0
         print(f'Episode: {episode + 1}')  # Print the episode number
-        obs, _ = env.reset()  # Reset the environment and get only the observation
+        obs = env.reset()  # Reset the environment and get only the observation
         obs = obs.copy() # Work around negative stride error 
         done = False  # Start done at false
         while not done:  # While the game isn't done
@@ -699,7 +705,7 @@ def make_env(instance_id, n_steps=8192, ai_level=1):
             n_steps=n_steps,
             showcase=False,
             step_delay=0.01666666666,
-            headless=True,
+            headless=False,
             speed=0,
             fps=60,
             log_episode_result=True, 

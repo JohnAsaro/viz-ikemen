@@ -1,1 +1,0 @@
-Changed n_steps to 8192, learning rate to 0.00001 and clip range to .1, turned back on pause thing, will add some redundancy to avoid a freak accident like in ppo_3 happening again
