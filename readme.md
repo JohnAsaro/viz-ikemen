@@ -30,12 +30,22 @@ Actions are actually called in the game through the lua script external_interfac
 
 The pipeline is: Python wrapper writes an action to bridge.db, external_interface.lua recognizes this and changes the map in the zss script, the zss script has KFM do one of the defined actions. On each in game tick, the screen buffer is also written to bridge.db, we always take the latest screen buffer as an observation when training the learner.
 
+### Features
+
+- Easy to use interface for controlling the "Kung Fu Man" character in Ikemen GO through Python. 
+- Proof of concept implementations of the interface in the open AI gym enviornments, utilizing stablebaselines3's DQN and PPO implementations to train CNN based agents that use the "Kung Fu Man" character to play Ikemen GO. 
+
 ## Results
 
-After training a model for 2048000 steps, it converged to a 90% winrate against the level 1 CPU training partner. 
-These results, the model trained, and hyperparameters used can be found in PPO_results. 
+After training a model for with PPO 2048000 steps, it reached a 90% winrate against the level 1 CPU training partner. 
+
+After training a model for with a DQN 2048000 steps, it converged to a 100% winrate against the level 1 CPU training partner. 
+
+The DQN model reached a solution much faster. In the DQN, the model converged to a 100% winrate solution at batch 75. In the PPO model, convergence never occured, and the model was still improving at 2048000 steps (batch 250). 
+
+These results, the model trained, and hyperparameters used can be found in PPO_results and DQN_results respectively.
 
 ## TODO
 
-- Expand to other algorithms
+- Formalize results such that they can actually be read somewhere other than a jank readme
 - Make enviornment into an API that can be installed through pip (its almost there, I just need the time to actually do it)

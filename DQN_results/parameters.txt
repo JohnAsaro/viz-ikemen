@@ -1,0 +1,30 @@
+Trained for 20480000 steps
+
+DQN Hyperparameters:
+"CnnPolicy"
+verbose = 1 
+learning_rate = 0.0003 
+batch_size = 64 
+gamma = 0.99 
+device = "auto"
+
+Env Parameters:
+ai_level=1
+screen_width=80
+screen_height=60
+show_capture=False
+n_steps = 8192 
+showcase=False
+step_delay=0.01666666666
+headless=False
+speed=0
+fps=60
+log_episode_result=True
+instance_id=str(instance_id)  # unique ID per env
+
+
+Other Parameters:
+instances = 8
+timesteps=20480000 # Total timesteps
+
+

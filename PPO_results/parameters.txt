@@ -1,4 +1,4 @@
-Trained for 
+Trained for 20480000 steps
 
 PPO Hyperparameters:
 "CnnPolicy"
