@@ -73,17 +73,13 @@ end
 function forceAction(p, data)
 	if not player(p) then return false end
 
-	if name() == "Kung Fu Man" then
-		changeState(data)
-	end
+  changeState(data)
 end
 
 function assertExtCommand(p, arg)
 	if not player(p) then return false end
 
-	if name() == "Kung Fu Man" then
-			mapSet('ext_command', arg)
-	end
+  mapSet('ext_command', arg)
 end
 
 -- End [Functions]

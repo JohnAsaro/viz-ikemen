@@ -22,3 +22,4 @@ RL_SAVES/*
 !RL_SAVES/plot_episodes.ipynb
 !RL_SAVES/current_episode_log.db
 presentation_stuff
+sakura_env
