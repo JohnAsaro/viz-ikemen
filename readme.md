@@ -21,7 +21,7 @@ By default Viz-ikemen uses the "Kung Fu Man" (KFM) character as both the learner
 
 ## Whats Actually Happening?
 
-The reason we have to compile my fork of Ikemen GO is that the communication between the game and Python wrapper happens through a SQLite datebase called bridge.db. This obviously doesn't work natively, so I made the following modifications:
+The reason we have to compile my fork of Ikemen GO is that the communication between the game and Python wrapper happens through a SQL datebase called bridge.db. This obviously doesn't work natively, so I made the following modifications:
    - Added the fps parameter to the quick launch 
    - Adding SQLite functionality to the compiled game file
    - Adding a function in the games code that writes the screen buffer to bridge.db
