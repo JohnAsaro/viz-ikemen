@@ -48,4 +48,4 @@ These results, the model trained, and hyperparameters used can be found in PPO_r
 ## TODO
 
 - Formalize results such that they can actually be read somewhere other than a jank readme
-- Make enviornment into an API that can be installed through pip (its almost there, I just need the time to actually do it)
+- Make enviornment into an API that can be installed through pip 
