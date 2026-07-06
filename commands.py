@@ -11,3 +11,5 @@ ACTIONS = ["None", "Triple Kung Fu Palm", "Smash Kung Fu Upper", "Kung Fu Blocki
 
 ACTIONS_SAKURA = ["None", "Kick", "Fireball", "DP", "Walk Forward", "Walk Back", "Jump", "Crouch", "Jump Forward", "Jump Back",
             "Down Forward", "Down Back"]  # Sakura commands, index corresponds directly to the action mapping in external.zss
+
+ACTIONS_ANJI = ["None", "Walk Forward", "Walk Back", "Jump", "Crouch", "Jump Forward", "Jump Back", "Down Forward", "Down Back"]

@@ -1,5 +1,5 @@
 gymnasium
-numpy
+numpy==2.3.5
 opencv-python
 stable-baselines3[extra]
 tensorboard
