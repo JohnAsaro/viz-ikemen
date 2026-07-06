@@ -1,16 +1,7 @@
-# ikemen_wrapper_sb3.py
 # ikemen environment written to work with stable_baselines3 algorithms
-# uses PPO for training as an example
+# uses DQN for training as an example
 
-import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
-
-# Toggle NNPACK usage
-USE_NNPACK = True
-if not USE_NNPACK:
-    os.environ["OMP_NUM_THREADS"] = "1"
-    os.environ["MKL_NUM_THREADS"] = "1"
-    os.environ["TORCH_CPP_LOG_LEVEL"] = "ERROR"
-    
+import os
 import gymnasium as gym
 import cv2
 import time
@@ -21,7 +12,7 @@ import shutil
 from commands import ACTIONS_SAKURA
 import sqlite3
 import numpy as np
-from stable_baselines3 import PPO 
+from stable_baselines3 import DQN 
 from stable_baselines3.common.callbacks import BaseCallback 
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
@@ -124,7 +115,7 @@ class IkemenEnv(gym.Env):
             raise EnvironmentError("Headless mode is currently only supported on Linux systems.")
         
         if headless and not shutil.which("xvfb-run"):
-            raise EnvironmentError("xvfb-run is required for headless mode but was not found. Try installing it with: sudo apt install xvfb")
+            raise EnvironmentError("xvfb-run is required for headless mode but was not found. Try installing it with: sudo apt install xvfb, sudo dnf install xorg-x11-server-Xvfb, etc...")
 
         # Game parameters
         
@@ -158,7 +149,6 @@ class IkemenEnv(gym.Env):
         # Headless
         if headless:
             full_cmd = ["xvfb-run", "-a"] + cmd
-            print("WARNING: HEADLESS MODE HAS ONLY BEEN TESTED ON DEBAIN BASED SYSTEMS.")
         else:
             full_cmd = cmd
 
@@ -535,7 +525,7 @@ class IkemenEnv(gym.Env):
 
 
 # ------------------------------------------------------------------
-# PPO Training and evaluation
+# DQN Training and evaluation
 
 class TrainAndLogCallback(BaseCallback): # Save best model
     
@@ -579,7 +569,7 @@ class TrainAndLogCallback(BaseCallback): # Save best model
         
         return True
 
-def make_new_model_path(base_dir="RL_SAVES/models", prefix="PPO_"):
+def make_new_model_path(base_dir="RL_SAVES/models", prefix="DQN_"):
     """
     Create a new model path with an incremented number.
     - base_dir: The base directory where the model will be saved.
@@ -599,9 +589,9 @@ def make_new_model_path(base_dir="RL_SAVES/models", prefix="PPO_"):
     os.makedirs(new_path)
     return new_path
 
-def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=None):
+def train_DQN(env, timesteps=100000, check=10000, num_steps=2048, model_path=None):
     """
-    Train a PPO model on the Ikemen environment
+    Train a DQN model on the Ikemen environment
     - env: The Ikemen environment
     - timesteps: Total number of timesteps to train the model
     - check: Frequency to save the model
@@ -609,7 +599,7 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     - model_path: Path to an existing model to load, if None, a new model will be created
     """
 
-    episodes_log_path = os.path.join(RL_SAVES, "current_episode_log.db") # TODO: Make this make its own directory with PPO matching models and tensorboard number
+    episodes_log_path = os.path.join(RL_SAVES, "current_episode_log.db") # TODO: Make this make its own directory with DQN matching models and tensorboard number
 
     # Initialize the log DB if needed
     conn = sqlite3.connect(episodes_log_path)
@@ -625,51 +615,45 @@ def train_PPO(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     conn.close()
 
     verbose = 1 # Verbosity level for the model training
-    learning_rate = 0.0003 # Learning rate for the PPO model
-    batch_size = 64 # Batch size for the PPO model
-    n_epochs = 8 # Number of epochs for the PPO model
-    gamma = 0.99 # Discount factor for the PPO model
-    gae_lambda = 0.95 # GAE lambda for the PPO model
-    clip_range = 0.1 # Clipping range for the PPO model
-    device = "cuda" # Use GPU if available
+    learning_rate = 0.0003 # Learning rate for the DQN model
+    batch_size = 64 # Batch size for the DQN model
+    gamma = 0.99 # Discount factor for the DQN model
+    device = "auto" # DQN works well on cpu, but can be changed to "cuda" for GPU training
     tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
 
     if model_path is None: # If no model path is provided, create a new one
 
-        # Create PPO model
-        model = PPO(
+        # Create DQN model
+        model = DQN(
             "CnnPolicy",  # CNN policy for image observations
             env,
             verbose=verbose,
             learning_rate=learning_rate,
             n_steps=num_steps,
             batch_size=batch_size,
-            n_epochs=n_epochs,
             gamma=gamma,
-            gae_lambda=gae_lambda,
-            clip_range=clip_range,
             device=device,
             tensorboard_log=tensorboard_log # Tensorboard log path
         )
 
     else: 
-        # Load existing PPO model
-        model = PPO.load(model_path, env, device=device)
+        # Load existing DQN model
+        model = DQN.load(model_path, env, device=device)
 
-    new_model_path = make_new_model_path(base_dir=os.path.join(RL_SAVES, "models"), prefix="PPO_") # Create a new model path with an incremented number
+    new_model_path = make_new_model_path(base_dir=os.path.join(RL_SAVES, "models"), prefix="DQN_") # Create a new model path with an incremented number
     callback = TrainAndLogCallback(check_freq=check, save_path=new_model_path) # Callback to save the model every 'check' timesteps
 
     model.learn(total_timesteps=timesteps, callback=callback, progress_bar=True) # Train the model
 
-def test_ppo(env, model_path, n_episodes=10):
+def test_DQN(env, model_path, n_episodes=10):
     """
-    Test the trained PPO model on the Ikemen environment
+    Test the trained DQN model on the Ikemen environment
     - env: The Ikemen environment
     """ 
     total_reward = 0.0  # Start total reward at 0
-    model = PPO.load(model_path)  # Load the trained model
+    model = DQN.load(model_path)  # Load the trained model
 
-    episodes_log_path = os.path.join(RL_SAVES, "current_episode_log.db") # TODO: Make this make its own directory with PPO matching models and tensorboard number
+    episodes_log_path = os.path.join(RL_SAVES, "current_episode_log.db") # TODO: Make this make its own directory with DQN matching models and tensorboard number
 
     # Initialize the log DB if needed
     conn = sqlite3.connect(episodes_log_path)
@@ -709,7 +693,7 @@ def make_env(instance_id = "test", n_steps=8192, ai_level=1, showcase=False, log
             n_steps=n_steps,
             showcase=showcase,
             step_delay=0.01666666666,
-            headless=False,
+            headless=True,
             speed=0,
             fps=60,
             log_episode_result=log_episode_result, 
@@ -721,9 +705,9 @@ if __name__ == "__main__":
     
     n_steps = 8192 # Number of steps to take before revaluting the policy
     #env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
-    instances = 1
-    env = SubprocVecEnv([make_env(i, n_steps=n_steps, log_episode_result=True, showcase=True) for i in range(instances)]) # train env
-    train_PPO(env, timesteps=1000000, check=n_steps, num_steps=n_steps)
+    instances = 8
+    env = SubprocVecEnv([make_env(i, n_steps=n_steps, log_episode_result=True) for i in range(instances)]) # train env
+    train_DQN(env, timesteps=4096000, check=n_steps, num_steps=n_steps)
     #env = DummyVecEnv([make_env(instance_id ="test", showcase=True, log_episode_result=False)]) # test env
-    #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_1", "model_2048000"), n_episodes=999)  # Test the trained model
+    #test_DQN(env, model_path=os.path.join(RL_SAVES, "models", "DQN_1", "model_2048000"), n_episodes=999)  # Test the trained model
     

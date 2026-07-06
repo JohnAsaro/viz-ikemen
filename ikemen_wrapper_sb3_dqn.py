@@ -1,16 +1,7 @@
-# ikemen_wrapper_sb3.py
 # ikemen environment written to work with stable_baselines3 algorithms
 # uses DQN for training as an example
 
-import os #To save the model to the correct pathfrom stable_baselines3.common.callbacks import BaseCallback #Import the BaseCallback class from stable_baselines3 to learn from the environment
-
-# Toggle NNPACK usage
-USE_NNPACK = True
-if not USE_NNPACK:
-    os.environ["OMP_NUM_THREADS"] = "1"
-    os.environ["MKL_NUM_THREADS"] = "1"
-    os.environ["TORCH_CPP_LOG_LEVEL"] = "ERROR"
-    
+import os
 import gymnasium as gym
 import cv2
 import time
@@ -117,10 +108,10 @@ class IkemenEnv(gym.Env):
             raise RuntimeError("You can't showcase and be headless at the same time, choose one or the other!")
 
         if headless and platform.system() != "Linux":
-            raise EnvironmentError("Headless mode is currently only suDQNrted on Linux systems.")
+            raise EnvironmentError("Headless mode is currently only supported on Linux systems.")
         
         if headless and not shutil.which("xvfb-run"):
-            raise EnvironmentError("xvfb-run is required for headless mode but was not found. Try installing it with: sudo apt install xvfb")
+            raise EnvironmentError("xvfb-run is required for headless mode but was not found. Try installing it with: sudo apt install xvfb, sudo dnf install xorg-x11-server-Xvfb, etc...")
 
         # Game parameters
         
@@ -154,7 +145,6 @@ class IkemenEnv(gym.Env):
         # Headless
         if headless:
             full_cmd = ["xvfb-run", "-a"] + cmd
-            print("WARNING: HEADLESS MODE HAS ONLY BEEN TESTED ON DEBAIN BASED SYSTEMS.")
         else:
             full_cmd = cmd
 
@@ -624,7 +614,7 @@ def train_DQN(env, timesteps=100000, check=10000, num_steps=2048, model_path=Non
     learning_rate = 0.0003 # Learning rate for the DQN model
     batch_size = 64 # Batch size for the DQN model
     gamma = 0.99 # Discount factor for the DQN model
-    device = "cpu" # DQN works well on cpu, but can be changed to "cuda" for GPU training
+    device = "auto" # Set to cuda to force GPU training
     tensorboard_log=os.path.join(RL_SAVES, "tensorboard") # Tensorboard log path
 
     if model_path is None: # If no model path is provided, create a new one
