@@ -37,15 +37,18 @@ The pipeline is: Python wrapper writes an action to bridge.db, external_interfac
 
 ## Results
 
-After training a model for with PPO 2048000 steps, it reached a 90% winrate against the level 1 CPU training partner. 
+After training a model for with PPO 2048000 steps, it reached a 90% winrate against the level 1 CPU training partner.
 
-After training a model for with a DQN 2048000 steps, it converged to a 100% winrate against the level 1 CPU training partner. 
+After training a model for with a DQN 2048000 steps, it converged to a 100% winrate against the level 1 CPU training partner.
 
-The DQN model reached a solution much faster. In the DQN, the model converged to a 100% winrate solution at batch 75. In the PPO model, convergence never occured, and the model was still improving at 2048000 steps (batch 250). 
+The DQN model reached a solution much faster. In the DQN, the model converged to a 100% winrate solution at batch 75. In the PPO model, convergence never occured, and the model was still improving at 2048000 steps (batch 250).
 
 These results, the model trained, and hyperparameters used can be found in PPO_results and DQN_results respectively.
 
-## TODO
+A video of a first to 10 between the DQN trained model and a level 1 Kung Fu Man CPU can be found [here](https://www.youtube.com/watch?v=XqVZMRcSQfY). 
 
-- Formalize results such that they can actually be read somewhere other than a jank readme
-- Write other things that can be done with this project to encourage further development from anyone who might be interested
+## Future Directions:
+
+What is in this repository is a proof of concept, plenty of things can be done with the Viz Ikemen environment. ./old_wrappers/ikemen_wrapper_base.py is a version of the Viz Ikemen wrapper not dependent on stablebaselines3, this can be used as a base for experimentation with other visual learning algorithms. ./old_wrappers/ikemen_random_launch.py shows an example of Kung Fu Man doing random actions using the base ikemen wrapper. Viz Ikemen is not limited to Kung Fu Man, and can be used with any character supported by Ikemen GO. [Here](https://youtu.be/ZFlr3VPXS8M) is an example of a level 1 Kung Fu Man CPU fighting a version of potsmugen's Sakura after it was trained for 60000 steps with the same DQN setup and an action space limited to Neutral, Light Kick, Light Fireball, Light Dragon Punch and the 8 cardinal directions. 
+
+This project was very fun to work on, if you are interested please feel free to fork and tinker around with it. I'd be happy to answer any questions.
