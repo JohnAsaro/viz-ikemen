@@ -1,9 +1,0 @@
-NOTES: 
-
-- Don't reszie the window it breaks it
-- Don't resize window 
-- Headless only works on linux
-
-
-TODO:
-- turn into full fledged library

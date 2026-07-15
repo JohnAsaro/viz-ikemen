@@ -708,8 +708,8 @@ if __name__ == "__main__":
     n_steps = 8192 # Number of steps to take before revaluting the policy
     #env = IkemenEnv(ai_level=1, screen_width=80, screen_height=60, show_capture=False, n_steps=n_steps, showcase=False, step_delay = 0.01666666666, headless = False, speed = 0, fps = 60, log_episode_result=False, instance_id=1)  # Create the Ikemen environment
     #instances = 8
-    #env = SubprocVecEnv([make_env(i, n_steps=n_steps, log_episode_result=True) for i in range(instances)]) # train env
-    #train_PPO(env, timesteps=4096000*4, check=n_steps, num_steps=n_steps)
-    env = DummyVecEnv([make_env(instance_id ="test", showcase=True, log_episode_result=False)]) # test env
-    test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_1", "model_2048000"), n_episodes=999)  # Test the trained model
+    env = SubprocVecEnv([make_env(i, n_steps=n_steps, log_episode_result=True) for i in range(instances)]) # train env
+    train_PPO(env, timesteps=4096000*4, check=n_steps, num_steps=n_steps)
+    #env = DummyVecEnv([make_env(instance_id ="test", showcase=True, log_episode_result=False)]) # test env
+    #test_ppo(env, model_path=os.path.join(RL_SAVES, "models", "PPO_1", "model_2048000"), n_episodes=999)  # Test the trained model
     
