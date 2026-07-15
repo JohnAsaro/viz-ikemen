@@ -23,3 +23,4 @@ RL_SAVES/*
 !RL_SAVES/current_episode_log.db
 presentation_stuff
 sakura_env
+ikemen_wrapper_sb3_sakura.py

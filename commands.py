@@ -1,5 +1,3 @@
-# commands.py  -------------------------------------------
-
 ACTIONS = ["None", "Triple Kung Fu Palm", "Smash Kung Fu Upper", "Kung Fu Blocking (Air/High)", "Kung Fu Blocking (Low)",
             "Light KF Upper", "Strong KF Upper", "Fast KF Upper", "Light KF Palm", "Strong KF Palm", "Fast KF Palm", 
             "Light KF Blow", "Strong KF Blow", "Fast KF Blow", "Light KF Zankou", "Strong KF Zankou", "Fast KF Zankou", 
@@ -9,5 +7,4 @@ ACTIONS = ["None", "Triple Kung Fu Palm", "Smash Kung Fu Upper", "Kung Fu Blocki
             "Forward Throw", "Back Throw", "Walk Forward", "Walk Back", "Jump", "Crouch", "Jump Forward", "Jump Back",
             "Down Forward", "Down Back", "Taunt"]  # KFMs commands, index corresponds directly to the action mapping in external.zss
 
-ACTIONS_SAKURA = ["None", "Kick", "Fireball", "DP", "Walk Forward", "Walk Back", "Jump", "Crouch", "Jump Forward", "Jump Back",
-            "Down Forward", "Down Back"]  # Sakura commands, index corresponds directly to the action mapping in external.zss
+
